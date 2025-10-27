@@ -176,22 +176,4 @@ public class SubmittedReport {
     public void setReviewerStaff(Staff reviewerStaff) {
         this.reviewerStaff = reviewerStaff;
     }
-
-
-
-    public LostItem getLostItem() {
-        return lostItem;
-    }
-    public void setLostItem(LostItem lostItem) {
-        this.lostItem = lostItem;
-    }
-
-
-
-    public FoundItem getFoundItem() {
-        return foundItem;
-    }
-    public void setFoundItem(FoundItem foundItem) {
-        this.foundItem = foundItem;
-    }
 }

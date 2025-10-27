@@ -19,7 +19,7 @@ public class Claim {
     private String status;
 
     @Column(name = "date_submitted", nullable = false)
-    private LocalDateTime date_submitted;
+    private LocalDateTime dateSubmitted;
 
     // Relationships
 

@@ -3,8 +3,8 @@ package com.example.appdev.returnhub.repositor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.example.appdev.returnhub.entity.notification;
+import com.example.appdev.returnhub.entity.Notification;
 
 @Repository
-public interface notificationRepository extends JpaRepository<notification, Integer> {
+public interface NotificationRepository extends JpaRepository<Notification, Integer> {
 }
