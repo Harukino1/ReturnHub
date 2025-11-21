@@ -1,0 +1,72 @@
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--white);
+  box-shadow: 0 2px 8px rgba(17, 24, 39, .08);
+}
+.nav-inner {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.nav-left { display: flex; align-items: center; gap: 2rem; }
+.nav-right { display: flex; align-items: center; gap: .75rem; }
+.logo { font-weight: 800; font-size: 1.5rem; color: #78350f; }
+.logo-sep { color: var(--amber-700); }
+.menu { display: none; align-items: center; gap: 2rem; }
+.menu a { color: #374151; font-weight: 500; transition: color .2s ease; }
+.menu a:hover { color: var(--amber-700); }
+
+.nav-auth { display: none; align-items: center; gap: .75rem; }
+.nav-login {
+  padding: .5rem 1rem;
+  color: var(--amber-700);
+  font-weight: 600;
+  border-radius: .5rem;
+}
+.nav-login:hover { background: #fff7ed; }
+.nav-signup {
+  padding: .5rem 1.25rem;
+  background-image: linear-gradient(to right, var(--amber-600), var(--amber-700));
+  color: var(--white);
+  font-weight: 600;
+  border-radius: .5rem;
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: .5rem;
+  border: 1px solid #e5e7eb;
+  background: var(--white);
+  color: #374151;
+  cursor: pointer;
+}
+.theme-toggle:hover { background: #f9fafb; }
+
+.mobile-trigger { display: block; color: #374151; background: transparent; border: 0; cursor: pointer; }
+.mobile-trigger:hover { color: var(--amber-700); }
+
+.mobile-menu { padding-bottom: 1rem; border-top: 1px solid #e5e7eb; }
+.mobile-menu a { display: block; padding: .75rem; border-radius: .5rem; color: #374151; }
+.mobile-menu a:hover { background: #fff7ed; color: var(--amber-700); }
+
+.mobile-auth { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e5e7eb; display: grid; gap: .5rem; }
+.mobile-auth .nav-login,
+.mobile-auth .nav-signup { width: 100%; text-align: center; display: inline-block; }
+.mobile-auth .nav-login { background: transparent; }
+.mobile-auth .nav-signup { border-radius: .5rem; }
+
+@media (min-width: 768px) {
+  .menu { display: flex; }
+  .nav-auth { display: flex; }
+  .mobile-trigger { display: none; }
+  .mobile-menu { display: none !important; }
+}
+

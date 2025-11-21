@@ -1,4 +1,5 @@
 import { Zap, Lock, MessageCircle, Heart, Smartphone, AlertCircle } from 'lucide-react'
+import '../../styles/components/Features.css'
 
 const features = [
   {

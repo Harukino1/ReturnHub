@@ -1,5 +1,3 @@
-import './index.css'
-import './styles/global.css'
 import { useEffect, useState } from 'react'
 import LandingPage from './pages/LandingPage'
 import AuthPage from './pages/AuthPage'

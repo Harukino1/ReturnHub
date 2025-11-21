@@ -1,0 +1,18 @@
+.cta {
+  background-image: linear-gradient(to right, var(--amber-600), var(--orange-600));
+  padding: 4rem 0;
+  color: var(--white);
+  text-align: center;
+}
+.cta h2 { font-size: clamp(1.75rem, 3vw, 2.5rem); font-weight: 800; margin: 0 0 1rem; }
+.cta p { font-size: 1.125rem; color: #fffbeb; margin: 0 0 2rem; }
+.cta-actions { display: grid; grid-auto-flow: row; gap: .75rem; justify-content: center; }
+.cta .btn-white { background: var(--white); color: var(--amber-700); }
+.cta .btn-white:hover { background: #fff7ed; }
+.cta .btn-outline-white { background: var(--amber-700); color: var(--white); border: 2px solid var(--white); }
+.cta .btn-outline-white:hover { background: transparent; }
+
+@media (min-width: 768px) {
+  .cta-actions { grid-auto-flow: column; }
+}
+

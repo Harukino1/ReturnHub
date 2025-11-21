@@ -1,0 +1,12 @@
+.landing-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.landing-page > section,
+.landing-page > nav,
+.landing-page > footer {
+  width: 100%;
+}
+

@@ -1,5 +1,6 @@
 import { Menu, X, Sun, Moon } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import '../../styles/components/Navbar.css'
 
 export default function Navbar({ menuOpen, setMenuOpen }) {
   const [theme, setTheme] = useState('light')
@@ -28,9 +29,9 @@ export default function Navbar({ menuOpen, setMenuOpen }) {
             >
               {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
             </button>
-            <div className="auth">
-              <a className="login" href="#/auth/login">Login</a>
-              <a className="signup" href="#/auth/signup">Sign Up</a>
+            <div className="nav-auth">
+              <a className="nav-login" href="#/auth/login">Login</a>
+              <a className="nav-signup" href="#/auth/signup">Sign Up</a>
             </div>
             <button className="mobile-trigger" aria-label="Toggle menu" onClick={() => setMenuOpen(!menuOpen)}>
               {menuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -44,8 +45,8 @@ export default function Navbar({ menuOpen, setMenuOpen }) {
             <a href="#features" onClick={() => setMenuOpen(false)}>Features</a>
             <a href="#/contact" onClick={() => setMenuOpen(false)}>Contact Us</a>
             <div className="mobile-auth">
-              <a className="login" href="#/auth/login" onClick={() => setMenuOpen(false)}>Login</a>
-              <a className="signup" href="#/auth/signup" onClick={() => setMenuOpen(false)}>Sign Up</a>
+              <a className="nav-login" href="#/auth/login" onClick={() => setMenuOpen(false)}>Login</a>
+              <a className="nav-signup" href="#/auth/signup" onClick={() => setMenuOpen(false)}>Sign Up</a>
             </div>
           </div>
         )}
