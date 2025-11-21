@@ -1,0 +1,136 @@
+ReturnHub — Lost & Found Management System
+
+Table of Contents
+1. Project Purpose / Business Justification
+2. Objectives
+3. Scope
+4. Deliverables
+5. Architecture & Technology Choices
+6. Data Model Summary
+7. Feature / Function Flows
+8. API & UX Surface
+9. Security, Privacy & Compliance
+10. Non-Functional Requirements
+11. Development Practices, CI/CD, Testing, Deployment
+12. Acceptance Criteria / Test Cases
+13. Operational Runbook
+14. Post-Launch Suggestions
+15. Roadmap
+
+1. Project Purpose / Business Justification
+- Centralizes lost-and-found handling for organizations and improves claim resolution.
+- Benefits: faster return rates, chain of custody, fewer complaints, actionable analytics.
+- Success measures: match rate within X days, average resolution time, staff time saved.
+
+2. Objectives
+- Secure registration, authentication, and profile verification.
+- Submit, search, edit, and track lost/found reports with photos and metadata.
+- Staff review, post items, verify claims, and schedule pickups.
+- Real-time notifications for status changes and matches.
+- Robust claim verification with proof and checklist; audit logs and reporting.
+
+3. Scope
+In-Scope
+- React frontend (responsive).
+- Spring Boot backend.
+- MySQL database; Supabase storage for photos.
+- JWT auth (access + refresh) with bcrypt hashing.
+- RBAC (USER_FOUND, USER_LOST, STAFF, ADMIN).
+- Search and automated fuzzy matching.
+- Real-time messaging and push/browser notifications.
+- Claim workflow with proof, verification, scheduling.
+
+4. Deliverables
+- Frontend React ; Backend Spring Boot.
+- MySQL schemas and migrations.
+- Suoabase storage.
+
+5. Architecture & Technology Choices
+- Frontend: React (TypeScript), Router, React.
+- Backend: Spring Boot (Java 17+), Security, Data JPA.
+- DB: MySQL 8.x with indexing and FK constraints.
+- Storage: Supabase URLs.
+- Notifications.
+- Search/Matching: full-text + simple fuzzy.
+
+6. Data Model Summary
+- users: id, name, email(unique), phone, password_hash, role(ENUM), is_verified, created_at, updated_at.
+- submitted_reports: id, submitter_id(FK), type(ENUM LOST|FOUND), category, description(TEXT), date_of_event(DATE), location, status(ENUM), photos(JSON URLs), reviewer_staff_id, date_submitted, date_reviewed.
+- lost_items / found_items: id, submitted_report_id(FK), posted_by_staff_id(FK), status(ENUM), created_at.
+- claims: id, lost_item_id(FK), found_item_id(FK), claimer_user_id(FK), proof_urls(JSON), status(ENUM), verified_by_staff_id, pickup_schedule(datetime), created_at, updated_at.
+- conversations: id, user_id(FK), staff_id(FK), last_message_at.
+- messages: id, conversation_id(FK), sender_user_id(nullable), sender_staff_id(nullable), content(TEXT), attachments(JSON), created_at.
+- notifications: id, user_id(FK), type, message, metadata(JSON), is_read, created_at.
+- audit_logs: id, actor_id, actor_role, action, target_type, target_id, details(JSON), timestamp.
+- Indexes: users.email, submitted_reports(type,status,location), claims.status, full-text on submitted_reports.description.
+
+7. Feature / Function Flows
+Common: Register & Login
+- Register: validate, hash password(bcrypt), email verify, set is_verified true.
+- Login: JWT access(15m) + refresh cookie; refresh endpoint.
+Lost-Item User: Submit Lost Report
+- Form: category, description(min 20), date, location, photos(1–5), tags.
+- Upload via pre-signed URLs; create report(type LOST, status PENDING).
+- Edit while PENDING/REVIEWED; track status; claim flow with proof upload.
+Found-Item User: Report Found Item
+- Form: description, location, time, photos; optional anonymity.
+- Create report(type FOUND, status PENDING); record handover.
+- Keep private contact accessible to staff only if anonymous.
+Staff Workflows
+- Review queue, annotate, REJECT or POST; create LostItem/FoundItem.
+- Verify claims with checklist; approve/reject; schedule pickup; audit logs.
+Matching Algorithm
+- Deterministic rules + fuzzy scoring; match threshold 0.75; notify parties.
+
+8. API & UX Surface
+Core REST endpoints
+- POST /api/auth/register
+- GET /api/auth/verify?token=...
+- POST /api/auth/login
+- POST /api/auth/refresh
+- POST /api/auth/logout
+- GET /api/reports?type=LOST|FOUND&status=&q=&page=&size=
+- GET /api/reports/{id}
+- POST /api/reports
+- PUT /api/reports/{id}
+- DELETE /api/reports/{id}
+
+Additional endpoints
+- POST /api/uploads/presigned
+- POST /api/claims
+- GET /api/claims/{id}
+- PUT /api/claims/{id}/cancel
+- GET /api/staff/reports?status=PENDING
+- POST /api/staff/reports/{id}/review
+- POST /api/staff/claims/{id}/verify
+- GET /api/conversations
+- POST /api/conversations/{id}/messages
+- GET /api/notifications
+- POST /api/notifications/mark-read
+UI Screens (React)
+- Landing/Home with search and filters
+- Register/Login/
+- User Profile & verification
+- Report Lost/Found forms
+- My Reports, Report Detail, Edit
+- Public Listings feed
+- Claim flow & history
+- Messaging/Conversations
+- Staff Dashboard: Pending Queue, Review Detail, Claims Queue, Pickup Scheduling, Admin (Users/Staff/Audit/Settings)
+- Notifications panel/toasts
+Payload example (create report)
+POST /api/reports
+{
+  "type": "LOST",
+  "category": "Electronics/Phone",
+  "description": "Black Samsung A13 with gray case. Scratch near camera. Lost on 2025-11-10 at Gate 3.",
+  "date_of_event": "2025-11-10",
+  "location": "Gate 3, North Terminal",
+  "photos": ["https://supabaseurl/.../photo1.jpg"],
+  "tags": ["samsung", "black", "serial:SN12345"]
+}
+
+9. Security, Privacy & Compliance
+- RBAC and server-side authorization checks.
+- Minimize data; encrypt proofs at rest.
+- Data export/deletion; retention policy for photos (e.g., 90 days if unclaimed).

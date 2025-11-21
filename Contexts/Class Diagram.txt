@@ -1,0 +1,90 @@
+ReturnHub Class Diagram
+
+Staff
+- staffId: int
+- name: string
+- email: string
+- password: string
+Methods
++ login(email: string, password: string): bool
++ reviewReport(reportId: int): void
++ postItem(item: LostItem | FoundItem): void
++ verifyClaim(claim: Claim): void
++ sendMessage(conversationId: int, content: string): void
+
+User
+- userId: int
+- name: string
+- email: string
+- phone: string
+- password: string
+- isVerified: bool
+Methods
++ login(email: string, password: string): bool
++ register(name: string, email: string, phone: string, password: string): bool
++ submitReport(report: SubmittedReport): void
++ makeClaim(claim: Claim): void
++ sendMessage(conversationId: int, content: string): void
+
+SubmittedReport
+- reportId: int
+- submitterId: int
+- type: string
+- category: string
+- description: string
+- dateOfEvent: date
+Methods
++ updateStatus(status: string): void
+
+Conversation
+- conversationId: int
+- userId: int
+- staffId: int
+Methods
++ getMessages(): List
+
+Notification
+- notificationId: int
+- userId: int
+- message: string
+- isRead: bool
+- createdAt: date
+Methods
++ markAsRead(): void
+
+FoundItem
+- itemId: int
+- submittedReportId: int
+- postedByStaffId: int
+- status: string
+- createdAt: date
+Methods
++ updateStatus(status: string): void
+
+LostItem
+- itemId: int
+- submittedReportId: int
+- postedByStaffId: int
+- status: string
+- createdAt: date
+Methods
++ updateStatus(status: string): void
+
+Message
+- messageId: int
+- conversationId: int
+- senderUserId: int
+- senderStaffId: int
+- content: string
+Methods
++ send(): void
+
+Claim
+- claimId: int
+- lostItemId: int
+- foundItemId: int
+- claimerUserId: int
+- proofDocumentUrl: string
+Methods
++ approveClaim(): void
++ rejectClaim(): void

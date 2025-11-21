@@ -1,0 +1,33 @@
+ACTORS
+- User (Lost an Item)
+- User (Found an Item)
+- Staff
+
+COMMON USE CASES
+- Login
+- Register
+
+LOST-ITEM USER USE CASES
+- Look for an item lost
+- Report an Item Lost
+- Ask for claim
+- Message staff
+- Picking the item
+- Edit/Update lost report
+- View claim request status
+- Cancel claim request
+
+FOUND-ITEM USER USE CASES
+- Hand over the item that is found
+- Ask staff they seen the item
+
+STAFF USE CASES
+- Review the lost report
+- Accepts claim request
+- Schedule for claiming
+- Manage lost and found items
+- Keeping the items found
+- Contact user
+- Notify users about matched found items
+- Verify the item that was seen by the founder
+
