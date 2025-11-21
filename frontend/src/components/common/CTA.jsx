@@ -1,3 +1,5 @@
+import '../../styles/components/CTA.css'
+
 export default function CTA({ onNavigate }) {
   return (
     <section className="cta">

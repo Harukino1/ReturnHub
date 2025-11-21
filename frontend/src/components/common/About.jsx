@@ -1,3 +1,6 @@
+import '../../styles/components/About.css'
+import randomStuff from '../../assets/random-stuff.png'
+
 export default function About() {
   return (
     <section id="about" className="about">
@@ -10,9 +13,7 @@ export default function About() {
           </div>
           <div>
             <div className="about-illustration">
-              <div>
-                <p className="illustration-title">Illustration Placeholder</p>
-              </div>
+              <img className="about-image" src={randomStuff} alt="Assortment of recovered belongings" />
             </div>
           </div>
         </div>

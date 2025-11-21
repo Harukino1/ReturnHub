@@ -1,4 +1,6 @@
 import { Plus, Search } from 'lucide-react'
+import '../../styles/components/Hero.css'
+import logo from '../../assets/logo_retrurnhub.png'
 
 export default function Hero({ onNavigate }) {
   return (
@@ -15,10 +17,7 @@ export default function Hero({ onNavigate }) {
         </div>
         <div className="hero-illustration">
           <div className="illustration-box">
-            <div style={{ textAlign: 'center' }}>
-              <Search size={80} color="#d97706" style={{ opacity: .2, display: 'block', margin: '0 auto' }} />
-              <p className="illustration-title">Illustration Placeholder</p>
-            </div>
+            <img className="hero-logo" src={logo} alt="ReturnHub logo" />
           </div>
         </div>
       </div>

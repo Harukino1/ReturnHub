@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Mail, Lock, User, Phone, ArrowRight, Eye, EyeOff } from 'lucide-react'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
+import '../styles/pages/AuthPage.css'
 
 export default function AuthPage({ authMode = 'login' }) {
   const [isLogin, setIsLogin] = useState(true)
@@ -33,9 +34,9 @@ export default function AuthPage({ authMode = 'login' }) {
   }
 
   return (
-    <div className="page">
+    <div className="auth-page">
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-      <section className="auth">
+      <section className="auth-section">
         <div className="container">
           <div className="auth-grid">
             <div className="auth-left">

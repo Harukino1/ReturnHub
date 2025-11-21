@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
+import '../styles/pages/ContactPage.css'
 
 export default function ContactPage() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -23,9 +24,9 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="page">
+    <div className="contact-page">
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-      <section className="contact">
+      <section className="contact-section">
         <div className="container">
           <div className="contact-grid">
             <div>
