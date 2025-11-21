@@ -1,18 +1,20 @@
 import { useState } from 'react'
-import Navbar from '../shared/Navbar'
-import Hero from '../sections/Hero'
-import Features from '../sections/Features'
-import CTA from '../sections/CTA'
-import Footer from '../shared/Footer'
+import Navbar from '../components/layout/Navbar'
+import Hero from '../components/common/Hero'
+import About from '../components/common/About'
+import Features from '../components/common/Features'
+import CTA from '../components/common/CTA'
+import Footer from '../components/layout/Footer'
 
 export default function LandingPage() {
   const [menuOpen, setMenuOpen] = useState(false)
   return (
     <div className="page">
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-      <Hero />
+      <Hero onNavigate={(t)=>window.location.hash=t==='auth'?'#/auth/login':`#${t}`} />
+      <About />
       <Features />
-      <CTA />
+      <CTA onNavigate={(t)=>window.location.hash=t==='auth'?'#/auth/login':`#${t}`} />
       <Footer />
     </div>
   )

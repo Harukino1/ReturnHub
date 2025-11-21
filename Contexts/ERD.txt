@@ -1,0 +1,87 @@
+ENTITY RELATIONSHIP DIAGRAM
+
+STAFF
+- staff_id: Integer PK
+- name: Varchar(100) NOT_NULL
+- email: Varchar(100) NOT_NULL
+- password: Varchar(100) NOT_NULL
+- role: Varchar(20) NOT_NULL
+
+USER
+- user_id: Integer PK NOT_NULL
+- name: Varchar(100) NOT_NULL
+- email: Varchar(100) NOT_NULL
+- phone: Varchar(15) NOT_NULL
+- password: Varchar(100) NOT_NULL
+- is_verified: Boolean NOT_NULL
+- created_at: Timestamp NOT_NULL
+
+NOTIFICATION
+- notification_id: Integer PK
+- user_id: Integer FK
+- message: Text
+- is_read: Boolean NOT_NULL
+- created_at: Timestamp NOT_NULL
+
+CONVERSATION
+- conversation_id: Integer PK
+- user_id: Integer FK
+- staff_id: Integer FK
+
+MESSAGE
+- message_id: Integer PK NOT_NULL
+- conversation_id: Integer FK
+- sender_user_id: Integer
+- sender_staff_id: Integer
+- content: Text
+- created_at: Timestamp
+
+SUBMITTEDREPORT
+- report_id: Integer PK NOT_NULL
+- submitter_user_id: Integer NOT_NULL
+- type: Varchar(20)
+- category: Varchar(50)
+- description: Text
+- date_of_event: Varchar(20)
+- location: Varchar(100)
+- status: Varchar(20)
+- photos_url: Varchar(200)
+- reviewer_staff_id: Integer
+- date_submitted: Timestamp
+- date_reviewed: Timestamp
+
+LOSTITEM
+- item_id: Integer PK NOT_NULL
+- submitted_report_id: Integer FK
+- posted_by_staff_id: Integer FK
+- status: Varchar(20) NOT_NULL
+- created_at: Timestamp NOT_NULL
+
+FOUNDITEM
+- item_id: Integer PK NOT_NULL
+- submitted_report_id: Integer FK
+- posted_by_staff_id: Integer FK
+- status: Varchar(20) NOT_NULL
+- created_at: Timestamp NOT_NULL
+
+CLAIM
+- claim_id: Integer PK NOT_NULL
+- lost_item_id: Integer FK
+- found_item_id: Integer FK
+- claimer_user_id: Integer FK
+- proof_document_url: Varchar(200) NOT_NULL
+- verified_by_staff_id: Integer NOT_NULL
+- date_submitted: Timestamp NOT_NULL
+
+RELATIONSHIPS
+- USER submits SUBMITTEDREPORT
+- STAFF verifies SUBMITTEDREPORT
+- SUBMITTEDREPORT links to LOSTITEM
+- SUBMITTEDREPORT links to FOUNDITEM
+- STAFF posts LOSTITEM
+- STAFF posts FOUNDITEM
+- USER makes CLAIM
+- CLAIM links to LOSTITEM and FOUNDITEM
+- USER receives NOTIFICATION
+- USER and STAFF start CONVERSATION
+- CONVERSATION contains MESSAGE
