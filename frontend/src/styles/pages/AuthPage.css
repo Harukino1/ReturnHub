@@ -36,6 +36,16 @@
   justify-content: center;
   background: var(--white);
 }
+.auth-illustration {
+  border: 2px solid #d1d5db;
+  border-radius: .75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  overflow: hidden;
+}
+.auth-image { width: 100%; height: 100%; object-fit: contain; }
 .auth-right { padding: 2rem; min-width: 320px; }
 .auth-title { font-weight: 800; font-size: clamp(1.75rem,3vw,2.5rem); color: var(--gray-900); margin: 0 0 .25rem; }
 .auth-subtitle { color: #6b7280; margin: 0 0 1.5rem; }
@@ -95,6 +105,7 @@
   border-color: #1f2937;
   background: #0b0e14;
 }
+[data-theme='dark'] .auth-illustration { border-color: #1f2937; background: transparent; }
 
 [data-theme='dark'] .auth-error-message {
   background: #7f1d1d;

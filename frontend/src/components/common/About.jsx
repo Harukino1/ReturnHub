@@ -1,5 +1,5 @@
 import '../../styles/components/About.css'
-import randomStuff from '../../assets/random-stuff.png'
+import logo from '../../assets/logo_retrurnhub.png'
 
 export default function About() {
   return (
@@ -13,7 +13,7 @@ export default function About() {
           </div>
           <div>
             <div className="about-illustration">
-              <img className="about-image" src={randomStuff} alt="Assortment of recovered belongings" />
+              <img className="about-image" src={logo} alt="ReturnHub logo" />
             </div>
           </div>
         </div>

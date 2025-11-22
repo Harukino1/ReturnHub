@@ -1,6 +1,6 @@
 import { Plus, Search } from 'lucide-react'
 import '../../styles/components/Hero.css'
-import logo from '../../assets/logo_retrurnhub.png'
+import randomStuff from '../../assets/random-stuff.png'
 
 export default function Hero({ onNavigate }) {
   return (
@@ -17,7 +17,7 @@ export default function Hero({ onNavigate }) {
         </div>
         <div className="hero-illustration">
           <div className="illustration-box">
-            <img className="hero-logo" src={logo} alt="ReturnHub logo" />
+            <img className="hero-logo" src={randomStuff} alt="Assortment of recovered belongings" />
           </div>
         </div>
       </div>
