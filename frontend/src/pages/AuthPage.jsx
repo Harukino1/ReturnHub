@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Mail, Lock, User, Phone, ArrowRight, Eye, EyeOff } from 'lucide-react'
+import { Mail, Lock, User, Phone, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react'
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import '../styles/pages/AuthPage.css'
+
+const API_BASE_URL = 'http://localhost:8080/api/users'
 
 export default function AuthPage({ authMode = 'login' }) {
   const [isLogin, setIsLogin] = useState(true)
@@ -11,6 +13,8 @@ export default function AuthPage({ authMode = 'login' }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [formData, setFormData] = useState({ email: '', password: '', confirmPassword: '', fullName: '', phone: '' })
   const [errors, setErrors] = useState({})
+  const [isLoading, setIsLoading] = useState(false)
+  const [submitError, setSubmitError] = useState('')
 
   useEffect(() => { setIsLogin(authMode !== 'signup') }, [authMode])
 
@@ -18,19 +22,152 @@ export default function AuthPage({ authMode = 'login' }) {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }))
+    if (submitError) setSubmitError('')
   }
+
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-  const handleSubmit = () => {
+  const validatePhone = (phone) => /^[\d\s\-\+\(\)]+$/.test(phone) && phone.replace(/\D/g, '').length >= 10
+
+  const validateForm = () => {
     const newErrors = {}
-    if (!formData.email || !validateEmail(formData.email)) newErrors.email = 'Please enter a valid email'
-    if (!formData.password || formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters'
-    if (!isLogin) {
-      if (!formData.fullName || formData.fullName.length < 2) newErrors.fullName = 'Please enter your full name'
-      if (!formData.phone || formData.phone.length < 10) newErrors.phone = 'Please enter a valid phone number'
-      if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match'
+    
+    if (!formData.email || !validateEmail(formData.email)) {
+      newErrors.email = 'Please enter a valid email address'
     }
-    if (Object.keys(newErrors).length) { setErrors(newErrors); return }
-    console.log(isLogin ? 'Login' : 'Signup', formData)
+    
+    if (!formData.password || formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters'
+    }
+    
+    if (!isLogin) {
+      if (!formData.fullName || formData.fullName.trim().length < 2) {
+        newErrors.fullName = 'Please enter your full name (at least 2 characters)'
+      }
+      
+      if (!formData.phone || !validatePhone(formData.phone)) {
+        newErrors.phone = 'Please enter a valid phone number (at least 10 digits)'
+      }
+      
+      if (formData.password !== formData.confirmPassword) {
+        newErrors.confirmPassword = 'Passwords do not match'
+      }
+    }
+    
+    return newErrors
+  }
+  const handleSubmit = async (e) => {
+    e?.preventDefault()
+    setSubmitError('')
+    
+    const newErrors = validateForm()
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors)
+      return
+    }
+
+    setIsLoading(true)
+    setErrors({})
+
+    try {
+      if (isLogin) {
+        // Login
+        const response = await fetch(`${API_BASE_URL}/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: formData.email.trim(),
+            password: formData.password,
+          }),
+        })
+
+        let data
+        try {
+          data = await response.json()
+        } catch (jsonError) {
+          console.error('JSON parse error:', jsonError)
+          setSubmitError('Server error. Please try again later.')
+          setIsLoading(false)
+          return
+        }
+
+        if (!response.ok) {
+          setSubmitError(data.message || `Login failed (${response.status}). Please check your credentials.`)
+          setIsLoading(false)
+          return
+        }
+
+        if (data.success) {
+          // Store user data in localStorage
+          localStorage.setItem('user', JSON.stringify({
+            userId: data.userId,
+            name: data.name,
+            email: data.email,
+          }))
+          
+          // Redirect to dashboard
+          window.location.hash = '#/dashboard'
+        } else {
+          setSubmitError(data.message || 'Login failed. Please try again.')
+        }
+      } else {
+        // Signup
+        const response = await fetch(`${API_BASE_URL}/register`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: formData.fullName.trim(),
+            email: formData.email.trim(),
+            phone: formData.phone.trim(),
+            password: formData.password,
+          }),
+        })
+
+        let data
+        try {
+          data = await response.json()
+        } catch (jsonError) {
+          console.error('JSON parse error:', jsonError)
+          setSubmitError('Server error. Please try again later.')
+          setIsLoading(false)
+          return
+        }
+
+        if (!response.ok) {
+          const errorMsg = data.message || `Registration failed (${response.status}). Please try again.`
+          setSubmitError(errorMsg)
+          setIsLoading(false)
+          return
+        }
+
+        if (data.success) {
+          // Clear form
+          setFormData({ email: '', password: '', confirmPassword: '', fullName: '', phone: '' })
+          setErrors({})
+          setSubmitError('')
+          
+          // Show success message briefly, then redirect to login
+          setSubmitError('')
+          setTimeout(() => {
+            window.location.hash = '#/auth/login'
+          }, 500)
+        } else {
+          setSubmitError(data.message || 'Registration failed. Please try again.')
+        }
+      }
+    } catch (error) {
+      console.error('Auth error:', error)
+      if (error.message.includes('Failed to fetch') || error.message.includes('ERR_CONNECTION_REFUSED')) {
+        setSubmitError('Cannot connect to server. Please make sure the backend is running on port 8080.')
+      } else {
+        setSubmitError('Network error. Please check your connection and try again.')
+      }
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -61,7 +198,13 @@ export default function AuthPage({ authMode = 'login' }) {
               <h2 className="auth-title">{isLogin ? 'Welcome Back' : 'Join ReturnHub'}</h2>
               <p className="auth-subtitle">{isLogin ? 'Sign in to your account to continue' : 'Create an account to get started'}</p>
 
-              <div className="form-grid">
+              {submitError && (
+                <div className="auth-error-message">
+                  {submitError}
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="form-grid">
                 {!isLogin && (
                   <>
                     <div>
@@ -119,14 +262,37 @@ export default function AuthPage({ authMode = 'login' }) {
                   </div>
                 )}
 
-                <button onClick={handleSubmit} className="submit">{isLogin ? 'Sign In' : 'Create Account'}<ArrowRight size={18} /></button>
+                <button 
+                  onClick={handleSubmit} 
+                  className="submit" 
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 size={18} className="spinning" />
+                      {isLogin ? 'Signing In...' : 'Creating Account...'}
+                    </>
+                  ) : (
+                    <>
+                      {isLogin ? 'Sign In' : 'Create Account'}
+                      <ArrowRight size={18} />
+                    </>
+                  )}
+                </button>
 
                 <div className="divider">
                   <div className="divider-line"></div>
                   <span className="divider-label">OR</span>
                 </div>
 
-                <button type="button" className="social-btn">
+                <button 
+                  type="button" 
+                  className="social-btn"
+                  onClick={() => {
+                    console.log('Google sign-in')
+                    window.location.hash = '#/dashboard'
+                  }}
+                >
                   <svg width="20" height="20" viewBox="0 0 24 24">
                     <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                     <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
@@ -149,7 +315,7 @@ export default function AuthPage({ authMode = 'login' }) {
                     </>
                   )}
                 </div>
-              </div>
+              </form>
             </div>
           </div>
         </div>

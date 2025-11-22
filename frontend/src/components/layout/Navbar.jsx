@@ -1,12 +1,15 @@
-import { Menu, X, Sun, Moon } from 'lucide-react'
+import { Menu, X, Sun, Moon, Settings, User } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import '../../styles/components/Navbar.css'
 
-export default function Navbar({ menuOpen, setMenuOpen }) {
-  const [theme, setTheme] = useState('light')
+export default function Navbar({ menuOpen, setMenuOpen, variant = 'public' }) {
+  const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light')
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
   }, [theme])
+
+  const isPrivate = variant === 'private'
 
   return (
     <nav className="navbar">
@@ -14,12 +17,14 @@ export default function Navbar({ menuOpen, setMenuOpen }) {
         <div className="nav-inner">
           <div className="nav-left">
             <div className="logo">Return<span className="logo-sep">|</span>Hub</div>
-            <div className="menu">
-              <a href="#home">Home</a>
-              <a href="#about">About</a>
-              <a href="#features">Features</a>
-              <a href="#/contact">Contact Us</a>
-            </div>
+            {!isPrivate && (
+              <div className="menu">
+                <a href="#home">Home</a>
+                <a href="#about">About</a>
+                <a href="#features">Features</a>
+                <a href="#/contact">Contact Us</a>
+              </div>
+            )}
           </div>
           <div className="nav-right">
             <button
@@ -29,16 +34,29 @@ export default function Navbar({ menuOpen, setMenuOpen }) {
             >
               {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
             </button>
-            <div className="nav-auth">
-              <a className="nav-login" href="#/auth/login">Login</a>
-              <a className="nav-signup" href="#/auth/signup">Sign Up</a>
-            </div>
-            <button className="mobile-trigger" aria-label="Toggle menu" onClick={() => setMenuOpen(!menuOpen)}>
-              {menuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            {isPrivate ? (
+              <>
+                <button className="nav-icon-btn" aria-label="Settings">
+                  <Settings size={18} />
+                </button>
+                <button className="nav-icon-btn" aria-label="User profile">
+                  <User size={18} />
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="nav-auth">
+                  <a className="nav-login" href="#/auth/login">Login</a>
+                  <a className="nav-signup" href="#/auth/signup">Sign Up</a>
+                </div>
+                <button className="mobile-trigger" aria-label="Toggle menu" onClick={() => setMenuOpen(!menuOpen)}>
+                  {menuOpen ? <X size={24} /> : <Menu size={24} />}
+                </button>
+              </>
+            )}
           </div>
         </div>
-        {menuOpen && (
+        {!isPrivate && menuOpen && (
           <div className="mobile-menu">
             <a href="#home" onClick={() => setMenuOpen(false)}>Home</a>
             <a href="#about" onClick={() => setMenuOpen(false)}>About</a>
