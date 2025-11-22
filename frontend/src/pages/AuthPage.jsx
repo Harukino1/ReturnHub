@@ -3,6 +3,7 @@ import { Mail, Lock, User, Phone, ArrowRight, Eye, EyeOff, Loader2 } from 'lucid
 import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import '../styles/pages/AuthPage.css'
+import randomStuff from '../assets/random-stuff.png'
 
 const API_BASE_URL = 'http://localhost:8080/api/users'
 
@@ -180,19 +181,15 @@ export default function AuthPage({ authMode = 'login' }) {
               <div>
                 <p className="auth-desc">Find or report your lost items easily. Help others reunite with what they've lost.</p>
               </div>
-              <div>
-                <div className="auth-placeholder">
-                  <svg width="48" height="48" viewBox="0 0 20 20" fill="currentColor" style={{ color: '#d1d5db' }}>
-                    <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
-                  </svg>
-                </div>
+              <div className="auth-illustration">
+                <img className="auth-image" src={randomStuff} alt="Assortment of recovered belongings" />
+              </div>
                 <div style={{ fontSize: 12, color: 'var(--gray-500)' }}>
                   <p>Secure & Private</p>
                   <p>Smart Matching</p>
                   <p>Mobile Friendly</p>
                 </div>
               </div>
-            </div>
 
             <div className="auth-right">
               <h2 className="auth-title">{isLogin ? 'Welcome Back' : 'Join ReturnHub'}</h2>
