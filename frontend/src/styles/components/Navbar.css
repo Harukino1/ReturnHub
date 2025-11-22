@@ -70,3 +70,24 @@
   .mobile-menu { display: none !important; }
 }
 
+/* Private header icon buttons */
+.nav-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: .5rem;
+  border: 1px solid #e5e7eb;
+  background: var(--white);
+  color: #374151;
+  cursor: pointer;
+}
+.nav-icon-btn:hover { background: #f9fafb; border-color: var(--amber-600); color: var(--amber-700); }
+
+/* Dark mode brand colors */
+[data-theme='dark'] .logo { color: #fbbf24; }
+[data-theme='dark'] .logo-sep { color: #fbbf24; }
+[data-theme='dark'] .nav-icon-btn { background: #0b0e14; border-color: #334155; color: #e5e7eb; }
+[data-theme='dark'] .nav-icon-btn:hover { background: #1f2937; border-color: #fbbf24; color: #fbbf24; }
+

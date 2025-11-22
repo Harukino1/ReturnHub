@@ -16,3 +16,22 @@
   .cta-actions { grid-auto-flow: column; }
 }
 
+/* Dark mode adjustments for friendlier contrast */
+[data-theme='dark'] .cta {
+  background-image: linear-gradient(to right, #1f2937, #0b0e14);
+  color: #e5e7eb;
+}
+[data-theme='dark'] .cta h2 { color: #e5e7eb; }
+[data-theme='dark'] .cta p { color: #cbd5e1; }
+[data-theme='dark'] .cta .btn-white {
+  background: #0b0e14;
+  color: #e5e7eb;
+  border: 1px solid #334155;
+}
+[data-theme='dark'] .cta .btn-white:hover { background: #1f2937; }
+[data-theme='dark'] .cta .btn-outline-white {
+  background: transparent;
+  color: #e5e7eb;
+  border-color: #334155;
+}
+

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import LandingPage from './pages/LandingPage'
 import AuthPage from './pages/AuthPage'
 import ContactPage from './pages/ContactPage'
+import Dashboard from './pages/Dashboard'
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('landing')
@@ -16,6 +17,7 @@ export default function App() {
         const seg = path.split('/')
         setAuthMode(seg[1] === 'signup' ? 'signup' : 'login')
       } else if (path === 'contact') setCurrentPage('contact')
+      else if (path === 'dashboard') setCurrentPage('dashboard')
       else setCurrentPage('landing')
     } else {
       setCurrentPage('landing')
@@ -32,10 +34,12 @@ export default function App() {
   const handleNavigate = (target, opts = {}) => {
     if (target === 'auth') window.location.hash = `#/auth/${opts.mode === 'signup' ? 'signup' : 'login'}`
     else if (target === 'contact') window.location.hash = '#/contact'
+    else if (target === 'dashboard') window.location.hash = '#/dashboard'
     else window.location.hash = `#${target || 'home'}`
   }
 
   if (currentPage === 'auth') return <AuthPage onNavigate={handleNavigate} authMode={authMode} />
   if (currentPage === 'contact') return <ContactPage onNavigate={handleNavigate} />
+  if (currentPage === 'dashboard') return <Dashboard onNavigate={handleNavigate} />
   return <LandingPage onNavigate={handleNavigate} />
 }
