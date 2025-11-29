@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { LandingPage, AuthPage, ContactPage } from './pages/public'
 import { Dashboard, ProfilePage, MessagesPage } from './pages/user'
+import { StaffDashboardPage } from './pages/staff'
 import { AdminLoginPage, AdminDashboard } from './pages/admin'
 
 export default function App() {
@@ -11,7 +12,10 @@ export default function App() {
   const routeFromHash = () => {
     const h = window.location.hash || '#home'
     if (h.startsWith('#/')) {
-      const path = h.slice(2)
+      // Remove trailing slash for consistent matching
+      const rawPath = h.slice(2)
+      const path = rawPath.endsWith('/') ? rawPath.slice(0, -1) : rawPath
+
       if (path.startsWith('auth')) {
         setCurrentPage('auth')
         const seg = path.split('/')
@@ -20,6 +24,7 @@ export default function App() {
       else if (path === 'dashboard') setCurrentPage('dashboard')
       else if (path === 'profile') setCurrentPage('profile')
       else if (path === 'messages') setCurrentPage('messages')
+      else if (path === 'staff/dashboard') setCurrentPage('staff-dashboard')
       else if (path === 'admin-panel') setCurrentPage('admin')
       else setCurrentPage('landing')
     } else {
@@ -64,5 +69,6 @@ export default function App() {
   if (currentPage === 'dashboard') return <Dashboard onNavigate={handleNavigate} />
   if (currentPage === 'profile') return <ProfilePage onNavigate={handleNavigate} />
   if (currentPage === 'messages') return <MessagesPage onNavigate={handleNavigate} />
+  if (currentPage === 'staff-dashboard') return <StaffDashboardPage onNavigate={handleNavigate} />
   return <LandingPage onNavigate={handleNavigate} />
 }

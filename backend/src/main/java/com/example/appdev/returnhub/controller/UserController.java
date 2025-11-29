@@ -5,10 +5,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.appdev.returnhub.entity.User;
+import com.example.appdev.returnhub.entity.Staff;
 import com.example.appdev.returnhub.service.UserService;
+import com.example.appdev.returnhub.repositor.StaffRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * REST controller for User authentication and registration.
@@ -23,9 +27,13 @@ import java.util.Map;
 public class UserController {
 
     private final UserService userService;
+    private final StaffRepository staffRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, StaffRepository staffRepository, PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.staffRepository = staffRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -69,6 +77,7 @@ public class UserController {
         public String phone;
         public String profileImage;
         public boolean isVerified;
+        public String role;
 
         public AuthResponse(boolean success, String message) {
             this.success = success;
@@ -85,6 +94,18 @@ public class UserController {
                 this.phone = user.getPhone();
                 this.profileImage = user.getProfileImage();
                 this.isVerified = user.isVerified();
+                this.role = "USER";
+            }
+        }
+
+        public AuthResponse(boolean success, String message, Staff staff) {
+            this.success = success;
+            this.message = message;
+            if (staff != null) {
+                this.userId = staff.getStaffId();
+                this.name = staff.getName();
+                this.email = staff.getEmail();
+                this.role = staff.getRole();
             }
         }
     }
@@ -164,15 +185,26 @@ public class UserController {
                         .body(new AuthResponse(false, "Password is required"));
             }
 
-            // Authenticate user
+            // 1. Authenticate as User
             User user = userService.login(request.email.trim().toLowerCase(), request.password);
 
-            if (user == null) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(new AuthResponse(false, "Invalid email or password"));
+            if (user != null) {
+                return ResponseEntity.ok(new AuthResponse(true, "Login successful", user));
             }
 
-            return ResponseEntity.ok(new AuthResponse(true, "Login successful", user));
+            // 2. Authenticate as Staff
+            Optional<Staff> staffOpt = staffRepository.findByEmail(request.email.trim().toLowerCase());
+            if (staffOpt.isPresent()) {
+                Staff staff = staffOpt.get();
+                // Check encrypted password OR plain text (for legacy/manual entries)
+                if (passwordEncoder.matches(request.password, staff.getPassword()) ||
+                        request.password.equals(staff.getPassword())) {
+                    return ResponseEntity.ok(new AuthResponse(true, "Login successful", staff));
+                }
+            }
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new AuthResponse(false, "Invalid email or password"));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

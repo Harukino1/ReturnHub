@@ -1,1 +1,5 @@
-// Staff pages export
+import StaffDashboardPage from './StaffDashboard.page'
+
+export {
+  StaffDashboardPage
+}
