@@ -67,7 +67,15 @@
          * Check if email exists in the database.
          */
         public boolean emailExists(String email) {
-            return userRepository.findByEmailIgnoreCase(email).isPresent();
-        }
+        return userRepository.findByEmailIgnoreCase(email).isPresent();
     }
+
+    public java.util.List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public void deleteUser(int id) {
+        userRepository.deleteById(id);
+    }
+}
 

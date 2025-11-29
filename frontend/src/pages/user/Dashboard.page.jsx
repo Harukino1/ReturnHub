@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Search } from 'lucide-react'
-import Navbar from '../components/layout/Navbar'
-import '../styles/pages/Dashboard.css'
+import Navbar from '../../components/layout/Navbar'
+import styles from '../../styles/pages/user/Dashboard.module.css'
 
 // Dummy data for items
 const dummyItems = [
@@ -39,37 +39,37 @@ export default function Dashboard({ onNavigate }) {
   }
 
   return (
-    <div className="dashboard-page">
+    <div className={styles['dashboard-page']}>
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} variant="private" />
 
       {/* Main Content */}
-      <main className="dashboard-main">
+      <main className={styles['dashboard-main']}>
         <div className="container">
           {/* Search Section */}
-          <div className="dashboard-search-section">
-            <form onSubmit={handleSearch} className="dashboard-search-form">
+          <div className={styles['dashboard-search-section']}>
+            <form onSubmit={handleSearch} className={styles['dashboard-search-form']}>
               <input
                 type="text"
                 placeholder="Search for items..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="dashboard-search-input"
+                className={styles['dashboard-search-input']}
               />
-              <button type="submit" className="dashboard-search-btn">
+              <button type="submit" className={styles['dashboard-search-btn']}>
                 <Search size={20} />
               </button>
             </form>
 
             {/* Filter Toggles */}
-            <div className="dashboard-filters">
+            <div className={styles['dashboard-filters']}>
               <button
-                className={`dashboard-filter-btn ${filterType === 'lost' ? 'active' : ''}`}
+                className={`${styles['dashboard-filter-btn']} ${filterType === 'lost' ? styles.active : ''}`}
                 onClick={() => setFilterType('lost')}
               >
                 Lost
               </button>
               <button
-                className={`dashboard-filter-btn ${filterType === 'found' ? 'active' : ''}`}
+                className={`${styles['dashboard-filter-btn']} ${filterType === 'found' ? styles.active : ''}`}
                 onClick={() => setFilterType('found')}
               >
                 Found
@@ -78,25 +78,25 @@ export default function Dashboard({ onNavigate }) {
           </div>
 
           {/* Items Grid */}
-          <div className="dashboard-content">
-            <div className="dashboard-items-grid">
+          <div className={styles['dashboard-content']}>
+            <div className={styles['dashboard-items-grid']}>
               {filteredItems.length > 0 ? (
                 filteredItems.map((item) => (
-                  <div key={item.id} className="dashboard-item-card">
-                    <div className="dashboard-item-image">
+                  <div key={item.id} className={styles['dashboard-item-card']}>
+                    <div className={styles['dashboard-item-image']}>
                       <svg width="48" height="48" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
                       </svg>
                     </div>
-                    <div className="dashboard-item-content">
-                      <h3 className="dashboard-item-title">{item.title}</h3>
-                      <p className="dashboard-item-location">{item.location}</p>
-                      <p className="dashboard-item-date">{item.date}</p>
+                    <div className={styles['dashboard-item-content']}>
+                      <h3 className={styles['dashboard-item-title']}>{item.title}</h3>
+                      <p className={styles['dashboard-item-location']}>{item.location}</p>
+                      <p className={styles['dashboard-item-date']}>{item.date}</p>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="dashboard-empty">
+                <div className={styles['dashboard-empty']}>
                   <p>No {filterType} items found matching your search.</p>
                 </div>
               )}
@@ -104,7 +104,7 @@ export default function Dashboard({ onNavigate }) {
           </div>
 
           {/* Report Button */}
-          <button className="dashboard-report-btn" aria-label="Report item">
+          <button className={styles['dashboard-report-btn']} aria-label="Report item">
             Report
           </button>
         </div>

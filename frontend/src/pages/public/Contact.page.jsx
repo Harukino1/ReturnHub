@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import Navbar from '../components/layout/Navbar'
-import Footer from '../components/layout/Footer'
-import '../styles/pages/ContactPage.css'
+import Navbar from '../../components/layout/Navbar'
+import Footer from '../../components/layout/Footer'
+import styles from '../../styles/pages/public/Contact.module.css'
 
 export default function ContactPage() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -24,15 +24,15 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="contact-page">
+    <div className={styles['contact-page']}>
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-      <section className="contact-section">
+      <section className={styles['contact-section']}>
         <div className="container">
-          <div className="contact-grid">
+          <div className={styles['contact-grid']}>
             <div>
-              <h2 className="contact-title">Contact Us</h2>
-              <p className="contact-subtitle">Have questions or need help? Send us a message and we’ll get back to you.</p>
-              <form className="contact-form" onSubmit={onSubmit}>
+              <h2 className={styles['contact-title']}>Contact Us</h2>
+              <p className={styles['contact-subtitle']}>Have questions or need help? Send us a message and we’ll get back to you.</p>
+              <form className={styles['contact-form']} onSubmit={onSubmit}>
                 <div>
                   <input name="name" value={form.name} onChange={onChange} placeholder="Your Name" className={`input${errors.name ? ' error' : ''}`} />
                   {errors.name && <p className="error-text">{errors.name}</p>}
@@ -49,7 +49,7 @@ export default function ContactPage() {
               </form>
             </div>
             <div>
-              <div className="contact-card">
+              <div className={styles['contact-card']}>
                 <h3>Support</h3>
                 <p>Email: support@returnhub.example</p>
                 <p>Hours: Mon–Fri, 9am–5pm</p>
