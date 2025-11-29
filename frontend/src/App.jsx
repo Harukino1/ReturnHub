@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { LandingPage, AuthPage, ContactPage } from './pages/public'
-import { Dashboard, ProfilePage } from './pages/user'
+import { Dashboard, ProfilePage, MessagesPage } from './pages/user'
 import { AdminLoginPage, AdminDashboard } from './pages/admin'
 
 export default function App() {
@@ -19,6 +19,7 @@ export default function App() {
       } else if (path === 'contact') setCurrentPage('contact')
       else if (path === 'dashboard') setCurrentPage('dashboard')
       else if (path === 'profile') setCurrentPage('profile')
+      else if (path === 'messages') setCurrentPage('messages')
       else if (path === 'admin-panel') setCurrentPage('admin')
       else setCurrentPage('landing')
     } else {
@@ -37,6 +38,7 @@ export default function App() {
     if (target === 'auth') window.location.hash = `#/auth/${opts.mode === 'signup' ? 'signup' : 'login'}`
     else if (target === 'contact') window.location.hash = '#/contact'
     else if (target === 'dashboard') window.location.hash = '#/dashboard'
+    else if (target === 'messages') window.location.hash = '#/messages'
     else if (target === 'admin') window.location.hash = '#/admin-panel'
     else window.location.hash = `#${target || 'home'}`
   }
@@ -61,5 +63,6 @@ export default function App() {
   if (currentPage === 'contact') return <ContactPage onNavigate={handleNavigate} />
   if (currentPage === 'dashboard') return <Dashboard onNavigate={handleNavigate} />
   if (currentPage === 'profile') return <ProfilePage onNavigate={handleNavigate} />
+  if (currentPage === 'messages') return <MessagesPage onNavigate={handleNavigate} />
   return <LandingPage onNavigate={handleNavigate} />
 }

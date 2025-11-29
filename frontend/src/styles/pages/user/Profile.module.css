@@ -25,7 +25,7 @@
 /* Sidebar */
 .profile-sidebar h1 {
   font-size: 2.5rem;
-  font-weight: 800; /* Matched to Navbar logo weight */
+  font-weight: 800;
   margin: 0 0 2rem;
   color: var(--gray-900);
   font-family: inherit;
@@ -144,7 +144,7 @@
   padding: 0.75rem;
   border: 1px solid #d1d5db;
   border-radius: 0.5rem;
-  background: #f9fafb; /* Light gray input */
+  background: #f9fafb;
   color: #111827;
   font-size: 0.95rem;
   transition: all 0.2s;
@@ -157,63 +157,154 @@
   box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
 }
 
+.form-input:disabled {
+  background: #f3f4f6;
+  color: #6b7280;
+  border-color: #e5e7eb;
+  cursor: default;
+}
+
 .form-group.full-width {
   grid-column: 1 / -1;
 }
 
-.profile-submit-btn {
-  margin-top: 2rem;
-  width: 100%;
-  padding: 0.875rem;
-  background-image: linear-gradient(to right, var(--amber-600), var(--amber-700));
+/* Buttons */
+.btn-action-primary {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--amber-600); /* Brand Amber */
+  color: white;
   border: none;
   border-radius: 0.5rem;
   font-weight: 600;
-  color: var(--white);
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.profile-submit-btn:hover {
+.btn-action-primary:hover {
+  background-color: var(--amber-700);
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
 }
 
+.btn-action-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-action-secondary {
+  padding: 0.75rem 1.5rem;
+  background: transparent;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-action-secondary:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+/* Notifications */
+.notification {
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 500;
+  font-size: 0.95rem;
+  border-left: 4px solid transparent;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.notification-success {
+  background-color: #ecfdf5; /* Green-50 */
+  color: #065f46; /* Green-800 */
+  border-left-color: #10b981; /* Green-500 */
+}
+
+.notification-error {
+  background-color: #fef2f2; /* Red-50 */
+  color: #991b1b; /* Red-800 */
+  border-left-color: #ef4444; /* Red-500 */
+}
+
+.notification button {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.notification button:hover {
+  opacity: 1;
+}
+
+
+/* Autofill Overrides - Light Mode */
+.form-input:-webkit-autofill,
+.form-input:-webkit-autofill:hover, 
+.form-input:-webkit-autofill:focus, 
+.form-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #f9fafb inset !important;
+  -webkit-text-fill-color: #111827 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.form-input:focus:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 30px var(--white) inset !important;
+}
+
 /* =========================================
-   DARK MODE UNIFICATION (Fixed)
-   Matching colors from Navbar.css & Footer.css
+   DARK MODE
    ========================================= */
 
 [data-theme='dark'] .profile-page {
-  background-color: #0b0e14; /* Matches Navbar/Footer dark bg */
+  background-color: #0b0e14;
 }
 
 [data-theme='dark'] .profile-sidebar h1 {
   color: #f3f4f6;
 }
 
-/* Sidebar Tabs Dark Mode */
 [data-theme='dark'] .profile-tab {
   color: #9ca3af;
 }
 [data-theme='dark'] .profile-tab:hover {
-  background: #1f2937; /* Gray-800 */
+  background: #1f2937;
   color: #f3f4f6;
 }
 [data-theme='dark'] .profile-tab.active {
   background: #1f2937;
-  color: #fbbf24; /* Amber-400 */
+  color: #fbbf24;
 }
 
-/* Main Card Dark Mode */
 [data-theme='dark'] .profile-card {
-  background: #111827; /* Gray-900 (Slightly lighter than page bg) */
-  border-color: #334155; /* Matches Navbar/Feature borders */
+  background: #111827;
+  border-color: #334155;
 }
 
-/* Avatar Section Dark Mode */
 [data-theme='dark'] .profile-avatar-section {
-  background: #0b0e14; /* Darker inset */
+  background: #0b0e14;
   border-color: #334155;
 }
 
@@ -234,24 +325,69 @@
   color: #fbbf24;
 }
 
-/* Form Inputs Dark Mode - FIXED VISIBILITY */
 [data-theme='dark'] .form-label {
-  color: #94a3b8; /* Lighter label for readability */
+  color: #94a3b8;
 }
 
 [data-theme='dark'] .form-input {
-  background: #1f2937; /* Gray-800 */
-  border-color: #374151; /* Gray-700 */
-  color: #f3f4f6; /* White text */
+  background: #1f2937;
+  border-color: #374151;
+  color: #f3f4f6;
 }
 
 [data-theme='dark'] .form-input:focus {
   background: #111827;
-  border-color: #fbbf24; /* Amber focus */
+  border-color: #fbbf24;
 }
 
-/* Submit Button Dark Mode */
-[data-theme='dark'] .profile-submit-btn {
-  /* Keep gradient but maybe adjust shadow/glow if needed */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+[data-theme='dark'] .form-input:disabled {
+  background: #111827;
+  color: #6b7280;
+  border-color: #374151;
+  opacity: 0.7;
+}
+
+[data-theme='dark'] .btn-action-primary {
+  background-color: var(--amber-600);
+  color: white;
+}
+[data-theme='dark'] .btn-action-primary:hover {
+  background-color: var(--amber-500);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+}
+
+[data-theme='dark'] .btn-action-secondary {
+  border-color: #374151;
+  color: #e5e7eb;
+}
+[data-theme='dark'] .btn-action-secondary:hover {
+  background: #1f2937;
+  border-color: #fbbf24;
+  color: #fbbf24;
+}
+
+/* Notifications Dark Mode */
+[data-theme='dark'] .notification-success {
+  background-color: #064e3b; /* Green-900 */
+  color: #d1fae5; /* Green-100 */
+  border-left-color: #34d399; /* Green-400 */
+}
+
+[data-theme='dark'] .notification-error {
+  background-color: #7f1d1d; /* Red-900 */
+  color: #fee2e2; /* Red-100 */
+  border-left-color: #f87171; /* Red-400 */
+}
+
+/* Autofill Overrides - Dark Mode */
+[data-theme='dark'] .form-input:-webkit-autofill,
+[data-theme='dark'] .form-input:-webkit-autofill:hover, 
+[data-theme='dark'] .form-input:-webkit-autofill:focus, 
+[data-theme='dark'] .form-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #1f2937 inset !important;
+  -webkit-text-fill-color: #f3f4f6 !important;
+}
+
+[data-theme='dark'] .form-input:focus:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 30px #111827 inset !important;
 }

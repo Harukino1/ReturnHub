@@ -105,6 +105,8 @@ export default function AuthPage({ authMode = 'login' }) {
             userId: data.userId,
             name: data.name,
             email: data.email,
+            phone: data.phone,
+            profileImage: data.profileImage
           }))
           
           // Redirect to dashboard
