@@ -3,6 +3,7 @@ import LandingPage from './pages/LandingPage'
 import AuthPage from './pages/AuthPage'
 import ContactPage from './pages/ContactPage'
 import Dashboard from './pages/Dashboard'
+import ProfilePage from './pages/ProfilePage'
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('landing')
@@ -18,6 +19,7 @@ export default function App() {
         setAuthMode(seg[1] === 'signup' ? 'signup' : 'login')
       } else if (path === 'contact') setCurrentPage('contact')
       else if (path === 'dashboard') setCurrentPage('dashboard')
+      else if (path === 'profile') setCurrentPage('profile')
       else setCurrentPage('landing')
     } else {
       setCurrentPage('landing')
@@ -41,5 +43,6 @@ export default function App() {
   if (currentPage === 'auth') return <AuthPage onNavigate={handleNavigate} authMode={authMode} />
   if (currentPage === 'contact') return <ContactPage onNavigate={handleNavigate} />
   if (currentPage === 'dashboard') return <Dashboard onNavigate={handleNavigate} />
+  if (currentPage === 'profile') return <ProfilePage onNavigate={handleNavigate} />
   return <LandingPage onNavigate={handleNavigate} />
 }

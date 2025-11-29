@@ -1,0 +1,257 @@
+/* ProfilePage.css */
+
+.profile-page {
+  min-height: 100vh;
+  padding-bottom: 2rem;
+  background-color: var(--white); /* Default light */
+  transition: background-color 0.3s ease;
+}
+
+.profile-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding-top: 3rem;
+}
+
+@media (min-width: 768px) {
+  .profile-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 4rem;
+  }
+}
+
+/* Sidebar */
+.profile-sidebar h1 {
+  font-size: 2.5rem;
+  font-weight: 800; /* Matched to Navbar logo weight */
+  margin: 0 0 2rem;
+  color: var(--gray-900);
+  font-family: inherit;
+}
+
+.profile-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.profile-tab {
+  height: auto;
+  background: transparent;
+  color: #6b7280; /* Gray-500 */
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 1rem;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.profile-tab:hover {
+  background: #f3f4f6;
+  color: var(--gray-900);
+}
+
+.profile-tab.active {
+  background: #fff7ed; /* Light orange bg to match theme */
+  color: var(--amber-700);
+  font-weight: 600;
+}
+
+/* Card */
+.profile-card {
+  background: var(--white);
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* Inner Card for Avatar */
+.profile-avatar-section {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+}
+
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--white);
+  border: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+}
+
+.profile-btn-update-top {
+  padding: 0.5rem 1.5rem;
+  background: var(--white);
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.profile-btn-update-top:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+/* Form */
+.profile-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .profile-form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-input {
+  padding: 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  background: #f9fafb; /* Light gray input */
+  color: #111827;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--amber-600);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.profile-submit-btn {
+  margin-top: 2rem;
+  width: 100%;
+  padding: 0.875rem;
+  background-image: linear-gradient(to right, var(--amber-600), var(--amber-700));
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  color: var(--white);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.profile-submit-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
+}
+
+/* =========================================
+   DARK MODE UNIFICATION (Fixed)
+   Matching colors from Navbar.css & Footer.css
+   ========================================= */
+
+[data-theme='dark'] .profile-page {
+  background-color: #0b0e14; /* Matches Navbar/Footer dark bg */
+}
+
+[data-theme='dark'] .profile-sidebar h1 {
+  color: #f3f4f6;
+}
+
+/* Sidebar Tabs Dark Mode */
+[data-theme='dark'] .profile-tab {
+  color: #9ca3af;
+}
+[data-theme='dark'] .profile-tab:hover {
+  background: #1f2937; /* Gray-800 */
+  color: #f3f4f6;
+}
+[data-theme='dark'] .profile-tab.active {
+  background: #1f2937;
+  color: #fbbf24; /* Amber-400 */
+}
+
+/* Main Card Dark Mode */
+[data-theme='dark'] .profile-card {
+  background: #111827; /* Gray-900 (Slightly lighter than page bg) */
+  border-color: #334155; /* Matches Navbar/Feature borders */
+}
+
+/* Avatar Section Dark Mode */
+[data-theme='dark'] .profile-avatar-section {
+  background: #0b0e14; /* Darker inset */
+  border-color: #334155;
+}
+
+[data-theme='dark'] .profile-avatar {
+  background: #1f2937;
+  border-color: #374151;
+  color: #9ca3af;
+}
+
+[data-theme='dark'] .profile-btn-update-top {
+  background: #1f2937;
+  border-color: #374151;
+  color: #e5e7eb;
+}
+[data-theme='dark'] .profile-btn-update-top:hover {
+  background: #374151;
+  border-color: #fbbf24;
+  color: #fbbf24;
+}
+
+/* Form Inputs Dark Mode - FIXED VISIBILITY */
+[data-theme='dark'] .form-label {
+  color: #94a3b8; /* Lighter label for readability */
+}
+
+[data-theme='dark'] .form-input {
+  background: #1f2937; /* Gray-800 */
+  border-color: #374151; /* Gray-700 */
+  color: #f3f4f6; /* White text */
+}
+
+[data-theme='dark'] .form-input:focus {
+  background: #111827;
+  border-color: #fbbf24; /* Amber focus */
+}
+
+/* Submit Button Dark Mode */
+[data-theme='dark'] .profile-submit-btn {
+  /* Keep gradient but maybe adjust shadow/glow if needed */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
