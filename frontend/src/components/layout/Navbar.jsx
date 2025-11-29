@@ -17,14 +17,12 @@ export default function Navbar({ menuOpen, setMenuOpen, variant = 'public' }) {
         <div className="nav-inner">
           <div className="nav-left">
             <div className="logo">Return<span className="logo-sep">|</span>Hub</div>
-            {!isPrivate && (
-              <div className="menu">
+            <div className="menu">
                 <a href="#home">Home</a>
                 <a href="#about">About</a>
                 <a href="#features">Features</a>
                 <a href="#/contact">Contact Us</a>
               </div>
-            )}
           </div>
           <div className="nav-right">
             <button
@@ -39,9 +37,9 @@ export default function Navbar({ menuOpen, setMenuOpen, variant = 'public' }) {
                 <button className="nav-icon-btn" aria-label="Settings">
                   <Settings size={18} />
                 </button>
-                <button className="nav-icon-btn" aria-label="User profile">
+                <a href="#/profile" className="nav-icon-btn" aria-label="User profile">
                   <User size={18} />
-                </button>
+                </a>
               </>
             ) : (
               <>
