@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { User, Shield, Clock, Bell } from 'lucide-react'
-import Navbar from '../components/layout/Navbar'
-import '../styles/pages/ProfilePage.css'
+import Navbar from '../../components/layout/Navbar'
+import styles from '../../styles/pages/user/Profile.module.css'
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('personal')
@@ -43,19 +43,19 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="profile-page">
+    <div className={styles['profile-page']}>
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} variant="private" />
       
       <div className="container">
-        <div className="profile-layout">
+        <div className={styles['profile-layout']}>
           {/* Sidebar */}
-          <aside className="profile-sidebar">
+          <aside className={styles['profile-sidebar']}>
             <h1>Profile</h1>
-            <div className="profile-tabs">
+            <div className={styles['profile-tabs']}>
               {tabs.map(tab => (
                 <button
                   key={tab.id}
-                  className={`profile-tab ${activeTab === tab.id ? 'active' : ''}`}
+                  className={`${styles['profile-tab']} ${activeTab === tab.id ? styles.active : ''}`}
                   onClick={() => setActiveTab(tab.id)}
                 >
                   {tab.label}
@@ -65,106 +65,106 @@ export default function ProfilePage() {
           </aside>
 
           {/* Main Content */}
-          <main className="profile-content">
-            <div className="profile-card">
+          <main className={styles['profile-content']}>
+            <div className={styles['profile-card']}>
               {activeTab === 'personal' && (
                 <>
-                  <div className="profile-avatar-section">
-                    <div className="profile-avatar">
+                  <div className={styles['profile-avatar-section']}>
+                    <div className={styles['profile-avatar']}>
                       <User size={40} strokeWidth={1} />
                     </div>
-                    <button className="profile-btn-update-top">Update</button>
+                    <button className={styles['profile-btn-update-top']}>Update</button>
                   </div>
 
                   <form onSubmit={handleSubmit}>
-                    <div className="profile-form-grid">
-                      <div className="form-group">
-                        <label className="form-label">First name</label>
+                    <div className={styles['profile-form-grid']}>
+                      <div className={styles['form-group']}>
+                        <label className={styles['form-label']}>First name</label>
                         <input 
                           type="text" 
                           name="firstName"
-                          className="form-input" 
+                          className={styles['form-input']} 
                           value={formData.firstName} 
                           onChange={handleChange}
                         />
                       </div>
-                      <div className="form-group">
-                        <label className="form-label">Last name</label>
+                      <div className={styles['form-group']}>
+                        <label className={styles['form-label']}>Last name</label>
                         <input 
                           type="text" 
                           name="lastName"
-                          className="form-input" 
+                          className={styles['form-input']} 
                           value={formData.lastName} 
                           onChange={handleChange}
                         />
                       </div>
 
-                      <div className="form-group full-width">
-                        <label className="form-label">Contact Number</label>
+                      <div className={`${styles['form-group']} ${styles['full-width']}`}>
+                        <label className={styles['form-label']}>Contact Number</label>
                         <input 
                           type="tel" 
                           name="contactNumber"
-                          className="form-input" 
+                          className={styles['form-input']} 
                           value={formData.contactNumber} 
                           onChange={handleChange}
                         />
                       </div>
 
-                      <div className="form-group full-width">
-                        <label className="form-label">Email Address</label>
+                      <div className={`${styles['form-group']} ${styles['full-width']}`}>
+                        <label className={styles['form-label']}>Email Address</label>
                         <input 
                           type="email" 
                           name="email"
-                          className="form-input" 
+                          className={styles['form-input']} 
                           value={formData.email} 
                           onChange={handleChange}
                         />
                       </div>
 
-                      <div className="form-group">
-                        <label className="form-label">Street</label>
+                      <div className={styles['form-group']}>
+                        <label className={styles['form-label']}>Street</label>
                         <input 
                           type="text" 
                           name="street"
-                          className="form-input" 
+                          className={styles['form-input']} 
                           value={formData.street} 
                           onChange={handleChange}
                         />
                       </div>
-                      <div className="form-group">
-                        <label className="form-label">Barangay</label>
+                      <div className={styles['form-group']}>
+                        <label className={styles['form-label']}>Barangay</label>
                         <input 
                           type="text" 
                           name="barangay"
-                          className="form-input" 
+                          className={styles['form-input']} 
                           value={formData.barangay} 
                           onChange={handleChange}
                         />
                       </div>
 
-                      <div className="form-group">
-                        <label className="form-label">City</label>
+                      <div className={styles['form-group']}>
+                        <label className={styles['form-label']}>City</label>
                         <input 
                           type="text" 
                           name="city"
-                          className="form-input" 
+                          className={styles['form-input']} 
                           value={formData.city} 
                           onChange={handleChange}
                         />
                       </div>
-                      <div className="form-group">
-                        <label className="form-label">Zip Code</label>
+                      <div className={styles['form-group']}>
+                        <label className={styles['form-label']}>Zip Code</label>
                         <input 
                           type="text" 
                           name="zipCode"
-                          className="form-input" 
+                          className={styles['form-input']} 
                           value={formData.zipCode} 
                           onChange={handleChange}
                         />
                       </div>
                     </div>
 
-                    <button type="submit" className="profile-submit-btn">
+                    <button type="submit" className={styles['profile-submit-btn']}>
                       Update Information
                     </button>
                   </form>

@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
-import LandingPage from './pages/LandingPage'
-import AuthPage from './pages/AuthPage'
-import ContactPage from './pages/ContactPage'
-import Dashboard from './pages/Dashboard'
-import ProfilePage from './pages/ProfilePage'
+import { LandingPage, AuthPage, ContactPage } from './pages/public'
+import { Dashboard, ProfilePage } from './pages/user'
+import { AdminLoginPage, AdminDashboard } from './pages/admin'
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('landing')
   const [authMode, setAuthMode] = useState('login')
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(!!localStorage.getItem('adminAuth'))
 
   const routeFromHash = () => {
     const h = window.location.hash || '#home'
@@ -20,6 +19,7 @@ export default function App() {
       } else if (path === 'contact') setCurrentPage('contact')
       else if (path === 'dashboard') setCurrentPage('dashboard')
       else if (path === 'profile') setCurrentPage('profile')
+      else if (path === 'admin-panel') setCurrentPage('admin')
       else setCurrentPage('landing')
     } else {
       setCurrentPage('landing')
@@ -37,7 +37,24 @@ export default function App() {
     if (target === 'auth') window.location.hash = `#/auth/${opts.mode === 'signup' ? 'signup' : 'login'}`
     else if (target === 'contact') window.location.hash = '#/contact'
     else if (target === 'dashboard') window.location.hash = '#/dashboard'
+    else if (target === 'admin') window.location.hash = '#/admin-panel'
     else window.location.hash = `#${target || 'home'}`
+  }
+
+  const handleAdminLogin = () => {
+    setIsAdminLoggedIn(true)
+  }
+
+  const handleAdminLogout = () => {
+    localStorage.removeItem('adminAuth')
+    localStorage.removeItem('adminName')
+    setIsAdminLoggedIn(false)
+  }
+
+  if (currentPage === 'admin') {
+    return isAdminLoggedIn 
+      ? <AdminDashboard onLogout={handleAdminLogout} /> 
+      : <AdminLoginPage onLogin={handleAdminLogin} />
   }
 
   if (currentPage === 'auth') return <AuthPage onNavigate={handleNavigate} authMode={authMode} />

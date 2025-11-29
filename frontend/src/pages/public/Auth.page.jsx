@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Mail, Lock, User, Phone, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react'
-import Navbar from '../components/layout/Navbar'
-import Footer from '../components/layout/Footer'
-import '../styles/pages/AuthPage.css'
-import randomStuff from '../assets/random-stuff.png'
+import Navbar from '../../components/layout/Navbar'
+import Footer from '../../components/layout/Footer'
+import styles from '../../styles/pages/public/Auth.module.css'
+import randomStuff from '../../assets/random-stuff.png'
 
 const API_BASE_URL = 'http://localhost:8080/api/users'
 
@@ -172,17 +172,17 @@ export default function AuthPage({ authMode = 'login' }) {
   }
 
   return (
-    <div className="auth-page">
+    <div className={styles['auth-page']}>
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-      <section className="auth-section">
+      <section className={styles['auth-section']}>
         <div className="container">
-          <div className="auth-grid">
-            <div className="auth-left">
+          <div className={styles['auth-grid']}>
+            <div className={styles['auth-left']}>
               <div>
-                <p className="auth-desc">Find or report your lost items easily. Help others reunite with what they've lost.</p>
+                <p className={styles['auth-desc']}>Find or report your lost items easily. Help others reunite with what they've lost.</p>
               </div>
-              <div className="auth-illustration">
-                <img className="auth-image" src={randomStuff} alt="Assortment of recovered belongings" />
+              <div className={styles['auth-illustration']}>
+                <img className={styles['auth-image']} src={randomStuff} alt="Assortment of recovered belongings" />
               </div>
                 <div style={{ fontSize: 12, color: 'var(--gray-500)' }}>
                   <p>Secure & Private</p>
@@ -191,12 +191,12 @@ export default function AuthPage({ authMode = 'login' }) {
                 </div>
               </div>
 
-            <div className="auth-right">
-              <h2 className="auth-title">{isLogin ? 'Welcome Back' : 'Join ReturnHub'}</h2>
-              <p className="auth-subtitle">{isLogin ? 'Sign in to your account to continue' : 'Create an account to get started'}</p>
+            <div className={styles['auth-right']}>
+              <h2 className={styles['auth-title']}>{isLogin ? 'Welcome Back' : 'Join ReturnHub'}</h2>
+              <p className={styles['auth-subtitle']}>{isLogin ? 'Sign in to your account to continue' : 'Create an account to get started'}</p>
 
               {submitError && (
-                <div className="auth-error-message">
+                <div className={styles['auth-error-message']}>
                   {submitError}
                 </div>
               )}
@@ -266,7 +266,7 @@ export default function AuthPage({ authMode = 'login' }) {
                 >
                   {isLoading ? (
                     <>
-                      <Loader2 size={18} className="spinning" />
+                      <Loader2 size={18} className={styles.spinning} />
                       {isLogin ? 'Signing In...' : 'Creating Account...'}
                     </>
                   ) : (
@@ -299,7 +299,7 @@ export default function AuthPage({ authMode = 'login' }) {
                   Continue with Google
                 </button>
 
-                <div className="auth-toggle">
+                <div className={styles['auth-toggle']}>
                   {isLogin ? (
                     <>
                       Don't have an account?{' '}
