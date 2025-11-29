@@ -28,7 +28,7 @@ export default function ProfilePage() {
     street: '123 Rizal St.',
     barangay: 'San Antonio',
     city: 'Makati City',
-    zipCode: '1200'
+    zipCode: '12'
   })
 
   const handleChange = (e) => {
@@ -165,7 +165,7 @@ export default function ProfilePage() {
                     </div>
 
                     <button type="submit" className={styles['profile-submit-btn']}>
-                      Update Information
+                      Update Infomartion
                     </button>
                   </form>
                 </>
