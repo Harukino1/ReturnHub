@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react'
-import { LandingPage, AuthPage, ContactPage } from './pages/public'
-import { Dashboard, ProfilePage, MessagesPage } from './pages/user'
-import { StaffDashboardPage } from './pages/staff'
-import { AdminLoginPage, AdminDashboard } from './pages/admin'
+import LandingPage from './pages/public/Landing.page'
+import AuthPage from './pages/public/Auth.page'
+import ContactPage from './pages/public/Contact.page'
+import Dashboard from './pages/user/Dashboard.page'
+import ProfilePage from './pages/user/Profile.page'
+import MessagesPage from './pages/user/Messages.page'
+import StaffDashboardPage from './pages/staff/StaffDashboard.page'
+import AdminLoginPage from './pages/admin/AdminLogin.page'
+import AdminDashboard from './pages/admin/AdminDashboard.page'
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('landing')
