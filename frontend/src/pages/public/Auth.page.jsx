@@ -105,10 +105,17 @@ export default function AuthPage({ authMode = 'login' }) {
             userId: data.userId,
             name: data.name,
             email: data.email,
+            phone: data.phone,
+            profileImage: data.profileImage,
+            role: data.role // Store the role
           }))
           
-          // Redirect to dashboard
-          window.location.hash = '#/dashboard'
+          // Redirect based on role
+          if (data.role === 'ADMIN' || data.role === 'STAFF') {
+            window.location.hash = '#/staff/dashboard'
+          } else {
+            window.location.hash = '#/dashboard'
+          }
         } else {
           setSubmitError(data.message || 'Login failed. Please try again.')
         }

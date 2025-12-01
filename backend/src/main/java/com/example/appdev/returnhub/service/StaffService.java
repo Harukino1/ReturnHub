@@ -32,6 +32,17 @@ public class StaffService {
             staffRepository.save(admin);
             System.out.println("Default admin account created.");
         }
+
+        // Initialize test staff if not exists (For testing purposes)
+        if (staffRepository.findByEmail("teststaff@gmail.com").isEmpty()) {
+            Staff staff = new Staff();
+            staff.setName("Test Staff");
+            staff.setEmail("teststaff@gmail.com");
+            staff.setPassword(passwordEncoder.encode("123456"));
+            staff.setRole("STAFF");
+            staffRepository.save(staff);
+            System.out.println("Test staff account created: teststaff@gmail.com / 123456");
+        }
     }
 
     public Optional<Staff> getStaffByNameOrEmail(String username) {

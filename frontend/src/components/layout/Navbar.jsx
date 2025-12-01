@@ -1,4 +1,4 @@
-import { Menu, X, Sun, Moon, Settings, User } from 'lucide-react'
+import { Menu, X, Sun, Moon, User, Bell, LogOut } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import '../../styles/components/Navbar.css'
 
@@ -11,6 +11,11 @@ export default function Navbar({ menuOpen, setMenuOpen, variant = 'public' }) {
 
   const isPrivate = variant === 'private'
 
+  const handleLogout = () => {
+    localStorage.removeItem('user')
+    window.location.hash = '#/auth/login'
+  }
+
   return (
     <nav className="navbar">
       <div className="container">
@@ -18,11 +23,20 @@ export default function Navbar({ menuOpen, setMenuOpen, variant = 'public' }) {
           <div className="nav-left">
             <div className="logo">Return<span className="logo-sep">|</span>Hub</div>
             <div className="menu">
-                <a href="#home">Home</a>
-                <a href="#about">About</a>
-                <a href="#features">Features</a>
-                <a href="#/contact">Contact Us</a>
-              </div>
+              {isPrivate ? (
+                <>
+                  <a href="#/dashboard">Home</a>
+                  <a href="#/messages">Messages</a>
+                </>
+              ) : (
+                <>
+                  <a href="#home">Home</a>
+                  <a href="#about">About</a>
+                  <a href="#features">Features</a>
+                  <a href="#/contact">Contact Us</a>
+                </>
+              )}
+            </div>
           </div>
           <div className="nav-right">
             <button
@@ -34,12 +48,15 @@ export default function Navbar({ menuOpen, setMenuOpen, variant = 'public' }) {
             </button>
             {isPrivate ? (
               <>
-                <button className="nav-icon-btn" aria-label="Settings">
-                  <Settings size={18} />
+                <button className="nav-icon-btn" aria-label="Notifications">
+                  <Bell size={18} />
                 </button>
                 <a href="#/profile" className="nav-icon-btn" aria-label="User profile">
                   <User size={18} />
                 </a>
+                <button className="nav-icon-btn" aria-label="Logout" onClick={handleLogout}>
+                  <LogOut size={18} />
+                </button>
               </>
             ) : (
               <>
