@@ -21,11 +21,15 @@ export default function ProfilePage() {
   const [isCropping, setIsCropping] = useState(false)
   const [selectedImage, setSelectedImage] = useState(null)
 
-  // Form state
+  // Form state - MERGED: Included address fields from master branch
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: ''
+    phone: '',
+    street: '',
+    barangay: '',
+    city: '',
+    zipCode: ''
   })
   const [errors, setErrors] = useState({})
   const [userId, setUserId] = useState(null)
@@ -45,7 +49,11 @@ export default function ProfilePage() {
       setFormData({
         name: user.name || '',
         email: user.email || '',
-        phone: user.phone || ''
+        phone: user.phone || '',
+        street: user.street || '',
+        barangay: user.barangay || '',
+        city: user.city || '',
+        zipCode: user.zipCode || ''
       })
       if (user.profileImage) {
         setAvatarUrl(user.profileImage)
@@ -64,11 +72,16 @@ export default function ProfilePage() {
       
       if (result.success) {
         // AuthResponse returns flattened user data directly in result
-        const { name, email, phone, profileImage } = result
+        // MERGED: Destructured new address fields
+        const { name, email, phone, profileImage, street, barangay, city, zipCode } = result
         setFormData({
           name: name || '',
           email: email || '',
-          phone: phone ? formatPhoneNumber(phone) : ''
+          phone: phone ? formatPhoneNumber(phone) : '',
+          street: street || '',
+          barangay: barangay || '',
+          city: city || '',
+          zipCode: zipCode || ''
         })
         if (profileImage) {
           setAvatarUrl(profileImage)
@@ -87,6 +100,8 @@ export default function ProfilePage() {
       setLoading(false)
     }
   }
+
+  // --- MERGED LOGIC: Kept image handling from juen/frontend ---
 
   const handleAvatarClick = () => {
     if (!isEditing) return
@@ -161,14 +176,10 @@ export default function ProfilePage() {
       // Delete old image from Supabase to save storage
       if (oldAvatarUrl) {
         try {
-          // Extract filename from URL
-          // Format: https://.../storage/v1/object/public/profiles/filename.jpg
           const urlParts = oldAvatarUrl.split('/')
           const lastPart = urlParts[urlParts.length - 1]
-          const oldFileName = lastPart.split('?')[0] // Handle query params if any
+          const oldFileName = lastPart.split('?')[0] 
 
-          // Only delete if it looks like a Supabase URL and has a filename
-          // And ensure we are not deleting the file we just uploaded (unlikely due to timestamp)
           if (oldAvatarUrl.includes('supabase') && oldFileName && oldFileName !== fileName) {
             console.log('Deleting old profile image:', oldFileName)
             const { error: deleteError } = await supabase.storage
@@ -195,13 +206,9 @@ export default function ProfilePage() {
   }
 
   const formatPhoneNumber = (value) => {
-    // Remove all non-numeric characters
     const cleaned = value.replace(/\D/g, '')
-    
-    // Limit to 11 digits
     const truncated = cleaned.slice(0, 11)
     
-    // Format as 09XX XXX XXXX
     if (truncated.length > 7) {
       return `${truncated.slice(0, 4)} ${truncated.slice(4, 7)} ${truncated.slice(7)}`
     } else if (truncated.length > 4) {
@@ -274,6 +281,11 @@ export default function ProfilePage() {
                 name: dataToUpdate.name,
                 email: dataToUpdate.email,
                 phone: phoneClean,
+                // MERGED: Send address fields to backend
+                street: dataToUpdate.street,
+                barangay: dataToUpdate.barangay,
+                city: dataToUpdate.city,
+                zipCode: dataToUpdate.zipCode,
                 profileImage: dataToUpdate.profileImage || avatarUrl
             })
         })
@@ -293,6 +305,10 @@ export default function ProfilePage() {
                 name: result.name || dataToUpdate.name,
                 email: result.email || dataToUpdate.email,
                 phone: result.phone || phoneClean,
+                street: result.street || dataToUpdate.street,
+                barangay: result.barangay || dataToUpdate.barangay,
+                city: result.city || dataToUpdate.city,
+                zipCode: result.zipCode || dataToUpdate.zipCode,
                 profileImage: result.profileImage || dataToUpdate.profileImage || avatarUrl
             }
             localStorage.setItem('user', JSON.stringify(updatedUser))
@@ -333,7 +349,7 @@ export default function ProfilePage() {
     setIsEditing(false)
     setErrors({})
     setNotification(null)
-    // Reset form to original values (re-fetch or use current saved state)
+    // Reset form to original values
     if (userId) fetchUserData(userId)
   }
 
@@ -384,7 +400,7 @@ export default function ProfilePage() {
                     aria-labelledby="Zoom"
                     onChange={(e) => setZoom(Number(e.target.value))}
                     style={{ width: '100%' }}
-                 />
+                  />
             </div>
         </div>
       )}
@@ -490,13 +506,67 @@ export default function ProfilePage() {
                           value={formData.phone} 
                           onChange={handleChange}
                           placeholder="09XX XXX XXXX"
-                          maxLength={13} // 11 digits + 2 spaces
+                          maxLength={13} 
                           disabled={!isEditing}
                         />
                         {errors.phone && <span style={{ color: 'red', fontSize: '0.8rem' }}>{errors.phone}</span>}
                       </div>
+
+                      {/* MERGED: Added Address fields from master */}
+                      <div className={styles['form-group']}>
+                        <label className={styles['form-label']}>Street Address</label>
+                        <input 
+                          type="text" 
+                          name="street"
+                          className={styles['form-input']} 
+                          value={formData.street} 
+                          onChange={handleChange}
+                          placeholder="123 Rizal St."
+                          disabled={!isEditing}
+                        />
+                      </div>
+
+                      <div className={styles['form-group']}>
+                        <label className={styles['form-label']}>Barangay</label>
+                        <input 
+                          type="text" 
+                          name="barangay"
+                          className={styles['form-input']} 
+                          value={formData.barangay} 
+                          onChange={handleChange}
+                          placeholder="San Antonio"
+                          disabled={!isEditing}
+                        />
+                      </div>
+
+                      <div className={styles['form-group']}>
+                        <label className={styles['form-label']}>City</label>
+                        <input 
+                          type="text" 
+                          name="city"
+                          className={styles['form-input']} 
+                          value={formData.city} 
+                          onChange={handleChange}
+                          placeholder="Makati City"
+                          disabled={!isEditing}
+                        />
+                      </div>
+
+                       <div className={styles['form-group']}>
+                        <label className={styles['form-label']}>Zip Code</label>
+                        <input 
+                          type="text" 
+                          name="zipCode"
+                          className={styles['form-input']} 
+                          value={formData.zipCode} 
+                          onChange={handleChange}
+                          placeholder="1234"
+                          disabled={!isEditing}
+                        />
+                      </div>
                     </div>
                     
+                    {/* MERGED: Kept juen/frontend logic for buttons (Edit vs Save/Cancel) */}
                     <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
                         {!isEditing ? (
                            <button 
