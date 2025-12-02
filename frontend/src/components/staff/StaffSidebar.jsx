@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { LayoutGrid, FileText, Package, BadgeCheck, Users, Settings, LogOut, User } from 'lucide-react'
+import { LayoutGrid, FileText, Package, BadgeCheck, Settings, LogOut, User, MessageSquare } from 'lucide-react'
 import '../../styles/components/StaffSidebar.css'
 import ConfirmModal from '../common/ConfirmModal'
 
@@ -9,7 +9,8 @@ export default function StaffSidebar({ open = true }) {
     { key: 'staff/reports', label: 'Reports', icon: FileText, href: '#/staff/reports' },
     { key: 'staff/inventory', label: 'Inventory', icon: Package, href: '#/staff/inventory' },
     { key: 'staff/claims', label: 'Claims', icon: BadgeCheck, href: '#/staff/claims' },
-    { key: 'staff/users', label: 'User Management', icon: Users, href: '#/staff/users' },
+    { key: 'staff/messages', label: 'Messages', icon: MessageSquare, href: '#/staff/messages' },
+    { key: 'staff/profile', label: 'Profile', icon: User, href: '#/staff/profile' },
     { key: 'staff/settings', label: 'Settings', icon: Settings, href: '#/staff/settings' },
   ]), [])
 

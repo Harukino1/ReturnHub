@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { ArrowLeft } from 'lucide-react'
 import Navbar from '../../components/layout/Navbar'
 import StaffSidebar from '../../components/staff/StaffSidebar'
 import styles from '../../styles/pages/user/Profile.module.css'
@@ -68,15 +67,7 @@ export default function StaffProfilePage() {
     }
   }
 
-  const onBack = () => {
-    const r = sessionStorage.getItem('returnRoute')
-    if (r) {
-      sessionStorage.removeItem('returnRoute')
-      window.location.hash = `#/${r}`
-      return
-    }
-    window.location.hash = '#/staff/dashboard'
-  }
+
 
   
 
@@ -153,13 +144,7 @@ export default function StaffProfilePage() {
         <div className={styles['profile-layout']}>
           <aside className={styles['profile-sidebar']}>
             <div style={{ marginBottom: '1.5rem' }}>
-              <button 
-                onClick={onBack} 
-                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', color: 'var(--gray-700)' }}
-                aria-label="Go back"
-              >
-                <ArrowLeft size={24} />
-              </button>
+              
             </div>
 
             <h1 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>Profile</h1>

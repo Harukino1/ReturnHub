@@ -6,25 +6,40 @@ import Dashboard from './pages/user/Dashboard.page'
 import ProfilePage from './pages/user/Profile.page'
 import MessagesPage from './pages/user/Messages.page'
 import StaffDashboardPage from './pages/staff/StaffDashboard.page'
+import StaffReportsPage from './pages/staff/StaffReports.page'
+import StaffInventoryPage from './pages/staff/StaffInventory.page'
+import StaffClaimsPage from './pages/staff/StaffClaims.page'
+import StaffMessagesPage from './pages/staff/StaffMessages.page'
 import StaffProfilePage from './pages/staff/StaffProfile.page'
 import AdminLoginPage from './pages/admin/AdminLogin.page'
 import AdminDashboard from './pages/admin/AdminDashboard.page'
 
 export default function App() {
+  const routeMap = (p) => {
+    const path = p.endsWith('/') ? p.slice(0, -1) : p
+    if (path.startsWith('auth')) return 'auth'
+    const m = {
+      'contact': 'contact',
+      'dashboard': 'dashboard',
+      'profile': 'profile',
+      'messages': 'messages',
+      'staff/dashboard': 'staff-dashboard',
+      'staff/profile': 'staff-profile',
+      'staff/reports': 'staff-reports',
+      'staff/inventory': 'staff-inventory',
+      'staff/claims': 'staff-claims',
+      'staff/messages': 'staff-messages',
+      'admin-panel': 'admin'
+    }
+    if (m[path]) return m[path]
+    if (path.startsWith('staff/')) return 'staff-dashboard'
+    return 'landing'
+  }
   const computeInitialRoute = () => {
     const h = window.location.hash || '#home'
     if (h.startsWith('#/')) {
       const rawPath = h.slice(2)
-      const path = rawPath.endsWith('/') ? rawPath.slice(0, -1) : rawPath
-      if (path.startsWith('auth')) return 'auth'
-      if (path === 'contact') return 'contact'
-      if (path === 'dashboard') return 'dashboard'
-      if (path === 'profile') return 'profile'
-      if (path === 'staff/profile') return 'staff-profile'
-      if (path === 'messages') return 'messages'
-      if (path === 'staff/dashboard') return 'staff-dashboard'
-      if (path === 'admin-panel') return 'admin'
-      return 'landing'
+      return routeMap(rawPath)
     }
     return 'landing'
   }
@@ -68,14 +83,9 @@ export default function App() {
           setCurrentPage('auth')
           const seg = path.split('/')
           setAuthMode(seg[1] === 'signup' ? 'signup' : 'login')
-        } else if (path === 'contact') setCurrentPage('contact')
-        else if (path === 'dashboard') setCurrentPage('dashboard')
-        else if (path === 'profile') setCurrentPage('profile')
-        else if (path === 'staff/profile') setCurrentPage('staff-profile')
-        else if (path === 'messages') setCurrentPage('messages')
-        else if (path === 'staff/dashboard') setCurrentPage('staff-dashboard')
-        else if (path === 'admin-panel') setCurrentPage('admin')
-        else setCurrentPage('landing')
+        } else {
+          setCurrentPage(routeMap(path))
+        }
         lastPath = path
       } else {
         setCurrentPage('landing')
@@ -118,6 +128,10 @@ export default function App() {
   if (currentPage === 'profile') return <ProfilePage onNavigate={handleNavigate} />
   if (currentPage === 'messages') return <MessagesPage onNavigate={handleNavigate} />
   if (currentPage === 'staff-dashboard') return <StaffDashboardPage onNavigate={handleNavigate} />
+  if (currentPage === 'staff-reports') return <StaffReportsPage onNavigate={handleNavigate} />
+  if (currentPage === 'staff-inventory') return <StaffInventoryPage onNavigate={handleNavigate} />
+  if (currentPage === 'staff-claims') return <StaffClaimsPage onNavigate={handleNavigate} />
+  if (currentPage === 'staff-messages') return <StaffMessagesPage onNavigate={handleNavigate} />
   if (currentPage === 'staff-profile') return <StaffProfilePage onNavigate={handleNavigate} />
   return <LandingPage onNavigate={handleNavigate} />
 }

@@ -39,12 +39,17 @@ public class AdminController {
         if (staffOpt.isPresent()) {
             Staff staff = staffOpt.get();
             if (passwordEncoder.matches(password, staff.getPassword())) {
-                // In a real app, return JWT or Session. For now, just success.
-                // Frontend will use Basic Auth with these credentials for subsequent requests.
-                return ResponseEntity.ok(Map.of("success", true, "role", staff.getRole(), "name", staff.getName()));
+                return ResponseEntity.ok(Map.of(
+                        "success", true,
+                        "role", staff.getRole(),
+                        "name", staff.getName(),
+                        "email", staff.getEmail(),
+                        "staffId", staff.getStaffId(),
+                        "profileImage", staff.getProfileImage()));
             }
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("success", false, "message", "Invalid credentials"));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("success", false, "message", "Invalid credentials"));
     }
 
     // --- Staff Management ---
@@ -52,6 +57,14 @@ public class AdminController {
     @GetMapping("/staff")
     public List<Staff> getAllStaff() {
         return staffService.getAllStaff();
+    }
+
+    @GetMapping("/staff/{id}")
+    public ResponseEntity<?> getStaffById(@PathVariable int id) {
+        Optional<Staff> staff = staffService.getStaffById(id);
+        return staff.<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Map.of("success", false, "message", "Staff not found")));
     }
 
     @PostMapping("/staff")
