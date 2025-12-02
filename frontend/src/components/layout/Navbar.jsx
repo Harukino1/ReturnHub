@@ -47,7 +47,7 @@ export default function Navbar({ menuOpen, setMenuOpen, variant = 'public', onHa
                 <Menu size={18} />
               </button>
             )}
-            <div className="logo">Return<span className="logo-sep">|</span>Hub</div>
+            <div className="logo">Return<span className="logo-sep">|</span>Hub{isStaffHeader ? ' Staff' : ''}</div>
             <div className="menu">
               {isPrivate ? (
                 <>

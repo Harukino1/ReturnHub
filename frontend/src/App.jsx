@@ -5,6 +5,7 @@ import ContactPage from './pages/public/Contact.page'
 import Dashboard from './pages/user/Dashboard.page'
 import ProfilePage from './pages/user/Profile.page'
 import MessagesPage from './pages/user/Messages.page'
+import ReportsPage from './pages/user/Reports.page'
 import StaffDashboardPage from './pages/staff/StaffDashboard.page'
 import StaffReportsPage from './pages/staff/StaffReports.page'
 import StaffInventoryPage from './pages/staff/StaffInventory.page'
@@ -21,6 +22,7 @@ export default function App() {
     const m = {
       'contact': 'contact',
       'dashboard': 'dashboard',
+      'reports': 'reports',
       'profile': 'profile',
       'messages': 'messages',
       'staff/dashboard': 'staff-dashboard',
@@ -100,6 +102,7 @@ export default function App() {
     if (target === 'auth') window.location.hash = `#/auth/${opts.mode === 'signup' ? 'signup' : 'login'}`
     else if (target === 'contact') window.location.hash = '#/contact'
     else if (target === 'dashboard') window.location.hash = '#/dashboard'
+    else if (target === 'reports') window.location.hash = '#/reports'
     else if (target === 'messages') window.location.hash = '#/messages'
     else if (target === 'admin') window.location.hash = '#/admin-panel'
     else window.location.hash = `#${target || 'home'}`
@@ -125,6 +128,7 @@ export default function App() {
   if (currentPage === 'auth') return <AuthPage onNavigate={handleNavigate} authMode={authMode} />
   if (currentPage === 'contact') return <ContactPage onNavigate={handleNavigate} />
   if (currentPage === 'dashboard') return <Dashboard onNavigate={handleNavigate} />
+  if (currentPage === 'reports') return <ReportsPage onNavigate={handleNavigate} />
   if (currentPage === 'profile') return <ProfilePage onNavigate={handleNavigate} />
   if (currentPage === 'messages') return <MessagesPage onNavigate={handleNavigate} />
   if (currentPage === 'staff-dashboard') return <StaffDashboardPage onNavigate={handleNavigate} />
