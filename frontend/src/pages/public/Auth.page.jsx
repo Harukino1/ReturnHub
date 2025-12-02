@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Mail, Lock, User, Phone, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react'
 import Navbar from '../../components/layout/Navbar'
-import Footer from '../../components/layout/Footer'
 import styles from '../../styles/pages/public/Auth.module.css'
 import randomStuff from '../../assets/random-stuff.png'
 
@@ -27,7 +26,7 @@ export default function AuthPage({ authMode = 'login' }) {
   }
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-  const validatePhone = (phone) => /^[\d\s\-\+\(\)]+$/.test(phone) && phone.replace(/\D/g, '').length >= 10
+  const validatePhone = (phone) => /[\d\s\-+()]+/.test(phone) && phone.replace(/\D/g, '').length >= 10
 
   const validateForm = () => {
     const newErrors = {}
@@ -324,7 +323,6 @@ export default function AuthPage({ authMode = 'login' }) {
           </div>
         </div>
       </section>
-      <Footer />
     </div>
   )
 }

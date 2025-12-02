@@ -56,6 +56,7 @@ export default function AdminDashboard({ onLogout }) {
       if (res.ok) fetchData()
       else alert('Failed to delete')
     } catch (error) {
+      console.error('Error deleting:', error)
       alert('Error deleting')
     }
   }
@@ -88,6 +89,7 @@ export default function AdminDashboard({ onLogout }) {
         alert('Operation failed')
       }
     } catch (error) {
+      console.error('Error submitting form:', error)
       alert('Error submitting form')
     }
   }
@@ -153,9 +155,11 @@ export default function AdminDashboard({ onLogout }) {
           <table className={styles['data-table']}>
             <thead>
               <tr>
+                {activeTab === 'users' && <th>Profile</th>}
                 <th>ID</th>
                 <th>Name</th>
                 <th>Email</th>
+                {activeTab === 'users' && <th>Phone Number</th>}
                 {activeTab === 'staff' && <th>Role</th>}
                 <th>Actions</th>
               </tr>
@@ -163,9 +167,20 @@ export default function AdminDashboard({ onLogout }) {
             <tbody>
               {(activeTab === 'users' ? users : staff).map(item => (
                 <tr key={item.userId || item.staffId}>
+                  {activeTab === 'users' && (
+                    <td>
+                      <img 
+                        src={item.profileImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=random`} 
+                        alt="Profile" 
+                        style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
+                        onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name)}&background=random` }}
+                      />
+                    </td>
+                  )}
                   <td>{item.userId || item.staffId}</td>
                   <td>{item.name}</td>
                   <td>{item.email}</td>
+                  {activeTab === 'users' && <td>{item.phone || 'N/A'}</td>}
                   {activeTab === 'staff' && <td>{item.role}</td>}
                   <td>
                     <button 

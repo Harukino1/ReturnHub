@@ -41,6 +41,7 @@ export default function AdminLogin({ onLogin }) {
         setError(data.message || 'Invalid credentials')
       }
     } catch (err) {
+      console.error('Admin login error:', err)
       setError('Server error. Please try again.')
     } finally {
       setIsLoading(false)

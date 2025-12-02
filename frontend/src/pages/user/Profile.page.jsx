@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
-import { User, Shield, Clock, Bell, Camera, Loader2, X, Check } from 'lucide-react'
+import { User, Bell, Camera, Loader2, X, Check, ArrowLeft } from 'lucide-react'
 import Cropper from 'react-easy-crop'
 import Navbar from '../../components/layout/Navbar'
+import ConfirmModal from '../../components/common/ConfirmModal'
 import styles from '../../styles/pages/user/Profile.module.css'
 import { supabase } from '../../lib/supabaseClient'
 import { getCroppedImg } from '../../lib/cropUtils'
@@ -35,6 +36,7 @@ export default function ProfilePage() {
   const [userId, setUserId] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
   const [notification, setNotification] = useState(null)
+  const [showUserLogoutConfirm, setShowUserLogoutConfirm] = useState(false)
 
   // Theme sync & Load Data
   useEffect(() => {
@@ -281,11 +283,6 @@ export default function ProfilePage() {
                 name: dataToUpdate.name,
                 email: dataToUpdate.email,
                 phone: phoneClean,
-                // MERGED: Send address fields to backend
-                street: dataToUpdate.street,
-                barangay: dataToUpdate.barangay,
-                city: dataToUpdate.city,
-                zipCode: dataToUpdate.zipCode,
                 profileImage: dataToUpdate.profileImage || avatarUrl
             })
         })
@@ -305,10 +302,6 @@ export default function ProfilePage() {
                 name: result.name || dataToUpdate.name,
                 email: result.email || dataToUpdate.email,
                 phone: result.phone || phoneClean,
-                street: result.street || dataToUpdate.street,
-                barangay: result.barangay || dataToUpdate.barangay,
-                city: result.city || dataToUpdate.city,
-                zipCode: result.zipCode || dataToUpdate.zipCode,
                 profileImage: result.profileImage || dataToUpdate.profileImage || avatarUrl
             }
             localStorage.setItem('user', JSON.stringify(updatedUser))
@@ -339,10 +332,9 @@ export default function ProfilePage() {
   }
 
   const tabs = [
-    { id: 'personal', label: 'Personal Information', icon: User },
-    { id: 'security', label: 'Security', icon: Shield },
-    { id: 'activity', label: 'Activity History', icon: Clock },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'personal', label: 'Profile Information' },
+    { id: 'account', label: 'Account Settings' },
+    { id: 'notifications', label: 'Notifications' },
   ]
 
   const handleCancel = () => {
@@ -409,7 +401,35 @@ export default function ProfilePage() {
         <div className={styles['profile-layout']}>
           {/* Sidebar */}
           <aside className={styles['profile-sidebar']}>
-            <h1>Profile</h1>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <button 
+                onClick={() => {
+                  const r = sessionStorage.getItem('returnRoute')
+                  if (r) {
+                    sessionStorage.removeItem('returnRoute')
+                    window.location.hash = `#/${r}`
+                  } else {
+                    const s = localStorage.getItem('user')
+                    if (s) {
+                      try {
+                        const u = JSON.parse(s)
+                        if (u.role === 'STAFF') {
+                          window.location.hash = '#/staff/dashboard'
+                          return
+                        }
+                      } catch (e) { void e }
+                    }
+                    window.location.hash = '#/dashboard'
+                  }
+                }} 
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', color: 'var(--gray-700)' }}
+                aria-label="Go back"
+              >
+                <ArrowLeft size={24} />
+              </button>
+            </div>
+
+            <h1 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>Profile</h1>
             <div className={styles['profile-tabs']}>
               {tabs.map(tab => (
                 <button
@@ -417,10 +437,15 @@ export default function ProfilePage() {
                   className={`${styles['profile-tab']} ${activeTab === tab.id ? styles.active : ''}`}
                   onClick={() => setActiveTab(tab.id)}
                 >
-                  <tab.icon size={18} style={{ marginRight: '10px' }} />
                   {tab.label}
                 </button>
               ))}
+              <button
+                className={styles['profile-tab']}
+                onClick={() => setShowUserLogoutConfirm(true)}
+              >
+                Logout
+              </button>
             </div>
           </aside>
 
@@ -519,11 +544,11 @@ export default function ProfilePage() {
                           type="text" 
                           name="street"
                           className={styles['form-input']} 
-                          value={formData.street} 
-                          onChange={handleChange}
-                          placeholder="123 Rizal St."
-                          disabled={!isEditing}
+                          value={''} 
+                          placeholder=""
+                          disabled={true}
                         />
+                        <span style={{ color: 'var(--gray-500)', fontSize: '0.8rem' }}>Not yet available</span>
                       </div>
 
                       <div className={styles['form-group']}>
@@ -532,11 +557,11 @@ export default function ProfilePage() {
                           type="text" 
                           name="barangay"
                           className={styles['form-input']} 
-                          value={formData.barangay} 
-                          onChange={handleChange}
-                          placeholder="San Antonio"
-                          disabled={!isEditing}
+                          value={''} 
+                          placeholder=""
+                          disabled={true}
                         />
+                        <span style={{ color: 'var(--gray-500)', fontSize: '0.8rem' }}>Not yet available</span>
                       </div>
 
                       <div className={styles['form-group']}>
@@ -545,24 +570,24 @@ export default function ProfilePage() {
                           type="text" 
                           name="city"
                           className={styles['form-input']} 
-                          value={formData.city} 
-                          onChange={handleChange}
-                          placeholder="Makati City"
-                          disabled={!isEditing}
+                          value={''} 
+                          placeholder=""
+                          disabled={true}
                         />
+                        <span style={{ color: 'var(--gray-500)', fontSize: '0.8rem' }}>Not yet available</span>
                       </div>
 
-                       <div className={styles['form-group']}>
+                      <div className={styles['form-group']}>
                         <label className={styles['form-label']}>Zip Code</label>
                         <input 
                           type="text" 
                           name="zipCode"
                           className={styles['form-input']} 
-                          value={formData.zipCode} 
-                          onChange={handleChange}
-                          placeholder="1234"
-                          disabled={!isEditing}
+                          value={''} 
+                          placeholder=""
+                          disabled={true}
                         />
+                        <span style={{ color: 'var(--gray-500)', fontSize: '0.8rem' }}>Not yet available</span>
                       </div>
                     </div>
                     
@@ -608,6 +633,21 @@ export default function ProfilePage() {
           </main>
         </div>
       </div>
+
+      <ConfirmModal
+        open={showUserLogoutConfirm}
+        title="Logout"
+        message="Are you sure you want to logout?"
+        confirmText="Logout"
+        cancelText="Cancel"
+        onCancel={() => setShowUserLogoutConfirm(false)}
+        onConfirm={() => {
+          localStorage.removeItem('user')
+          setShowUserLogoutConfirm(false)
+          window.location.hash = '#/auth/login'
+        }}
+        tone="danger"
+      />
     </div>
   )
 }
