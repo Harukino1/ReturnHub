@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { User, Bell, Camera, Loader2, X, Check, ArrowLeft } from 'lucide-react'
 import Cropper from 'react-easy-crop'
 import Navbar from '../../components/layout/Navbar'
+import UserSidebar from '../../components/user/UserSidebar'
 import ConfirmModal from '../../components/common/ConfirmModal'
 import styles from '../../styles/pages/user/Profile.module.css'
 import { supabase } from '../../lib/supabaseClient'
@@ -10,6 +11,7 @@ import { getCroppedImg } from '../../lib/cropUtils'
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('personal')
   const [menuOpen, setMenuOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const fileInputRef = useRef(null)
   const [uploading, setUploading] = useState(false)
   const [avatarUrl, setAvatarUrl] = useState(null)
@@ -347,7 +349,8 @@ export default function ProfilePage() {
 
   return (
     <div className={styles['profile-page']}>
-      <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} variant="private" />
+      <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} variant="private" onHamburgerClick={() => setSidebarOpen((p) => !p)} />
+      <UserSidebar open={sidebarOpen} />
       
       {/* Crop Modal */}
       {isCropping && (
@@ -397,7 +400,7 @@ export default function ProfilePage() {
         </div>
       )}
 
-      <div className="container">
+      <div className="container" style={{ paddingTop: '0', marginLeft: sidebarOpen ? '250px' : '0' }}>
         <div className={styles['profile-layout']}>
           {/* Sidebar */}
           <aside className={styles['profile-sidebar']}>

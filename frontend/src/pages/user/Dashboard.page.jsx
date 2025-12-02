@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Search } from 'lucide-react'
 import Navbar from '../../components/layout/Navbar'
+import UserSidebar from '../../components/user/UserSidebar'
 import styles from '../../styles/pages/user/Dashboard.module.css'
 
 // Dummy data for items
@@ -19,6 +20,7 @@ export default function Dashboard() {
   const [filterType, setFilterType] = useState('lost')
   const [searchQuery, setSearchQuery] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   useEffect(() => {
     const t = localStorage.getItem('theme') || 'light'
@@ -40,11 +42,12 @@ export default function Dashboard() {
 
   return (
     <div className={styles['dashboard-page']}>
-      <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} variant="private" />
+      <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} variant="private" onHamburgerClick={() => setSidebarOpen((p) => !p)} />
+      <UserSidebar open={sidebarOpen} />
 
       {/* Main Content */}
       <main className={styles['dashboard-main']}>
-        <div className="container">
+        <div className="container" style={{ marginLeft: sidebarOpen ? '250px' : '0' }}>
           {/* Search Section */}
           <div className={styles['dashboard-search-section']}>
             <form onSubmit={handleSearch} className={styles['dashboard-search-form']}>
