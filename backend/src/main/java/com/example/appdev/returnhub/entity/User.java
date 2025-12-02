@@ -1,7 +1,9 @@
 package com.example.appdev.returnhub.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +28,7 @@ public class User {
     @Column(name = "profile_image", columnDefinition = "TEXT")
     private String profileImage;
 
+    @JsonIgnore
     @Column(name = "password", length = 100, nullable = false)
     private String password;
 

@@ -1,0 +1,28 @@
+.staff-sidebar { width: 250px; background: var(--white); border-right: 1px solid #e5e7eb; position: fixed; top: 64px; bottom: 0; left: 0; overflow-y: auto; }
+.staff-sidebar.collapsed { display: none; }
+.staff-sidebar-inner { display: flex; flex-direction: column; height: 100%; }
+.staff-welcome { padding: 1rem; border-bottom: 1px solid #e5e7eb; }
+.staff-welcome-title { display: block; color: var(--gray-500); font-size: .875rem; }
+.staff-welcome-name { display: block; font-weight: 700; color: var(--gray-900); }
+.staff-nav { display: flex; flex-direction: column; padding: .5rem; gap: .25rem; }
+.staff-nav-item { display: flex; align-items: center; gap: .75rem; padding: .6rem .75rem; border-radius: .5rem; color: #374151; text-decoration: none; border: 1px solid transparent; }
+.staff-nav-item:hover { background: #f9fafb; border-color: #e5e7eb; }
+.staff-nav-item.active { background: #f59e0b20; color: #b45309; border-color: #f59e0b; }
+.staff-nav-item .chev { margin-left: auto; color: #b45309; font-weight: 700; }
+.staff-nav-bottom { margin-top: auto; padding: .5rem; border-top: 1px solid #e5e7eb; }
+.staff-nav-item.logout { width: 100%; background: transparent; border: 1px solid transparent; cursor: pointer; }
+.staff-nav-item.logout:hover { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+
+@media (max-width: 768px) {
+  .staff-sidebar { width: 220px; }
+}
+
+[data-theme='dark'] .staff-sidebar { background: #0b0e14; border-right-color: #1f2937; }
+[data-theme='dark'] .staff-welcome { border-bottom-color: #1f2937; }
+[data-theme='dark'] .staff-welcome-title { color: #94a3b8; }
+[data-theme='dark'] .staff-welcome-name { color: #f3f4f6; }
+[data-theme='dark'] .staff-nav-item { color: #e5e7eb; }
+[data-theme='dark'] .staff-nav-item:hover { background: #1f2937; border-color: #374151; }
+[data-theme='dark'] .staff-nav-item.active { background: #1f2937; color: #fbbf24; border-color: #fbbf24; }
+[data-theme='dark'] .staff-nav-bottom { border-top-color: #1f2937; }
+[data-theme='dark'] .staff-nav-item.logout:hover { background: #7f1d1d; color: #fecaca; border-color: #991b1b; }

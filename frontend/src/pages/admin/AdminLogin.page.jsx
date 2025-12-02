@@ -36,11 +36,19 @@ export default function AdminLogin({ onLogin }) {
         const authHeader = 'Basic ' + btoa(formData.username + ':' + formData.password)
         localStorage.setItem('adminAuth', authHeader)
         localStorage.setItem('adminName', data.name)
+        localStorage.setItem('user', JSON.stringify({
+          staffId: data.staffId,
+          name: data.name,
+          email: data.email,
+          profileImage: data.profileImage,
+          role: data.role
+        }))
         onLogin()
       } else {
         setError(data.message || 'Invalid credentials')
       }
     } catch (err) {
+      console.error('Admin login error:', err)
       setError('Server error. Please try again.')
     } finally {
       setIsLoading(false)

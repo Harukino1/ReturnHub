@@ -1,0 +1,52 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface-1, #fff);
+  color: var(--text-1, #111827);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.header { padding: 1rem 1rem 0.5rem; }
+.title { font-size: 1.125rem; font-weight: 600; margin: 0; }
+.body { padding: 0 1rem 1rem; }
+.message { margin: 0; color: var(--text-2, #4b5563); }
+
+.footer {
+  display: flex;
+  gap: .5rem;
+  padding: .75rem 1rem 1rem;
+  justify-content: flex-end;
+}
+
+.btn {
+  border: 1px solid var(--border, #e5e7eb);
+  background: var(--surface-2, #f9fafb);
+  color: var(--text-1, #111827);
+  padding: .5rem .9rem;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.cancel { background: var(--surface-2); }
+.primary { background: var(--amber-50, #fff7ed); color: var(--amber-800, #92400e); border-color: var(--amber-200, #fed7aa) }
+.danger { background: var(--amber-600, #d97706); color: var(--white, #ffffff); border-color: var(--amber-700, #b45309) }
+
+/* Dark mode based on data-theme attribute */
+[data-theme='dark'] .modal { background: #0b0e14; color: #e5e7eb; border-color: #334155 }
+[data-theme='dark'] .message { color: #cbd5e1 }
+[data-theme='dark'] .btn { background: #111827; color: #e5e7eb; border-color: #334155 }
+[data-theme='dark'] .cancel { background: #1f2937; color: #e5e7eb; border-color: #334155 }
+[data-theme='dark'] .primary { background: #1f2937; color: #fbbf24; border-color: #3d2b12 }
+[data-theme='dark'] .danger { background: #92400e; color: #fff; border-color: #b45309 }

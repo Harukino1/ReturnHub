@@ -25,6 +25,9 @@ public class Staff{
     @Column(name = "role", length = 20, nullable = false)
     private String role;
 
+    @Column(name = "profile_image", columnDefinition = "TEXT")
+    private String profileImage;
+
     // Relationships
 
     public Staff() {}
@@ -78,5 +81,12 @@ public class Staff{
     }
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getProfileImage() {
+        return profileImage;
+    }
+    public void setProfileImage(String profileImage) {
+        this.profileImage = profileImage;
     }
 }

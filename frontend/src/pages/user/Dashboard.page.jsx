@@ -15,7 +15,7 @@ const dummyItems = [
   { id: 8, title: 'Laptop Bag', type: 'found', location: 'Train Station', date: '6 hours ago', description: 'Gray laptop bag with charger inside' },
 ]
 
-export default function Dashboard({ onNavigate }) {
+export default function Dashboard() {
   const [filterType, setFilterType] = useState('lost')
   const [searchQuery, setSearchQuery] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)

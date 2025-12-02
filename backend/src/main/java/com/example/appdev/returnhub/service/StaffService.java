@@ -68,6 +68,9 @@ public class StaffService {
         staff.setName(staffDetails.getName());
         staff.setEmail(staffDetails.getEmail());
         staff.setRole(staffDetails.getRole());
+        if (staffDetails.getProfileImage() != null) {
+            staff.setProfileImage(staffDetails.getProfileImage());
+        }
         return staffRepository.save(staff);
     }
 
