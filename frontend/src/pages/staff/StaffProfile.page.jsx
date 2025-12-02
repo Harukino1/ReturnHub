@@ -1,11 +1,8 @@
-import { useEffect, useState, useRef } from 'react'
-import { ArrowLeft, User, Loader2 } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { ArrowLeft } from 'lucide-react'
 import Navbar from '../../components/layout/Navbar'
 import StaffSidebar from '../../components/staff/StaffSidebar'
 import styles from '../../styles/pages/user/Profile.module.css'
-import Cropper from 'react-easy-crop'
-import { supabase } from '../../lib/supabaseClient'
-import { getCroppedImg } from '../../lib/cropUtils'
 
 export default function StaffProfilePage() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -19,26 +16,57 @@ export default function StaffProfilePage() {
   const [activeTab, setActiveTab] = useState('personal')
   const [isEditing, setIsEditing] = useState(false)
   const [loading, setLoading] = useState(false)
-  const fileInputRef = useRef(null)
-  const [uploading, setUploading] = useState(false)
-  const [avatarUrl, setAvatarUrl] = useState(null)
+  
   const [formData, setFormData] = useState({ name: '', email: '' })
   const [errors, setErrors] = useState({})
+  const API_BASE_ADMIN = 'http://localhost:8080/api/admin'
 
-  const [crop, setCrop] = useState({ x: 0, y: 0 })
-  const [zoom, setZoom] = useState(1)
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
-  const [isCropping, setIsCropping] = useState(false)
-  const [selectedImage, setSelectedImage] = useState(null)
+  
 
   useEffect(() => {
     const t = localStorage.getItem('theme') || 'light'
     document.documentElement.setAttribute('data-theme', t)
     if (staff) {
       setFormData({ name: staff.name || '', email: staff.email || '' })
-      if (staff.profileImage) setAvatarUrl(staff.profileImage)
+      const id = staff.staffId || staff.userId
+      const isStaff = staff.role === 'STAFF' || staff.role === 'ADMIN'
+      const authHeader = localStorage.getItem('adminAuth')
+      if (isStaff && authHeader) fetchStaffData(id)
     }
   }, [staff])
+
+  const fetchStaffData = async (id) => {
+    try {
+      const headers = { 'Authorization': localStorage.getItem('adminAuth') || '' }
+      const res = await fetch(`${API_BASE_ADMIN}/staff/${id}`, { headers })
+      if (res.status === 401) return
+      if (!res.ok) return
+      const s = await res.json()
+      setFormData({ name: s.name || '', email: s.email || '' })
+      const uStr = localStorage.getItem('user')
+      if (uStr) {
+        const u = JSON.parse(uStr)
+        localStorage.setItem('user', JSON.stringify({ ...u, name: s.name, email: s.email }))
+      }
+    } catch (e) {
+      console.error('Fetch staff error:', e)
+    }
+  }
+
+  const updateLocal = (dataToUpdate) => {
+    try {
+      const s = localStorage.getItem('user')
+      if (!s) return false
+      const u = JSON.parse(s)
+      const next = { ...u, name: dataToUpdate.name, email: dataToUpdate.email }
+      localStorage.setItem('user', JSON.stringify(next))
+      setStaff(next)
+      return true
+    } catch (err) {
+      console.error('Local update error:', err)
+      return false
+    }
+  }
 
   const onBack = () => {
     const r = sessionStorage.getItem('returnRoute')
@@ -50,59 +78,46 @@ export default function StaffProfilePage() {
     window.location.hash = '#/staff/dashboard'
   }
 
-  const handleAvatarClick = () => {
-    if (!isEditing) return
-    fileInputRef.current?.click()
-  }
+  
 
-  const handleFileChange = (event) => {
-    if (event.target.files && event.target.files.length > 0) {
-      const file = event.target.files[0]
-      if (!['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) { alert('Please upload a valid image (JPG, PNG, GIF).'); return }
-      if (file.size > 5 * 1024 * 1024) { alert('Image size must be less than 5MB.'); return }
-      const reader = new FileReader()
-      reader.addEventListener('load', () => { setSelectedImage(reader.result); setIsCropping(true) })
-      reader.readAsDataURL(file)
-    }
-  }
-
-  const onCropComplete = (_, pixels) => { setCroppedAreaPixels(pixels) }
-
-  const updateLocal = (dataToUpdate) => {
-    const s = localStorage.getItem('user')
-    if (!s) return false
+  const updateBackend = async (dataToUpdate) => {
     try {
+      const s = localStorage.getItem('user')
+      if (!s) throw new Error('Not logged in')
       const u = JSON.parse(s)
-      const next = { ...u, name: dataToUpdate.name, email: dataToUpdate.email, profileImage: dataToUpdate.profileImage || u.profileImage }
+      const id = u.staffId || u.userId
+      const isStaff = u.role === 'STAFF' || u.role === 'ADMIN'
+      const authHeader = localStorage.getItem('adminAuth') || ''
+      if (!isStaff || !authHeader) {
+        return updateLocal(dataToUpdate)
+      }
+      const headers = { 'Content-Type': 'application/json', 'Authorization': authHeader }
+      const res = await fetch(`${API_BASE_ADMIN}/staff/${id}`, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({
+          name: dataToUpdate.name,
+          email: dataToUpdate.email,
+          role: u.role || 'STAFF',
+          
+        })
+      })
+      if (res.status === 401) {
+        return updateLocal(dataToUpdate)
+      }
+      if (!res.ok) throw new Error('Failed to update')
+      const updated = await res.json()
+      const next = { ...u, name: updated.name, email: updated.email, role: updated.role }
       localStorage.setItem('user', JSON.stringify(next))
       setStaff(next)
       return true
-    } catch (e) { console.error(e); return false }
-  }
-
-  const handleCropSave = async () => {
-    try {
-      setUploading(true)
-      const oldAvatarUrl = avatarUrl
-      const croppedBlob = await getCroppedImg(selectedImage, croppedAreaPixels)
-      const fileName = `${(staff?.staffId || staff?.userId || 'staff')}-${Date.now()}.jpg`
-      const filePath = `${fileName}`
-      const { error: uploadError } = await supabase.storage.from('profiles').upload(filePath, croppedBlob, { contentType: 'image/jpeg', upsert: true })
-      if (uploadError) throw uploadError
-      const { data } = supabase.storage.from('profiles').getPublicUrl(filePath)
-      const publicUrl = data.publicUrl
-      setAvatarUrl(publicUrl)
-      setIsCropping(false)
-      setSelectedImage(null)
-      updateLocal({ ...formData, profileImage: publicUrl })
-      if (oldAvatarUrl) { try { /* optional delete old */ } catch (e) { console.error(e) } }
-    } catch (error) {
-      console.error('Upload error:', error)
-      alert('Failed to upload image: ' + error.message)
-    } finally {
-      setUploading(false)
+    } catch (err) {
+      console.error('Staff update error:', err)
+      return false
     }
   }
+
+  
 
   const validateForm = () => {
     const n = {}
@@ -114,11 +129,12 @@ export default function StaffProfilePage() {
     return Object.keys(n).length === 0
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
     setLoading(true)
-    const ok = updateLocal(formData)
+    const ok = await updateBackend(formData)
+    
     setIsEditing(ok ? false : true)
     setLoading(false)
   }
@@ -151,47 +167,15 @@ export default function StaffProfilePage() {
               <button className={`${styles['profile-tab']} ${activeTab === 'personal' ? styles.active : ''}`} onClick={() => setActiveTab('personal')}>Profile Information</button>
               <button className={`${styles['profile-tab']} ${activeTab === 'account' ? styles.active : ''}`} onClick={() => setActiveTab('account')}>Account Settings</button>
               <button className={`${styles['profile-tab']} ${activeTab === 'notifications' ? styles.active : ''}`} onClick={() => setActiveTab('notifications')}>Notifications</button>
-              <a className={styles['profile-tab']} href="#/auth/login">Logout</a>
+              
             </div>
           </aside>
 
           <main className={styles['profile-content']}>
             <div className={styles['profile-card']}>
-              {isCropping && (
-                <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-                  <div style={{ position: 'relative', width: '90%', height: '60%', background: '#333' }}>
-                    <Cropper image={selectedImage} crop={crop} zoom={zoom} aspect={1} onCropChange={setCrop} onCropComplete={onCropComplete} onZoomChange={setZoom} />
-                  </div>
-                  <div style={{ marginTop: 20, display: 'flex', gap: 20 }}>
-                    <button onClick={() => setIsCropping(false)} style={{ padding: '10px 20px', background: 'white', border: 'none', borderRadius: 5, cursor: 'pointer' }}>Cancel</button>
-                    <button onClick={handleCropSave} disabled={uploading} style={{ padding: '10px 20px', background: '#007bff', color: 'white', border: 'none', borderRadius: 5, cursor: 'pointer' }}>{uploading ? 'Saving...' : 'Save & Upload'}</button>
-                  </div>
-                  <div style={{ marginTop: 10, width: '50%' }}>
-                    <input type="range" value={zoom} min={1} max={3} step={0.1} aria-labelledby="Zoom" onChange={(e) => setZoom(Number(e.target.value))} style={{ width: '100%' }} />
-                  </div>
-                </div>
-              )}
+              
 
-              <div className={styles['profile-avatar-section']}>
-                <div className={styles['profile-avatar']} onClick={handleAvatarClick} style={{ cursor: isEditing ? 'pointer' : 'default', position: 'relative', overflow: 'hidden' }}>
-                  {avatarUrl ? (
-                    <img src={avatarUrl} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    <User size={40} strokeWidth={1} />
-                  )}
-                  {uploading && (
-                    <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <Loader2 className="spinning" color="white" />
-                    </div>
-                  )}
-                </div>
-                {isEditing && (
-                  <>
-                    <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/jpeg,image/png,image/gif" style={{ display: 'none' }} />
-                    <button className={styles['profile-btn-update-top']} onClick={handleAvatarClick} disabled={uploading}>{uploading ? 'Uploading...' : 'Update Photo'}</button>
-                  </>
-                )}
-              </div>
+              
 
               <form onSubmit={handleSubmit}>
                 <div className={styles['profile-form-grid']}> 

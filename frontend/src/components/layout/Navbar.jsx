@@ -11,6 +11,7 @@ export default function Navbar({ menuOpen, setMenuOpen, variant = 'public', onHa
   }, [theme])
 
   const isPrivate = variant === 'private'
+  const isStaffHeader = isPrivate && typeof window !== 'undefined' && (window.location.hash || '').startsWith('#/staff/')
 
   useEffect(() => {
     if (isPrivate) {
@@ -75,23 +76,25 @@ export default function Navbar({ menuOpen, setMenuOpen, variant = 'public', onHa
                 <button className="nav-icon-btn" aria-label="Notifications">
                   <Bell size={18} />
                 </button>
-                <a 
-                  href={profileHref} 
-                  className="nav-icon-btn" 
-                  aria-label="User profile" 
-                  style={{ padding: 0, borderRadius: '50%', width: '32px', height: '32px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #e5e7eb' }}
-                >
-                  {user && (user.profileImage || user.name) ? (
-                    <img 
-                      src={user.profileImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=random`}
-                      alt="Profile" 
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                      onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=random` }}
-                    />
-                  ) : (
-                    <User size={18} />
-                  )}
-                </a>
+                {!isStaffHeader && (
+                  <a 
+                    href={profileHref} 
+                    className="nav-icon-btn" 
+                    aria-label="User profile" 
+                    style={{ padding: 0, borderRadius: '50%', width: '32px', height: '32px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid #e5e7eb' }}
+                  >
+                    {user && (user.profileImage || user.name) ? (
+                      <img 
+                        src={user.profileImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=random`}
+                        alt="Profile" 
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                        onError={(e) => { e.target.onerror = null; e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=random` }}
+                      />
+                    ) : (
+                      <User size={18} />
+                    )}
+                  </a>
+                )}
               </>
             ) : (
               <>

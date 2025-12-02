@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { LayoutGrid, FileText, Package, BadgeCheck, Users, Settings, LogOut, User } from 'lucide-react'
 import '../../styles/components/StaffSidebar.css'
+import ConfirmModal from '../common/ConfirmModal'
 
 export default function StaffSidebar({ open = true }) {
   const items = useMemo(() => ([
@@ -32,13 +33,11 @@ export default function StaffSidebar({ open = true }) {
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
 
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+
   return (
     <aside className={`staff-sidebar${open ? '' : ' collapsed'}`}>
       <div className="staff-sidebar-inner">
-        <div className="staff-welcome">
-          <span className="staff-welcome-title">Welcome</span>
-          <span className="staff-welcome-name">{JSON.parse(localStorage.getItem('user') || '{}').name || 'Staff'}</span>
-        </div>
         <nav className="staff-nav">
           {items.map((item) => {
             const Icon = item.icon
@@ -59,15 +58,26 @@ export default function StaffSidebar({ open = true }) {
         <div className="staff-nav-bottom">
           <button
             className="staff-nav-item logout"
-            onClick={() => {
-              localStorage.removeItem('user')
-              window.location.hash = '#/auth/login'
-            }}
+            onClick={() => setShowLogoutConfirm(true)}
           >
             <LogOut size={18} />
             <span className="label">Logout</span>
           </button>
         </div>
+        <ConfirmModal
+          open={showLogoutConfirm}
+          title="Logout"
+          message="Are you sure you want to logout?"
+          confirmText="Logout"
+          cancelText="Cancel"
+          onCancel={() => setShowLogoutConfirm(false)}
+          onConfirm={() => {
+            localStorage.removeItem('user')
+            setShowLogoutConfirm(false)
+            window.location.hash = '#/auth/login'
+          }}
+          tone="danger"
+        />
       </div>
     </aside>
   )
