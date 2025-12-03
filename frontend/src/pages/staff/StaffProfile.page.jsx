@@ -140,7 +140,7 @@ export default function StaffProfilePage() {
     <div className={styles['profile-page']}>
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} variant="private" onHamburgerClick={() => setSidebarOpen((p) => !p)} />
       <StaffSidebar open={sidebarOpen} />
-      <div className="container" style={{ marginLeft: sidebarOpen ? '250px' : '0' }}>
+      <div className="container" style={{ paddingLeft: sidebarOpen ? '250px' : '0' }}>
         <div className={styles['profile-layout']}>
           <aside className={styles['profile-sidebar']}>
             <div style={{ marginBottom: '1.5rem' }}>

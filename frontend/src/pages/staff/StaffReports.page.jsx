@@ -34,7 +34,7 @@ export default function StaffReportsPage() {
     <div className={styles['reports-page']}>
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} variant="private" onHamburgerClick={() => setSidebarOpen((p) => !p)} />
       <StaffSidebar open={sidebarOpen} />
-      <div className="container" style={{ paddingTop: '4rem', marginLeft: sidebarOpen ? '250px' : '0' }}>
+      <div className="container" style={{ paddingTop: '4rem', paddingLeft: sidebarOpen ? '250px' : '0' }}>
         <div className={styles['reports-header']}>
           <h1 className={styles['reports-title']}>Reports Triage</h1>
           <form className={styles['reports-search-form']} onSubmit={(e) => e.preventDefault()}>

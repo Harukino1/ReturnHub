@@ -14,6 +14,14 @@ const dummyItems = [
   { id: 6, title: 'Keys with Keychain', type: 'found', location: 'Parking Lot', date: '2 days ago', description: 'Set of keys with car keychain' },
   { id: 7, title: 'Sunglasses', type: 'lost', location: 'Beach Area', date: '4 days ago', description: 'Black Ray-Ban sunglasses in case' },
   { id: 8, title: 'Laptop Bag', type: 'found', location: 'Train Station', date: '6 hours ago', description: 'Gray laptop bag with charger inside' },
+  { id: 1, title: 'Black Leather Wallet', type: 'lost', location: 'Downtown Mall', date: '2 days ago', description: 'Black leather wallet with ID cards inside' },
+  { id: 2, title: 'iPhone 13 Pro', type: 'found', location: 'Central Park', date: '1 day ago', description: 'Silver iPhone found near the fountain' },
+  { id: 3, title: 'Blue Backpack', type: 'lost', location: 'University Library', date: '3 days ago', description: 'Navy blue backpack with laptop compartment' },
+  { id: 4, title: 'Gold Watch', type: 'found', location: 'Coffee Shop', date: '5 hours ago', description: 'Gold wristwatch left on table' },
+  { id: 5, title: 'Red Umbrella', type: 'lost', location: 'Bus Station', date: '1 week ago', description: 'Red compact umbrella with wooden handle' },
+  { id: 6, title: 'Keys with Keychain', type: 'found', location: 'Parking Lot', date: '2 days ago', description: 'Set of keys with car keychain' },
+  { id: 7, title: 'Sunglasses', type: 'lost', location: 'Beach Area', date: '4 days ago', description: 'Black Ray-Ban sunglasses in case' },
+  { id: 8, title: 'Laptop Bag', type: 'found', location: 'Train Station', date: '6 hours ago', description: 'Gray laptop bag with charger inside' },
 ]
 
 export default function Dashboard() {
@@ -30,8 +38,8 @@ export default function Dashboard() {
   const filteredItems = dummyItems.filter(item => {
     const matchesType = item.type === filterType
     const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         item.location.toLowerCase().includes(searchQuery.toLowerCase())
+                          item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          item.location.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesType && matchesSearch
   })
 
@@ -47,7 +55,11 @@ export default function Dashboard() {
 
       {/* Main Content */}
       <main className={styles['dashboard-main']}>
-        <div className="container" style={{ marginLeft: sidebarOpen ? '250px' : '0' }}>
+        {/* CHANGED: Replaced "container" with "dashboard-container" for wider width */}
+        <div 
+          className={styles['dashboard-container']} 
+          style={{ paddingLeft: sidebarOpen ? '250px' : '2rem' }}
+        >
           {/* Search Section */}
           <div className={styles['dashboard-search-section']}>
             <form onSubmit={handleSearch} className={styles['dashboard-search-form']}>
@@ -115,4 +127,3 @@ export default function Dashboard() {
     </div>
   )
 }
-

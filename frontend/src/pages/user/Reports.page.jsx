@@ -34,7 +34,17 @@ export default function ReportsPage() {
     <div className={styles['reports-page']}>
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} variant="private" onHamburgerClick={() => setSidebarOpen((p) => !p)} />
       <UserSidebar open={sidebarOpen} />
-      <div className="container" style={{ paddingTop: '4rem', marginLeft: sidebarOpen ? '250px' : '0' }}>
+      
+      {/* UPDATED CONTAINER: 
+        1. Used custom styles['reports-container'] 
+        2. Added logic to style prop to handle sidebar offset 
+      */}
+      <div 
+        className={styles['reports-container']} 
+        style={{ 
+          paddingLeft: sidebarOpen ? '270px' : '2rem' // 250px sidebar + 20px gap
+        }}
+      >
         <div className={styles['reports-header']}>
           <h1 className={styles['reports-title']}>Your Reports</h1>
           <form className={styles['reports-search-form']} onSubmit={(e) => e.preventDefault()}>
@@ -49,7 +59,7 @@ export default function ReportsPage() {
             </button>
           </form>
           <button className="btn btn-primary" onClick={() => setShowAdd(true)} style={{ marginLeft: 'auto' }}>
-            <Plus size={16} /> New Report
+            <Plus size={16} /> <span className={styles['btn-text']}>New Report</span>
           </button>
         </div>
 
@@ -61,50 +71,53 @@ export default function ReportsPage() {
         </div>
 
         <div className={styles['reports-content']}>
-          <table className={styles['reports-table']}>
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Date</th>
-                <th>Category</th>
-                <th>Location</th>
-                {activeTab === 'all' && <th>Status</th>}
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((r) => (
-                <tr key={r.id}>
-                  <td>
-                    <div className={styles['item-cell']}>
-                      <div className={styles['thumb']}>
-                        {r.photoUrl ? (
-                          <img className={styles['thumb-image']} src={r.photoUrl} alt={r.name} />
-                        ) : (
-                          <Image size={18} />
-                        )}
-                      </div>
-                      <div className={styles['item-meta']}>
-                        <div className={styles['item-name']}>{r.name}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>{r.date}</td>
-                  <td>{r.category}</td>
-                  <td>{r.location}</td>
-                  {activeTab === 'all' && <td>{r.status}</td>}
-                  <td>
-                    <button className={styles['view-btn']}>View <Eye size={16} /></button>
-                  </td>
-                </tr>
-              ))}
-              {filtered.length === 0 && (
+          {/* ADDED: Table responsive wrapper for mobile scrolling */}
+          <div className={styles['table-responsive']}>
+            <table className={styles['reports-table']}>
+              <thead>
                 <tr>
-                  <td colSpan={activeTab === 'all' ? 6 : 5} className={styles['empty-cell']}>No reports</td>
+                  <th>Item</th>
+                  <th>Date</th>
+                  <th>Category</th>
+                  <th>Location</th>
+                  {activeTab === 'all' && <th>Status</th>}
+                  <th>Action</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filtered.map((r) => (
+                  <tr key={r.id}>
+                    <td>
+                      <div className={styles['item-cell']}>
+                        <div className={styles['thumb']}>
+                          {r.photoUrl ? (
+                            <img className={styles['thumb-image']} src={r.photoUrl} alt={r.name} />
+                          ) : (
+                            <Image size={18} />
+                          )}
+                        </div>
+                        <div className={styles['item-meta']}>
+                          <div className={styles['item-name']}>{r.name}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{r.date}</td>
+                    <td>{r.category}</td>
+                    <td>{r.location}</td>
+                    {activeTab === 'all' && <td>{r.status}</td>}
+                    <td>
+                      <button className={styles['view-btn']}>View <Eye size={16} /></button>
+                    </td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={activeTab === 'all' ? 6 : 5} className={styles['empty-cell']}>No reports</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {showAdd && (

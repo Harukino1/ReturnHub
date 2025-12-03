@@ -3,7 +3,6 @@ import { User, Bell, Camera, Loader2, X, Check, ArrowLeft } from 'lucide-react'
 import Cropper from 'react-easy-crop'
 import Navbar from '../../components/layout/Navbar'
 import UserSidebar from '../../components/user/UserSidebar'
-import ConfirmModal from '../../components/common/ConfirmModal'
 import styles from '../../styles/pages/user/Profile.module.css'
 import { supabase } from '../../lib/supabaseClient'
 import { getCroppedImg } from '../../lib/cropUtils'
@@ -24,7 +23,7 @@ export default function ProfilePage() {
   const [isCropping, setIsCropping] = useState(false)
   const [selectedImage, setSelectedImage] = useState(null)
 
-  // Form state - MERGED: Included address fields from master branch
+  // Form state
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -38,7 +37,7 @@ export default function ProfilePage() {
   const [userId, setUserId] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
   const [notification, setNotification] = useState(null)
-  const [showUserLogoutConfirm, setShowUserLogoutConfirm] = useState(false)
+  // Removed showUserLogoutConfirm state
 
   // Theme sync & Load Data
   useEffect(() => {
@@ -75,8 +74,6 @@ export default function ProfilePage() {
       const result = await response.json()
       
       if (result.success) {
-        // AuthResponse returns flattened user data directly in result
-        // MERGED: Destructured new address fields
         const { name, email, phone, profileImage, street, barangay, city, zipCode } = result
         setFormData({
           name: name || '',
@@ -90,7 +87,7 @@ export default function ProfilePage() {
         if (profileImage) {
           setAvatarUrl(profileImage)
         }
-        // Update localStorage to keep it in sync
+        // Update localStorage
         const userStr = localStorage.getItem('user')
         if (userStr) {
           const user = JSON.parse(userStr)
@@ -104,8 +101,6 @@ export default function ProfilePage() {
       setLoading(false)
     }
   }
-
-  // --- MERGED LOGIC: Kept image handling from juen/frontend ---
 
   const handleAvatarClick = () => {
     if (!isEditing) return
@@ -144,17 +139,12 @@ export default function ProfilePage() {
   const handleCropSave = async () => {
     try {
       setUploading(true)
-      
-      // Store old avatar URL for deletion
       const oldAvatarUrl = avatarUrl
-
       const croppedBlob = await getCroppedImg(selectedImage, croppedAreaPixels)
       
-      // Create a unique filename
       const fileName = `${userId}-${Date.now()}.jpg`
       const filePath = `${fileName}`
 
-      // Upload to Supabase
       const { error: uploadError } = await supabase.storage
         .from('profiles')
         .upload(filePath, croppedBlob, {
@@ -164,7 +154,6 @@ export default function ProfilePage() {
 
       if (uploadError) throw uploadError
 
-      // Get Public URL
       const { data } = supabase.storage
         .from('profiles')
         .getPublicUrl(filePath)
@@ -174,10 +163,8 @@ export default function ProfilePage() {
       setIsCropping(false)
       setSelectedImage(null)
 
-      // Update backend immediately with new image
       await updateBackend({ ...formData, profileImage: publicUrl })
 
-      // Delete old image from Supabase to save storage
       if (oldAvatarUrl) {
         try {
           const urlParts = oldAvatarUrl.split('/')
@@ -185,16 +172,7 @@ export default function ProfilePage() {
           const oldFileName = lastPart.split('?')[0] 
 
           if (oldAvatarUrl.includes('supabase') && oldFileName && oldFileName !== fileName) {
-            console.log('Deleting old profile image:', oldFileName)
-            const { error: deleteError } = await supabase.storage
-              .from('profiles')
-              .remove([oldFileName])
-            
-            if (deleteError) {
-              console.error('Failed to delete old profile image:', deleteError)
-            } else {
-              console.log('Old profile image deleted successfully')
-            }
+            await supabase.storage.from('profiles').remove([oldFileName])
           }
         } catch (deleteErr) {
           console.error('Error deleting old image:', deleteErr)
@@ -223,12 +201,10 @@ export default function ProfilePage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    
     if (name === 'phone') {
       const formatted = formatPhoneNumber(value)
       setFormData(prev => ({ ...prev, [name]: formatted }))
       
-      // Real-time validation for phone
       const digitsOnly = formatted.replace(/\s/g, '')
       if (digitsOnly.length > 0 && (digitsOnly.length !== 11 || !digitsOnly.startsWith('09'))) {
         setErrors(prev => ({ ...prev, phone: 'Must be 11 digits starting with 09' }))
@@ -246,29 +222,15 @@ export default function ProfilePage() {
 
   const validateForm = () => {
     const newErrors = {}
-    
-    // Name validation
-    if (!formData.name.trim()) {
-      newErrors.name = 'Name is required'
-    }
-
-    // Email validation
+    if (!formData.name.trim()) newErrors.name = 'Name is required'
     const emailRegex = /^[A-Za-z0-9+_.-]+@(.+)$/
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required'
-    } else if (!emailRegex.test(formData.email)) {
-      newErrors.email = 'Invalid email format'
-    }
+    if (!formData.email.trim()) newErrors.email = 'Email is required'
+    else if (!emailRegex.test(formData.email)) newErrors.email = 'Invalid email format'
 
-    // Phone validation
     const phoneDigits = formData.phone.replace(/\s/g, '')
-    if (!phoneDigits) {
-      newErrors.phone = 'Phone number is required'
-    } else if (phoneDigits.length !== 11) {
-      newErrors.phone = 'Phone number must be exactly 11 digits'
-    } else if (!phoneDigits.startsWith('09')) {
-      newErrors.phone = 'Phone number must start with 09'
-    }
+    if (!phoneDigits) newErrors.phone = 'Phone number is required'
+    else if (phoneDigits.length !== 11) newErrors.phone = 'Phone number must be exactly 11 digits'
+    else if (!phoneDigits.startsWith('09')) newErrors.phone = 'Phone number must start with 09'
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -277,7 +239,6 @@ export default function ProfilePage() {
   const updateBackend = async (dataToUpdate) => {
     try {
         const phoneClean = dataToUpdate.phone.replace(/\s/g, '')
-        
         const response = await fetch(`http://localhost:8080/api/users/${userId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -290,12 +251,8 @@ export default function ProfilePage() {
         })
 
         const result = await response.json()
-        
-        if (!result.success) {
-            throw new Error(result.message)
-        }
+        if (!result.success) throw new Error(result.message)
 
-        // Update localStorage
         const userStr = localStorage.getItem('user')
         if (userStr) {
             const currentUser = JSON.parse(userStr)
@@ -308,7 +265,6 @@ export default function ProfilePage() {
             }
             localStorage.setItem('user', JSON.stringify(updatedUser))
         }
-        
         return true
     } catch (error) {
         console.error('Update error:', error)
@@ -320,7 +276,6 @@ export default function ProfilePage() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
-
     setLoading(true)
     setNotification(null)
     const success = await updateBackend(formData)
@@ -343,7 +298,6 @@ export default function ProfilePage() {
     setIsEditing(false)
     setErrors({})
     setNotification(null)
-    // Reset form to original values
     if (userId) fetchUserData(userId)
   }
 
@@ -371,67 +325,27 @@ export default function ProfilePage() {
                 />
             </div>
             <div style={{ marginTop: 20, display: 'flex', gap: 20 }}>
-                <button 
-                    onClick={() => setIsCropping(false)}
-                    style={{ padding: '10px 20px', background: 'white', border: 'none', borderRadius: 5, cursor: 'pointer' }}
-                >
-                    Cancel
-                </button>
-                <button 
-                    onClick={handleCropSave}
-                    disabled={uploading}
-                    style={{ padding: '10px 20px', background: '#007bff', color: 'white', border: 'none', borderRadius: 5, cursor: 'pointer' }}
-                >
+                <button onClick={() => setIsCropping(false)} style={{ padding: '10px 20px', background: 'white', border: 'none', borderRadius: 5, cursor: 'pointer' }}>Cancel</button>
+                <button onClick={handleCropSave} disabled={uploading} style={{ padding: '10px 20px', background: '#007bff', color: 'white', border: 'none', borderRadius: 5, cursor: 'pointer' }}>
                     {uploading ? 'Saving...' : 'Save & Upload'}
                 </button>
             </div>
             <div style={{ marginTop: 10, width: '50%' }}>
-                 <input
-                    type="range"
-                    value={zoom}
-                    min={1}
-                    max={3}
-                    step={0.1}
-                    aria-labelledby="Zoom"
-                    onChange={(e) => setZoom(Number(e.target.value))}
-                    style={{ width: '100%' }}
-                  />
+                 <input type="range" value={zoom} min={1} max={3} step={0.1} onChange={(e) => setZoom(Number(e.target.value))} style={{ width: '100%' }} />
             </div>
         </div>
       )}
 
-      <div className="container" style={{ paddingTop: '0', marginLeft: sidebarOpen ? '250px' : '0' }}>
+      {/* CUSTOM CONTAINER */}
+      <div 
+        className={styles['profile-container']} 
+        style={{ 
+          paddingLeft: sidebarOpen ? '270px' : '2rem' 
+        }}
+      >
         <div className={styles['profile-layout']}>
           {/* Sidebar */}
           <aside className={styles['profile-sidebar']}>
-            <div style={{ marginBottom: '1.5rem' }}>
-              <button 
-                onClick={() => {
-                  const r = sessionStorage.getItem('returnRoute')
-                  if (r) {
-                    sessionStorage.removeItem('returnRoute')
-                    window.location.hash = `#/${r}`
-                  } else {
-                    const s = localStorage.getItem('user')
-                    if (s) {
-                      try {
-                        const u = JSON.parse(s)
-                        if (u.role === 'STAFF') {
-                          window.location.hash = '#/staff/dashboard'
-                          return
-                        }
-                      } catch (e) { void e }
-                    }
-                    window.location.hash = '#/dashboard'
-                  }
-                }} 
-                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', color: 'var(--gray-700)' }}
-                aria-label="Go back"
-              >
-                <ArrowLeft size={24} />
-              </button>
-            </div>
-
             <h1 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>Profile</h1>
             <div className={styles['profile-tabs']}>
               {tabs.map(tab => (
@@ -443,12 +357,7 @@ export default function ProfilePage() {
                   {tab.label}
                 </button>
               ))}
-              <button
-                className={styles['profile-tab']}
-                onClick={() => setShowUserLogoutConfirm(true)}
-              >
-                Logout
-              </button>
+              {/* Removed Logout Button */}
             </div>
           </aside>
 
@@ -540,61 +449,31 @@ export default function ProfilePage() {
                         {errors.phone && <span style={{ color: 'red', fontSize: '0.8rem' }}>{errors.phone}</span>}
                       </div>
 
-                      {/* MERGED: Added Address fields from master */}
                       <div className={styles['form-group']}>
                         <label className={styles['form-label']}>Street Address</label>
-                        <input 
-                          type="text" 
-                          name="street"
-                          className={styles['form-input']} 
-                          value={''} 
-                          placeholder=""
-                          disabled={true}
-                        />
+                        <input type="text" name="street" className={styles['form-input']} value={''} placeholder="" disabled={true} />
                         <span style={{ color: 'var(--gray-500)', fontSize: '0.8rem' }}>Not yet available</span>
                       </div>
 
                       <div className={styles['form-group']}>
                         <label className={styles['form-label']}>Barangay</label>
-                        <input 
-                          type="text" 
-                          name="barangay"
-                          className={styles['form-input']} 
-                          value={''} 
-                          placeholder=""
-                          disabled={true}
-                        />
+                        <input type="text" name="barangay" className={styles['form-input']} value={''} placeholder="" disabled={true} />
                         <span style={{ color: 'var(--gray-500)', fontSize: '0.8rem' }}>Not yet available</span>
                       </div>
 
                       <div className={styles['form-group']}>
                         <label className={styles['form-label']}>City</label>
-                        <input 
-                          type="text" 
-                          name="city"
-                          className={styles['form-input']} 
-                          value={''} 
-                          placeholder=""
-                          disabled={true}
-                        />
+                        <input type="text" name="city" className={styles['form-input']} value={''} placeholder="" disabled={true} />
                         <span style={{ color: 'var(--gray-500)', fontSize: '0.8rem' }}>Not yet available</span>
                       </div>
 
                       <div className={styles['form-group']}>
                         <label className={styles['form-label']}>Zip Code</label>
-                        <input 
-                          type="text" 
-                          name="zipCode"
-                          className={styles['form-input']} 
-                          value={''} 
-                          placeholder=""
-                          disabled={true}
-                        />
+                        <input type="text" name="zipCode" className={styles['form-input']} value={''} placeholder="" disabled={true} />
                         <span style={{ color: 'var(--gray-500)', fontSize: '0.8rem' }}>Not yet available</span>
                       </div>
                     </div>
                     
-                    {/* MERGED: Kept juen/frontend logic for buttons (Edit vs Save/Cancel) */}
                     <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
                         {!isEditing ? (
                            <button 
@@ -636,21 +515,7 @@ export default function ProfilePage() {
           </main>
         </div>
       </div>
-
-      <ConfirmModal
-        open={showUserLogoutConfirm}
-        title="Logout"
-        message="Are you sure you want to logout?"
-        confirmText="Logout"
-        cancelText="Cancel"
-        onCancel={() => setShowUserLogoutConfirm(false)}
-        onConfirm={() => {
-          localStorage.removeItem('user')
-          setShowUserLogoutConfirm(false)
-          window.location.hash = '#/auth/login'
-        }}
-        tone="danger"
-      />
+      {/* Removed ConfirmModal */}
     </div>
   )
 }

@@ -181,7 +181,8 @@ export default function AuthPage({ authMode = 'login' }) {
     <div className={styles['auth-page']}>
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
       <section className={styles['auth-section']}>
-        <div className="container">
+        {/* Replaced generic "container" with inline styles to ensure full width capability */}
+        <div style={{ width: '100%', padding: '0 2rem', display: 'flex', justifyContent: 'center' }}>
           <div className={styles['auth-grid']}>
             <div className={styles['auth-left']}>
               <div>
@@ -190,12 +191,7 @@ export default function AuthPage({ authMode = 'login' }) {
               <div className={styles['auth-illustration']}>
                 <img className={styles['auth-image']} src={randomStuff} alt="Assortment of recovered belongings" />
               </div>
-                <div style={{ fontSize: 12, color: 'var(--gray-500)' }}>
-                  <p>Secure & Private</p>
-                  <p>Smart Matching</p>
-                  <p>Mobile Friendly</p>
-                </div>
-              </div>
+            </div>
 
             <div className={styles['auth-right']}>
               <h2 className={styles['auth-title']}>{isLogin ? 'Welcome Back' : 'Join ReturnHub'}</h2>
