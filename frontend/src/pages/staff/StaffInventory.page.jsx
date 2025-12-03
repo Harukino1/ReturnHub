@@ -34,7 +34,7 @@ export default function StaffInventoryPage() {
     <div className={styles['inventory-page']}>
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} variant="private" onHamburgerClick={() => setSidebarOpen((p) => !p)} />
       <StaffSidebar open={sidebarOpen} />
-      <div className="container" style={{ paddingTop: '4rem', marginLeft: sidebarOpen ? '250px' : '0' }}>
+      <div className="container" style={{ paddingTop: '4rem', paddingLeft: sidebarOpen ? '250px' : '0' }}>
         <div className={styles['inventory-header']}>
           <h1 className={styles['inventory-title']}>Inventory</h1>
           <form className={styles['inventory-search-form']} onSubmit={(e) => e.preventDefault()}>
@@ -139,4 +139,3 @@ export default function StaffInventoryPage() {
     </div>
   )
 }
-

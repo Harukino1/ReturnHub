@@ -1,5 +1,13 @@
 .footer { background: var(--gray-900); color: #d1d5db; padding: 3rem 0; }
-.footer-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; margin-bottom: 2rem; }
+.footer-grid {
+  display: grid;
+  gap: 3rem;
+  align-items: center;
+  width: 100%;
+  max-width: 1420px; 
+  margin: 0 auto;
+  padding: 0 2rem; 
+}
 .footer h3,
 .footer h4 { color: var(--white); margin: 0 0 1rem; font-weight: 800; }
 .footer p,

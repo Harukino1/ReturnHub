@@ -35,7 +35,7 @@ export default function StaffClaimsPage() {
     <div className={styles['claims-page']}>
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} variant="private" onHamburgerClick={() => setSidebarOpen((p) => !p)} />
       <StaffSidebar open={sidebarOpen} />
-      <div className="container" style={{ paddingTop: '4rem', marginLeft: sidebarOpen ? '250px' : '0' }}>
+      <div className="container" style={{ paddingTop: '4rem', paddingLeft: sidebarOpen ? '250px' : '0' }}>
         <div className={styles['claims-header']}>
           <h1 className={styles['claims-title']}>Claims</h1>
           <form className={styles['claims-search-form']} onSubmit={(e) => e.preventDefault()}>
@@ -142,4 +142,3 @@ export default function StaffClaimsPage() {
     </div>
   )
 }
-
