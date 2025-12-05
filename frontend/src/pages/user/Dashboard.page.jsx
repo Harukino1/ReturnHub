@@ -92,15 +92,6 @@ export default function Dashboard() {
                 Found
               </button>
             </div>
-            <div style={{ marginLeft: 'auto' }}>
-              <button
-                type="button"
-                onClick={() => setShowLogoutConfirm(true)}
-                style={{ padding: '.6rem 1rem', borderRadius: '.5rem', border: '1px solid #d1d5db', background: 'var(--white)', color: 'var(--gray-900)', fontWeight: 600 }}
-              >
-                Logout
-              </button>
-            </div>
           </div>
 
           {/* Items Grid */}

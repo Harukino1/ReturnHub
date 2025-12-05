@@ -38,7 +38,16 @@ public class AdminController {
 
         if (staffOpt.isPresent()) {
             Staff staff = staffOpt.get();
-            if (passwordEncoder.matches(password, staff.getPassword())) {
+            boolean ok = false;
+            String stored = staff.getPassword();
+            if (stored != null) {
+                try {
+                    ok = passwordEncoder.matches(password, stored);
+                } catch (Exception e) {
+                    ok = password.equals(stored);
+                }
+            }
+            if (ok) {
                 return ResponseEntity.ok(Map.of(
                         "success", true,
                         "role", staff.getRole(),
