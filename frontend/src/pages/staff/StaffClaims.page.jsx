@@ -35,7 +35,14 @@ export default function StaffClaimsPage() {
     <div className={styles['claims-page']}>
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} variant="private" onHamburgerClick={() => setSidebarOpen((p) => !p)} />
       <StaffSidebar open={sidebarOpen} />
-      <div className="container" style={{ paddingTop: '4rem', paddingLeft: sidebarOpen ? '250px' : '0' }}>
+      
+      {/* CUSTOM CONTAINER: Expands to 1600px */}
+      <div 
+        className={styles['claims-container']} 
+        style={{ 
+          paddingLeft: sidebarOpen ? '270px' : '2rem' 
+        }}
+      >
         <div className={styles['claims-header']}>
           <h1 className={styles['claims-title']}>Claims</h1>
           <form className={styles['claims-search-form']} onSubmit={(e) => e.preventDefault()}>
@@ -43,7 +50,7 @@ export default function StaffClaimsPage() {
             <button className={styles['claims-search-btn']} aria-label="Search"><Search size={18} /></button>
           </form>
           <button className="btn btn-primary" onClick={() => setShowAdd(true)} style={{ marginLeft: 'auto' }}>
-            <Plus size={16} /> Add Claim
+            <Plus size={16} /> <span className={styles['btn-text']}>Add Claim</span>
           </button>
         </div>
 
@@ -56,46 +63,49 @@ export default function StaffClaimsPage() {
         </div>
 
         <div className={styles['claims-content']}>
-          <table className={styles['claims-table']}>
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Claimant</th>
-                <th>ID Type</th>
-                <th>ID Number</th>
-                <th>Date</th>
-                {activeTab === 'all' && <th>Status</th>}
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((c) => (
-                <tr key={c.id}>
-                  <td>
-                    <div className={styles['item-cell']}>
-                      <div className={styles['thumb']}>{c.photoUrl ? <img className={styles['thumb-image']} src={c.photoUrl} alt={c.itemName} /> : <Image size={18} />}</div>
-                      <div className={styles['item-meta']}>
-                        <div className={styles['item-name']}>{c.itemName}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>{c.claimant}</td>
-                  <td>{c.idType}</td>
-                  <td>{c.idNumber}</td>
-                  <td>{c.date}</td>
-                  {activeTab === 'all' && <td>{c.status}</td>}
-                  <td>
-                    <button className={styles['view-btn']}>View <Eye size={16} /></button>
-                  </td>
-                </tr>
-              ))}
-              {filtered.length === 0 && (
+          {/* RESPONSIVE TABLE WRAPPER */}
+          <div className={styles['table-responsive']}>
+            <table className={styles['claims-table']}>
+              <thead>
                 <tr>
-                  <td colSpan={activeTab === 'all' ? 7 : 6} className={styles['empty-cell']}>No claims</td>
+                  <th>Item</th>
+                  <th>Claimant</th>
+                  <th>ID Type</th>
+                  <th>ID Number</th>
+                  <th>Date</th>
+                  {activeTab === 'all' && <th>Status</th>}
+                  <th>Action</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filtered.map((c) => (
+                  <tr key={c.id}>
+                    <td>
+                      <div className={styles['item-cell']}>
+                        <div className={styles['thumb']}>{c.photoUrl ? <img className={styles['thumb-image']} src={c.photoUrl} alt={c.itemName} /> : <Image size={18} />}</div>
+                        <div className={styles['item-meta']}>
+                          <div className={styles['item-name']}>{c.itemName}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{c.claimant}</td>
+                    <td>{c.idType}</td>
+                    <td>{c.idNumber}</td>
+                    <td>{c.date}</td>
+                    {activeTab === 'all' && <td>{c.status}</td>}
+                    <td>
+                      <button className={styles['view-btn']}>View <Eye size={16} /></button>
+                    </td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={activeTab === 'all' ? 7 : 6} className={styles['empty-cell']}>No claims</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {showAdd && (

@@ -34,7 +34,14 @@ export default function StaffInventoryPage() {
     <div className={styles['inventory-page']}>
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} variant="private" onHamburgerClick={() => setSidebarOpen((p) => !p)} />
       <StaffSidebar open={sidebarOpen} />
-      <div className="container" style={{ paddingTop: '4rem', paddingLeft: sidebarOpen ? '250px' : '0' }}>
+      
+      {/* CUSTOM CONTAINER: Expands to 1600px */}
+      <div 
+        className={styles['inventory-container']} 
+        style={{ 
+          paddingLeft: sidebarOpen ? '270px' : '2rem' 
+        }}
+      >
         <div className={styles['inventory-header']}>
           <h1 className={styles['inventory-title']}>Inventory</h1>
           <form className={styles['inventory-search-form']} onSubmit={(e) => e.preventDefault()}>
@@ -42,7 +49,7 @@ export default function StaffInventoryPage() {
             <button className={styles['inventory-search-btn']} aria-label="Search"><Search size={18} /></button>
           </form>
           <button className="btn btn-primary" onClick={() => setShowAdd(true)} style={{ marginLeft: 'auto' }}>
-            <Plus size={16} /> Add Item
+            <Plus size={16} /> <span className={styles['btn-text']}>Add Item</span>
           </button>
         </div>
 
@@ -54,46 +61,49 @@ export default function StaffInventoryPage() {
         </div>
 
         <div className={styles['inventory-content']}>
-          <table className={styles['inventory-table']}>
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Category</th>
-                <th>Location</th>
-                <th>Date In</th>
-                <th>Qty</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((it) => (
-                <tr key={it.id}>
-                  <td>
-                    <div className={styles['item-cell']}>
-                      <div className={styles['thumb']}>{it.photoUrl ? <img className={styles['thumb-image']} src={it.photoUrl} alt={it.name} /> : <Image size={18} />}</div>
-                      <div className={styles['item-meta']}>
-                        <div className={styles['item-name']}>{it.name}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>{it.category}</td>
-                  <td>{it.location}</td>
-                  <td>{it.dateIn}</td>
-                  <td>{it.quantity}</td>
-                  <td>{it.status}</td>
-                  <td>
-                    <button className={styles['view-btn']}>View <Eye size={16} /></button>
-                  </td>
-                </tr>
-              ))}
-              {filtered.length === 0 && (
+          {/* RESPONSIVE TABLE WRAPPER */}
+          <div className={styles['table-responsive']}>
+            <table className={styles['inventory-table']}>
+              <thead>
                 <tr>
-                  <td colSpan={7} className={styles['empty-cell']}>No items</td>
+                  <th>Item</th>
+                  <th>Category</th>
+                  <th>Location</th>
+                  <th>Date In</th>
+                  <th>Qty</th>
+                  <th>Status</th>
+                  <th>Action</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filtered.map((it) => (
+                  <tr key={it.id}>
+                    <td>
+                      <div className={styles['item-cell']}>
+                        <div className={styles['thumb']}>{it.photoUrl ? <img className={styles['thumb-image']} src={it.photoUrl} alt={it.name} /> : <Image size={18} />}</div>
+                        <div className={styles['item-meta']}>
+                          <div className={styles['item-name']}>{it.name}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{it.category}</td>
+                    <td>{it.location}</td>
+                    <td>{it.dateIn}</td>
+                    <td>{it.quantity}</td>
+                    <td>{it.status}</td>
+                    <td>
+                      <button className={styles['view-btn']}>View <Eye size={16} /></button>
+                    </td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className={styles['empty-cell']}>No items</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {showAdd && (

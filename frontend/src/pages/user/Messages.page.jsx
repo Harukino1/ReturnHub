@@ -9,7 +9,10 @@ export default function MessagesPage() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [input, setInput] = useState('')
-  const [user, setUser] = useState(null)
+  const [user] = useState(() => {
+    const uStr = localStorage.getItem('user')
+    try { return uStr ? JSON.parse(uStr) : null } catch { return null }
+  })
   
   // Reference for auto-scrolling
   const messagesEndRef = useRef(null)
@@ -17,10 +20,6 @@ export default function MessagesPage() {
   useEffect(() => {
     const t = localStorage.getItem('theme') || 'light'
     document.documentElement.setAttribute('data-theme', t)
-    const uStr = localStorage.getItem('user')
-    if (uStr) {
-      try { setUser(JSON.parse(uStr)) } catch { /* noop */ }
-    }
   }, [])
 
   const [messages, setMessages] = useState([
