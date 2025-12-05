@@ -31,7 +31,13 @@ export default function ProfilePage() {
   })
   const [errors, setErrors] = useState({})
   const [userId, setUserId] = useState(null)
-  const [isEditing, setIsEditing] = useState(false)
+  const [isEditing, setIsEditing] = useState(() => {
+    try {
+      return sessionStorage.getItem('profileEditing') === 'true'
+    } catch {
+      return false
+    }
+  })
   const [notification, setNotification] = useState(null)
 
   // Change Password State
@@ -292,7 +298,7 @@ export default function ProfilePage() {
           const out = await res.json()
           if (res.ok && out?.success) { successResp = out; break }
           // If not ok, try next base
-        } catch {}
+        } catch { void 0 }
       }
       if (!successResp) {
         setNotification({ type: 'error', message: 'Failed to update password.' })
@@ -620,3 +626,4 @@ export default function ProfilePage() {
     </div>
   )
 }
+    try { sessionStorage.removeItem('profileEditing') } catch { /* noop */ }
