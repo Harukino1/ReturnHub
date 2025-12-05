@@ -3,6 +3,7 @@ import { Search } from 'lucide-react'
 import Navbar from '../../components/layout/Navbar'
 import UserSidebar from '../../components/user/UserSidebar'
 import styles from '../../styles/pages/user/Dashboard.module.css'
+import ConfirmModal from '../../components/common/ConfirmModal'
 
 // Dummy data for items
 const dummyItems = [
@@ -29,6 +30,7 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
 
   useEffect(() => {
     const t = localStorage.getItem('theme') || 'light'
@@ -90,6 +92,15 @@ export default function Dashboard() {
                 Found
               </button>
             </div>
+            <div style={{ marginLeft: 'auto' }}>
+              <button
+                type="button"
+                onClick={() => setShowLogoutConfirm(true)}
+                style={{ padding: '.6rem 1rem', borderRadius: '.5rem', border: '1px solid #d1d5db', background: 'var(--white)', color: 'var(--gray-900)', fontWeight: 600 }}
+              >
+                Logout
+              </button>
+            </div>
           </div>
 
           {/* Items Grid */}
@@ -123,6 +134,20 @@ export default function Dashboard() {
             Report
           </button>
         </div>
+        <ConfirmModal
+          open={showLogoutConfirm}
+          title="Logout"
+          message="Are you sure you want to logout?"
+          confirmText="Logout"
+          cancelText="Cancel"
+          onCancel={() => setShowLogoutConfirm(false)}
+          onConfirm={() => {
+            localStorage.removeItem('user')
+            setShowLogoutConfirm(false)
+            window.location.hash = '#/auth/login'
+          }}
+          tone="danger"
+        />
       </main>
     </div>
   )

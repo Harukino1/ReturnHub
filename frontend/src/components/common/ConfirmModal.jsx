@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import styles from '../../styles/components/ConfirmModal.module.css'
 
 export default function ConfirmModal({
@@ -22,7 +23,7 @@ export default function ConfirmModal({
 
   if (!open) return null
 
-  return (
+  const modal = (
     <div className={styles.overlay} role="dialog" aria-modal="true">
       <div className={styles.modal}>
         <div className={styles.header}>
@@ -38,4 +39,6 @@ export default function ConfirmModal({
       </div>
     </div>
   )
+
+  return createPortal(modal, document.body)
 }

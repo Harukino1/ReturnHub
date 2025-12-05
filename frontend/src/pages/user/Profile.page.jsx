@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { User, Bell, Camera, Loader2, X, Check, ArrowLeft } from 'lucide-react'
+import { User, Bell, Camera, Loader2, X, Check, ArrowLeft, Image as ImageIcon } from 'lucide-react'
 import Cropper from 'react-easy-crop'
 import Navbar from '../../components/layout/Navbar'
 import UserSidebar from '../../components/user/UserSidebar'
@@ -27,17 +27,17 @@ export default function ProfilePage() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    phone: '',
-    street: '',
-    barangay: '',
-    city: '',
-    zipCode: ''
+    phone: ''
   })
   const [errors, setErrors] = useState({})
   const [userId, setUserId] = useState(null)
   const [isEditing, setIsEditing] = useState(false)
   const [notification, setNotification] = useState(null)
-  // Removed showUserLogoutConfirm state
+
+  // Change Password State
+  const [pwForm, setPwForm] = useState({ current: '', new: '', confirm: '' })
+  const [pwErrors, setPwErrors] = useState({})
+  const [pwLoading, setPwLoading] = useState(false)
 
   // Theme sync & Load Data
   useEffect(() => {
@@ -52,11 +52,7 @@ export default function ProfilePage() {
       setFormData({
         name: user.name || '',
         email: user.email || '',
-        phone: user.phone || '',
-        street: user.street || '',
-        barangay: user.barangay || '',
-        city: user.city || '',
-        zipCode: user.zipCode || ''
+        phone: user.phone || ''
       })
       if (user.profileImage) {
         setAvatarUrl(user.profileImage)
@@ -74,15 +70,11 @@ export default function ProfilePage() {
       const result = await response.json()
       
       if (result.success) {
-        const { name, email, phone, profileImage, street, barangay, city, zipCode } = result
+        const { name, email, phone, profileImage } = result
         setFormData({
           name: name || '',
           email: email || '',
-          phone: phone ? formatPhoneNumber(phone) : '',
-          street: street || '',
-          barangay: barangay || '',
-          city: city || '',
-          zipCode: zipCode || ''
+          phone: phone ? formatPhoneNumber(phone) : ''
         })
         if (profileImage) {
           setAvatarUrl(profileImage)
@@ -273,6 +265,49 @@ export default function ProfilePage() {
     }
   }
 
+  const validatePasswordForm = () => {
+    const e = {}
+    if (!pwForm.current.trim()) e.current = 'Current password is required'
+    if (!pwForm.new.trim()) e.new = 'New password is required'
+    else if (pwForm.new.length < 6) e.new = 'At least 6 characters'
+    if (pwForm.confirm !== pwForm.new) e.confirm = 'Passwords do not match'
+    setPwErrors(e)
+    return Object.keys(e).length === 0
+  }
+
+  const handlePasswordSubmit = async (ev) => {
+    ev.preventDefault()
+    if (!validatePasswordForm()) return
+    setPwLoading(true)
+    try {
+      const bases = ['http://localhost:8080']
+      let successResp = null
+      for (const base of bases) {
+        try {
+          const res = await fetch(`${base}/api/users/${userId}/password`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ currentPassword: pwForm.current, newPassword: pwForm.new })
+          })
+          const out = await res.json()
+          if (res.ok && out?.success) { successResp = out; break }
+          // If not ok, try next base
+        } catch {}
+      }
+      if (!successResp) {
+        setNotification({ type: 'error', message: 'Failed to update password.' })
+      } else {
+        setNotification({ type: 'success', message: 'Password updated successfully.' })
+        setPwForm({ current: '', new: '', confirm: '' })
+      }
+    } catch (err) {
+      console.error('Password change error:', err)
+      setNotification({ type: 'error', message: 'Failed to update password.' })
+    } finally {
+      setPwLoading(false)
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
@@ -306,33 +341,80 @@ export default function ProfilePage() {
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} variant="private" onHamburgerClick={() => setSidebarOpen((p) => !p)} />
       <UserSidebar open={sidebarOpen} />
       
-      {/* Crop Modal */}
+      {/* IMPROVED CROP MODAL */}
       {isCropping && (
-        <div style={{
-            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, 
-            backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 1000, 
-            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
-        }}>
-            <div style={{ position: 'relative', width: '90%', height: '60%', background: '#333' }}>
-                <Cropper
-                    image={selectedImage}
-                    crop={crop}
-                    zoom={zoom}
-                    aspect={1}
-                    onCropChange={setCrop}
-                    onCropComplete={onCropComplete}
-                    onZoomChange={setZoom}
+        <div className={styles['crop-modal-overlay']}>
+          <div className={styles['crop-modal-content']}>
+            
+            {/* Header */}
+            <div className={styles['crop-header']}>
+              <h3>Adjust Profile Photo</h3>
+              <button 
+                onClick={() => setIsCropping(false)} 
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit' }}
+                aria-label="Close"
+              >
+                <X size={20} className={styles['slider-icon']} />
+              </button>
+            </div>
+
+            {/* Cropper Area */}
+            <div className={styles['crop-area-wrapper']}>
+              <Cropper
+                image={selectedImage}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                cropShape="round" /* Circular mask for profile */
+                showGrid={false} 
+                onCropChange={setCrop}
+                onCropComplete={onCropComplete}
+                onZoomChange={setZoom}
+              />
+            </div>
+
+            {/* Controls & Footer */}
+            <div className={styles['crop-controls']}>
+              <div className={styles['slider-container']}>
+                <ImageIcon size={18} className={styles['slider-icon']} />
+                <input
+                  type="range"
+                  value={zoom}
+                  min={1}
+                  max={3}
+                  step={0.1}
+                  aria-labelledby="Zoom"
+                  onChange={(e) => setZoom(Number(e.target.value))}
+                  className={styles['crop-slider']}
                 />
-            </div>
-            <div style={{ marginTop: 20, display: 'flex', gap: 20 }}>
-                <button onClick={() => setIsCropping(false)} style={{ padding: '10px 20px', background: 'white', border: 'none', borderRadius: 5, cursor: 'pointer' }}>Cancel</button>
-                <button onClick={handleCropSave} disabled={uploading} style={{ padding: '10px 20px', background: '#007bff', color: 'white', border: 'none', borderRadius: 5, cursor: 'pointer' }}>
-                    {uploading ? 'Saving...' : 'Save & Upload'}
+                <ImageIcon size={24} className={styles['slider-icon']} />
+              </div>
+
+              <div className={styles['crop-actions']}>
+                <button 
+                  onClick={() => setIsCropping(false)} 
+                  className={styles['btn-action-secondary']}
+                >
+                  Cancel
                 </button>
+                <button 
+                  onClick={handleCropSave} 
+                  disabled={uploading} 
+                  className={styles['btn-action-primary']}
+                >
+                  {uploading ? (
+                    <>
+                      <Loader2 className="spinning" size={16} style={{ marginRight: '8px' }} />
+                      Saving...
+                    </>
+                  ) : (
+                    'Save & Update'
+                  )}
+                </button>
+              </div>
             </div>
-            <div style={{ marginTop: 10, width: '50%' }}>
-                 <input type="range" value={zoom} min={1} max={3} step={0.1} onChange={(e) => setZoom(Number(e.target.value))} style={{ width: '100%' }} />
-            </div>
+
+          </div>
         </div>
       )}
 
@@ -357,7 +439,6 @@ export default function ProfilePage() {
                   {tab.label}
                 </button>
               ))}
-              {/* Removed Logout Button */}
             </div>
           </aside>
 
@@ -417,7 +498,7 @@ export default function ProfilePage() {
                           placeholder="e.g. Juan Dela Cruz"
                           disabled={!isEditing}
                         />
-                        {errors.name && <span style={{ color: 'red', fontSize: '0.8rem' }}>{errors.name}</span>}
+                        {errors.name && <span style={{ color: 'var(--amber-600)', fontSize: '0.8rem' }}>{errors.name}</span>}
                       </div>
                       
                       <div className={styles['form-group']}>
@@ -431,7 +512,7 @@ export default function ProfilePage() {
                           placeholder="juan@example.com"
                           disabled={!isEditing}
                         />
-                        {errors.email && <span style={{ color: 'red', fontSize: '0.8rem' }}>{errors.email}</span>}
+                        {errors.email && <span style={{ color: 'var(--amber-600)', fontSize: '0.8rem' }}>{errors.email}</span>}
                       </div>
 
                       <div className={styles['form-group']}>
@@ -446,32 +527,10 @@ export default function ProfilePage() {
                           maxLength={13} 
                           disabled={!isEditing}
                         />
-                        {errors.phone && <span style={{ color: 'red', fontSize: '0.8rem' }}>{errors.phone}</span>}
+                        {errors.phone && <span style={{ color: 'var(--amber-600)', fontSize: '0.8rem' }}>{errors.phone}</span>}
                       </div>
 
-                      <div className={styles['form-group']}>
-                        <label className={styles['form-label']}>Street Address</label>
-                        <input type="text" name="street" className={styles['form-input']} value={''} placeholder="" disabled={true} />
-                        <span style={{ color: 'var(--gray-500)', fontSize: '0.8rem' }}>Not yet available</span>
-                      </div>
-
-                      <div className={styles['form-group']}>
-                        <label className={styles['form-label']}>Barangay</label>
-                        <input type="text" name="barangay" className={styles['form-input']} value={''} placeholder="" disabled={true} />
-                        <span style={{ color: 'var(--gray-500)', fontSize: '0.8rem' }}>Not yet available</span>
-                      </div>
-
-                      <div className={styles['form-group']}>
-                        <label className={styles['form-label']}>City</label>
-                        <input type="text" name="city" className={styles['form-input']} value={''} placeholder="" disabled={true} />
-                        <span style={{ color: 'var(--gray-500)', fontSize: '0.8rem' }}>Not yet available</span>
-                      </div>
-
-                      <div className={styles['form-group']}>
-                        <label className={styles['form-label']}>Zip Code</label>
-                        <input type="text" name="zipCode" className={styles['form-input']} value={''} placeholder="" disabled={true} />
-                        <span style={{ color: 'var(--gray-500)', fontSize: '0.8rem' }}>Not yet available</span>
-                      </div>
+                    
                     </div>
                     
                     <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
@@ -505,17 +564,59 @@ export default function ProfilePage() {
                   </form>
                 </>
               )}
-              
-              {activeTab !== 'personal' && (
-                <div style={{ padding: '4rem 2rem', textAlign: 'center', color: 'var(--gray-500)' }}>
-                  <p>Content for {tabs.find(t => t.id === activeTab)?.label} goes here.</p>
-                </div>
+
+              {activeTab === 'account' && (
+                <>
+                  <form onSubmit={handlePasswordSubmit}>
+                    <div className={styles['profile-form-grid']}>
+                    <div className={`${styles['form-group']} ${styles['pw-current']}`}>
+                      <label className={styles['form-label']}>Current Password</label>
+                      <input 
+                        type="password" 
+                        className={styles['form-input']} 
+                        value={pwForm.current}
+                        onChange={(e) => setPwForm((p) => ({ ...p, current: e.target.value }))}
+                        placeholder="Enter current password"
+                      />
+                        {pwErrors.current && <span style={{ color: 'var(--amber-600)', fontSize: '0.8rem' }}>{pwErrors.current}</span>}
+                    </div>
+
+                      <div className={`${styles['form-group']} ${styles['pw-new']}`}>
+                        <label className={styles['form-label']}>New Password</label>
+                        <input 
+                          type="password" 
+                          className={styles['form-input']} 
+                          value={pwForm.new}
+                          onChange={(e) => setPwForm((p) => ({ ...p, new: e.target.value }))}
+                          placeholder="Enter new password"
+                        />
+                        {pwErrors.new && <span style={{ color: 'var(--amber-600)', fontSize: '0.8rem' }}>{pwErrors.new}</span>}
+                      </div>
+
+                      <div className={`${styles['form-group']} ${styles['pw-confirm']}`}>
+                        <label className={styles['form-label']}>Confirm New Password</label>
+                        <input 
+                          type="password" 
+                          className={styles['form-input']} 
+                          value={pwForm.confirm}
+                          onChange={(e) => setPwForm((p) => ({ ...p, confirm: e.target.value }))}
+                          placeholder="Re-enter new password"
+                        />
+                        {pwErrors.confirm && <span style={{ color: 'var(--amber-600)', fontSize: '0.8rem' }}>{pwErrors.confirm}</span>}
+                      </div>
+                    </div>
+
+                    <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                      <button type="button" className={styles['btn-action-secondary']} onClick={() => { setPwForm({ current: '', new: '', confirm: '' }); setPwErrors({}) }}>Cancel</button>
+                      <button type="submit" className={styles['btn-action-primary']} disabled={pwLoading}>{pwLoading ? 'Updating...' : 'Update Password'}</button>
+                    </div>
+                  </form>
+                </>
               )}
             </div>
           </main>
         </div>
       </div>
-      {/* Removed ConfirmModal */}
     </div>
   )
 }

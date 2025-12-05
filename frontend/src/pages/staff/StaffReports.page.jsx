@@ -34,7 +34,14 @@ export default function StaffReportsPage() {
     <div className={styles['reports-page']}>
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} variant="private" onHamburgerClick={() => setSidebarOpen((p) => !p)} />
       <StaffSidebar open={sidebarOpen} />
-      <div className="container" style={{ paddingTop: '4rem', paddingLeft: sidebarOpen ? '250px' : '0' }}>
+      
+      {/* CUSTOM CONTAINER: Expands to 1600px */}
+      <div 
+        className={styles['reports-container']} 
+        style={{ 
+          paddingLeft: sidebarOpen ? '270px' : '2rem' 
+        }}
+      >
         <div className={styles['reports-header']}>
           <h1 className={styles['reports-title']}>Reports Triage</h1>
           <form className={styles['reports-search-form']} onSubmit={(e) => e.preventDefault()}>
@@ -49,7 +56,7 @@ export default function StaffReportsPage() {
             </button>
           </form>
           <button className="btn btn-primary" onClick={() => setShowAdd(true)} style={{ marginLeft: 'auto' }}>
-            <Plus size={16} /> Add Report
+            <Plus size={16} /> <span className={styles['btn-text']}>Add Report</span>
           </button>
         </div>
 
@@ -61,52 +68,55 @@ export default function StaffReportsPage() {
         </div>
 
         <div className={styles['reports-content']}>
-          <table className={styles['reports-table']}>
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Date</th>
-                <th>Category</th>
-                <th>Location</th>
-                <th>Reporter</th>
-                {activeTab === 'all' && <th>Status</th>}
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((r) => (
-                <tr key={r.id}>
-                  <td>
-                    <div className={styles['item-cell']}>
-                      <div className={styles['thumb']}>
-                        {r.photoUrl ? (
-                          <img className={styles['thumb-image']} src={r.photoUrl} alt={r.name} />
-                        ) : (
-                          <Image size={18} />
-                        )}
-                      </div>
-                      <div className={styles['item-meta']}>
-                        <div className={styles['item-name']}>{r.name}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td>{r.date}</td>
-                  <td>{r.category}</td>
-                  <td>{r.location}</td>
-                  <td>{r.reporter}</td>
-                  {activeTab === 'all' && <td>{r.status}</td>}
-                  <td>
-                    <button className={styles['view-btn']} onClick={() => alert('Placeholder')}>View <Eye size={16} /></button>
-                  </td>
-                </tr>
-              ))}
-              {filtered.length === 0 && (
+          {/* RESPONSIVE TABLE WRAPPER */}
+          <div className={styles['table-responsive']}>
+            <table className={styles['reports-table']}>
+              <thead>
                 <tr>
-                  <td colSpan={activeTab === 'all' ? 7 : 6} className={styles['empty-cell']}>No reports</td>
+                  <th>Item</th>
+                  <th>Date</th>
+                  <th>Category</th>
+                  <th>Location</th>
+                  <th>Reporter</th>
+                  {activeTab === 'all' && <th>Status</th>}
+                  <th>Action</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filtered.map((r) => (
+                  <tr key={r.id}>
+                    <td>
+                      <div className={styles['item-cell']}>
+                        <div className={styles['thumb']}>
+                          {r.photoUrl ? (
+                            <img className={styles['thumb-image']} src={r.photoUrl} alt={r.name} />
+                          ) : (
+                            <Image size={18} />
+                          )}
+                        </div>
+                        <div className={styles['item-meta']}>
+                          <div className={styles['item-name']}>{r.name}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{r.date}</td>
+                    <td>{r.category}</td>
+                    <td>{r.location}</td>
+                    <td>{r.reporter}</td>
+                    {activeTab === 'all' && <td>{r.status}</td>}
+                    <td>
+                      <button className={styles['view-btn']} onClick={() => alert('Placeholder')}>View <Eye size={16} /></button>
+                    </td>
+                  </tr>
+                ))}
+                {filtered.length === 0 && (
+                  <tr>
+                    <td colSpan={activeTab === 'all' ? 7 : 6} className={styles['empty-cell']}>No reports</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
 
         {showAdd && (

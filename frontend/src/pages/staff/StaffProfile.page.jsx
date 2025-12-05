@@ -20,8 +20,6 @@ export default function StaffProfilePage() {
   const [errors, setErrors] = useState({})
   const API_BASE_ADMIN = 'http://localhost:8080/api/admin'
 
-  
-
   useEffect(() => {
     const t = localStorage.getItem('theme') || 'light'
     document.documentElement.setAttribute('data-theme', t)
@@ -67,10 +65,6 @@ export default function StaffProfilePage() {
     }
   }
 
-
-
-  
-
   const updateBackend = async (dataToUpdate) => {
     try {
       const s = localStorage.getItem('user')
@@ -90,7 +84,6 @@ export default function StaffProfilePage() {
           name: dataToUpdate.name,
           email: dataToUpdate.email,
           role: u.role || 'STAFF',
-          
         })
       })
       if (res.status === 401) {
@@ -108,8 +101,6 @@ export default function StaffProfilePage() {
     }
   }
 
-  
-
   const validateForm = () => {
     const n = {}
     if (!formData.name.trim()) n.name = 'Name is required'
@@ -125,7 +116,6 @@ export default function StaffProfilePage() {
     if (!validateForm()) return
     setLoading(true)
     const ok = await updateBackend(formData)
-    
     setIsEditing(ok ? false : true)
     setLoading(false)
   }
@@ -140,11 +130,17 @@ export default function StaffProfilePage() {
     <div className={styles['profile-page']}>
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} variant="private" onHamburgerClick={() => setSidebarOpen((p) => !p)} />
       <StaffSidebar open={sidebarOpen} />
-      <div className="container" style={{ paddingLeft: sidebarOpen ? '250px' : '0' }}>
+      
+      {/* CUSTOM CONTAINER: Expands to 1600px */}
+      <div 
+        className={styles['profile-container']} 
+        style={{ 
+          paddingLeft: sidebarOpen ? '270px' : '2rem' 
+        }}
+      >
         <div className={styles['profile-layout']}>
           <aside className={styles['profile-sidebar']}>
             <div style={{ marginBottom: '1.5rem' }}>
-              
             </div>
 
             <h1 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>Profile</h1>
@@ -152,16 +148,11 @@ export default function StaffProfilePage() {
               <button className={`${styles['profile-tab']} ${activeTab === 'personal' ? styles.active : ''}`} onClick={() => setActiveTab('personal')}>Profile Information</button>
               <button className={`${styles['profile-tab']} ${activeTab === 'account' ? styles.active : ''}`} onClick={() => setActiveTab('account')}>Account Settings</button>
               <button className={`${styles['profile-tab']} ${activeTab === 'notifications' ? styles.active : ''}`} onClick={() => setActiveTab('notifications')}>Notifications</button>
-              
             </div>
           </aside>
 
           <main className={styles['profile-content']}>
             <div className={styles['profile-card']}>
-              
-
-              
-
               <form onSubmit={handleSubmit}>
                 <div className={styles['profile-form-grid']}> 
                   <div className={styles['form-group']}>

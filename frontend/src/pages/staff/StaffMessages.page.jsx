@@ -59,7 +59,14 @@ export default function StaffMessagesPage() {
     <div className={styles['messages-page']}>
       <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} variant="private" onHamburgerClick={() => setSidebarOpen((p) => !p)} />
       <StaffSidebar open={sidebarOpen} />
-      <div className="container" style={{ paddingTop: '4rem', paddingLeft: sidebarOpen ? '250px' : '0' }}>
+      
+      {/* CUSTOM CONTAINER: Expands to 1600px */}
+      <div 
+        className={styles['messages-container']} 
+        style={{ 
+          paddingLeft: sidebarOpen ? '270px' : '2rem' 
+        }}
+      >
         <div className={styles['messages-grid']}>
           <aside className={styles['list']}> 
             <div className={styles['list-header']}>

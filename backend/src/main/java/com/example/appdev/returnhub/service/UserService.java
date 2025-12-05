@@ -101,4 +101,19 @@ public class UserService {
     public Optional<User> getUserById(int id) {
         return userRepository.findById(id);
     }
+
+    /**
+     * Update user's password (plain text storage in current setup).
+     * Returns true if updated, false if user not found.
+     */
+    @Transactional
+    public boolean updatePassword(int userId, String newPassword) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isEmpty())
+            return false;
+        User u = userOpt.get();
+        u.setPassword(newPassword);
+        userRepository.save(u);
+        return true;
+    }
 }

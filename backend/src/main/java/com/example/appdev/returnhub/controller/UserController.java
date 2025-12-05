@@ -65,6 +65,14 @@ public class UserController {
     }
 
     /**
+     * Request DTO for changing password.
+     */
+    public static class ChangePasswordRequest {
+        public String currentPassword;
+        public String newPassword;
+    }
+
+    /**
      * Response DTO for authentication responses.
      * Does not include password or other sensitive information.
      */
@@ -298,6 +306,59 @@ public class UserController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new AuthResponse(false, "Update failed: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * Change user password (plain text for current demo setup).
+     * PUT /api/users/{userId}/password
+     */
+    @PutMapping("/{userId}/password")
+    public ResponseEntity<Map<String, Object>> changePassword(@PathVariable int userId,
+            @RequestBody ChangePasswordRequest request) {
+        Map<String, Object> resp = new HashMap<>();
+        try {
+            if (request.currentPassword == null || request.currentPassword.isEmpty()) {
+                resp.put("success", false);
+                resp.put("message", "Current password is required");
+                return ResponseEntity.badRequest().body(resp);
+            }
+            if (request.newPassword == null || request.newPassword.length() < 6) {
+                resp.put("success", false);
+                resp.put("message", "New password must be at least 6 characters");
+                return ResponseEntity.badRequest().body(resp);
+            }
+
+            Optional<User> userOpt = userService.getUserById(userId);
+            if (userOpt.isEmpty()) {
+                resp.put("success", false);
+                resp.put("message", "User not found");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(resp);
+            }
+
+            User user = userOpt.get();
+            // In production, use password hashing (BCrypt). Here we compare plain text.
+            String stored = user.getPassword();
+            if (stored == null || !stored.equals(request.currentPassword)) {
+                resp.put("success", false);
+                resp.put("message", "Current password is incorrect");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(resp);
+            }
+
+            boolean ok = userService.updatePassword(userId, request.newPassword);
+            if (!ok) {
+                resp.put("success", false);
+                resp.put("message", "Failed to update password");
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(resp);
+            }
+            resp.put("success", true);
+            resp.put("message", "Password updated successfully");
+            return ResponseEntity.ok(resp);
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.put("success", false);
+            resp.put("message", "Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(resp);
         }
     }
 }
