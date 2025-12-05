@@ -31,6 +31,7 @@ export default function Dashboard() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
+  const [showReportChoice, setShowReportChoice] = useState(false)
 
   useEffect(() => {
     const t = localStorage.getItem('theme') || 'light'
@@ -44,6 +45,8 @@ export default function Dashboard() {
                           item.location.toLowerCase().includes(searchQuery.toLowerCase())
     return matchesType && matchesSearch
   })
+
+  const isDark = (localStorage.getItem('theme') || 'light') === 'dark'
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -109,6 +112,20 @@ export default function Dashboard() {
                       <h3 className={styles['dashboard-item-title']}>{item.title}</h3>
                       <p className={styles['dashboard-item-location']}>{item.location}</p>
                       <p className={styles['dashboard-item-date']}>{item.date}</p>
+                      {item.type === 'found' && (
+                        <div style={{ marginTop: '.5rem' }}>
+                          <button
+                            type="button"
+                            className={styles['dashboard-filter-btn']}
+                            onClick={() => {
+                              try { sessionStorage.setItem('claimItem', JSON.stringify(item)) } catch { void 0 }
+                              window.location.hash = '#/claim-request'
+                            }}
+                          >
+                            Claim
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))
@@ -121,10 +138,50 @@ export default function Dashboard() {
           </div>
 
           {/* Report Button */}
-          <button className={styles['dashboard-report-btn']} aria-label="Report item">
+          <button
+            className={styles['dashboard-report-btn']}
+            aria-label="Report item"
+            onClick={() => setShowReportChoice(true)}
+          >
             Report
           </button>
         </div>
+        {/* Report Type Modal */}
+        {showReportChoice && (
+          <div className="overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000 }}>
+            <div className="modal" style={{ width: '100%', maxWidth: 420, background: isDark ? '#0b0e14' : 'var(--surface-1, #fff)', color: isDark ? '#e5e7eb' : 'var(--text-1, #111827)', border: `1px solid ${isDark ? '#334155' : 'var(--border, #e5e7eb)'}`, borderRadius: 12, boxShadow: '0 10px 30px rgba(0,0,0,0.15)' }}>
+              <div className="header" style={{ padding: '1rem 1rem 0.5rem' }}>
+                <h3 className="title" style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}>Choose Report Type</h3>
+              </div>
+              <div className="body" style={{ padding: '0 1rem 1rem' }}>
+                <p className="message" style={{ margin: 0, color: isDark ? '#cbd5e1' : 'var(--text-2, #4b5563)' }}>Select what you want to report.</p>
+              </div>
+              <div className="footer" style={{ display: 'flex', gap: '.5rem', padding: '.75rem 1rem 1rem', justifyContent: 'flex-end' }}>
+                <button
+                  className="btn cancel"
+                  onClick={() => setShowReportChoice(false)}
+                  style={{ border: `1px solid ${isDark ? '#334155' : 'var(--border, #e5e7eb)'}`, background: isDark ? '#1f2937' : 'var(--surface-2, #f9fafb)', color: isDark ? '#e5e7eb' : 'var(--text-1, #111827)', padding: '.5rem .9rem', borderRadius: 8, fontWeight: 500 }}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn primary"
+                  onClick={() => { setShowReportChoice(false); window.location.hash = '#/report/lost' }}
+                  style={{ border: `1px solid ${isDark ? '#3d2b12' : 'var(--amber-200, #fed7aa)'}`, background: isDark ? '#1f2937' : 'var(--amber-50, #fff7ed)', color: isDark ? '#fbbf24' : 'var(--amber-800, #92400e)', padding: '.5rem .9rem', borderRadius: 8, fontWeight: 500 }}
+                >
+                  Lost Item
+                </button>
+                <button
+                  className="btn primary"
+                  onClick={() => { setShowReportChoice(false); window.location.hash = '#/report/found' }}
+                  style={{ border: `1px solid ${isDark ? '#3d2b12' : 'var(--amber-200, #fed7aa)'}`, background: isDark ? '#1f2937' : 'var(--amber-50, #fff7ed)', color: isDark ? '#fbbf24' : 'var(--amber-800, #92400e)', padding: '.5rem .9rem', borderRadius: 8, fontWeight: 500 }}
+                >
+                  Found Item
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         <ConfirmModal
           open={showLogoutConfirm}
           title="Logout"

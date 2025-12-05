@@ -30,7 +30,7 @@ export default function AdminLogin({ onLogin }) {
       })
       const text = await response.text()
       let data = null
-      try { data = text ? JSON.parse(text) : null } catch {}
+      try { data = text ? JSON.parse(text) : null } catch { data = null }
       if (response.ok && data && data.success) {
         // Store credentials for Basic Auth (not secure for prod but fits requirements/time)
         const authHeader = 'Basic ' + btoa(formData.username + ':' + formData.password)
@@ -68,7 +68,7 @@ export default function AdminLogin({ onLogin }) {
           }
           const msg = (data && data.message) || (response.status >= 500 ? `Server ${response.status} error. Check backend/database.` : 'Invalid credentials')
           setError(msg)
-        } catch (e) {
+        } catch {
           setError('Server error. Please try again.')
         }
       }

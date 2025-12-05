@@ -1,0 +1,62 @@
+.claim-page { min-height: 100vh; background: var(--white); }
+.claim-container { width: 100%; max-width: 1600px; margin: 0 auto; padding-top: 5rem; padding-right: 2rem; transition: padding-left .3s ease; }
+.claim-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.header-left { display: flex; align-items: baseline; gap: .75rem; }
+.title { font-size: clamp(1.5rem, 2.5vw, 2rem); font-weight: 800; color: var(--gray-900); }
+.subtitle { color: #6b7280; margin-top: .25rem; }
+.selected { color: #111827; background: #fff7ed; border: 2px solid #fbbf24; padding: .5rem .75rem; border-radius: .5rem; font-weight: 700; }
+
+.back-btn { display: inline-flex; align-items: center; gap: .5rem; padding: .5rem .75rem; border: 2px solid #d1d5db; border-radius: .5rem; background: var(--white); color: #374151; cursor: pointer; }
+.back-btn:hover { border-color: var(--amber-600); color: var(--amber-700); }
+
+.grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 1.5rem; }
+.left { }
+.right { }
+
+.upload-bar { display: flex; align-items: center; gap: .75rem; margin-bottom: .75rem; }
+.upload-btn { display: inline-flex; align-items: center; gap: .5rem; padding: .625rem 1rem; border: 2px solid #d1d5db; border-radius: .75rem; background: var(--white); color: #374151; cursor: pointer; }
+.upload-btn:hover { border-color: var(--amber-600); color: var(--amber-700); }
+.upload-count { color: #6b7280; font-weight: 600; }
+
+.photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.photo-slot { display: grid; place-items: center; height: 160px; background: #f3f4f6; border: 2px solid #d1d5db; border-radius: .75rem; color: #9ca3af; }
+.photo-slot img { width: 100%; height: 100%; object-fit: cover; border-radius: .5rem; }
+
+.form { background: var(--white); border: 2px solid #e5e7eb; border-radius: .75rem; padding: 1rem; }
+.group { margin-bottom: 1rem; }
+.label { display: block; font-weight: 700; margin-bottom: .25rem; color: #111827; }
+.input { width: 100%; padding: .75rem 1rem; border: 2px solid #d1d5db; border-radius: .5rem; background: transparent; color: #111827; }
+.input:focus { outline: none; border-color: var(--amber-600); }
+.input::placeholder { color: #9ca3af; }
+.helper { color: #6b7280; font-size: .9rem; }
+.helper ul { margin: .5rem 0 0; padding-left: 1.25rem; }
+
+.details { margin-top: .75rem; }
+.details-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: .5rem; font-weight: 700; color: #111827; }
+.edit { background: transparent; border: 0; color: var(--amber-700); cursor: pointer; font-weight: 700; }
+.details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.mini-label { display: block; font-size: .85rem; color: #6b7280; margin-bottom: .25rem; }
+.text { font-weight: 600; color: #111827; padding: .625rem 0; }
+
+.actions { display: flex; justify-content: flex-end; margin-top: 1rem; }
+
+/* Dark mode */
+[data-theme='dark'] .claim-page { background: #0b0e14; }
+[data-theme='dark'] .title { color: #f8fafc; }
+[data-theme='dark'] .subtitle { color: #94a3b8; }
+[data-theme='dark'] .selected { background: #111827; border-color: #fbbf24; color: #fbbf24; }
+[data-theme='dark'] .back-btn { background: #0b0e14; border-color: #334155; color: #e5e7eb; }
+[data-theme='dark'] .back-btn:hover { border-color: #fbbf24; color: #fbbf24; }
+[data-theme='dark'] .upload-btn { background: #0b0e14; border-color: #334155; color: #e5e7eb; }
+[data-theme='dark'] .upload-btn:hover { border-color: #fbbf24; color: #fbbf24; }
+[data-theme='dark'] .upload-count { color: #94a3b8; }
+[data-theme='dark'] .photo-slot { background: #0b0e14; border-color: #334155; color: #64748b; }
+[data-theme='dark'] .form { background: #0b0e14; border-color: #334155; }
+[data-theme='dark'] .label { color: #e5e7eb; }
+[data-theme='dark'] .input { color: #e5e7eb; border-color: #334155; }
+[data-theme='dark'] .input::placeholder { color: #64748b; }
+[data-theme='dark'] .helper { color: #94a3b8; }
+[data-theme='dark'] .details-head { color: #e5e7eb; }
+[data-theme='dark'] .edit { color: #fbbf24; }
+[data-theme='dark'] .mini-label { color: #94a3b8; }
+[data-theme='dark'] .text { color: #e5e7eb; }
