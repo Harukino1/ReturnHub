@@ -110,7 +110,20 @@ export default function Dashboard() {
             <div className={styles['dashboard-items-grid']}>
               {filteredItems.length > 0 ? (
                 filteredItems.map((item) => (
-                  <div key={item.id} className={styles['dashboard-item-card']}>
+                  <div
+                    key={item.id}
+                    className={styles['dashboard-item-card']}
+                    onClick={() => {
+                      if (item.type === 'lost') {
+                        try { sessionStorage.setItem('lostItem', JSON.stringify(item)) } catch { void 0 }
+                        window.location.hash = '#/lost-item'
+                      } else if (item.type === 'found') {
+                        try { sessionStorage.setItem('foundItem', JSON.stringify(item)) } catch { void 0 }
+                        window.location.hash = '#/found-item'
+                      }
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <div className={styles['dashboard-item-image']}>
                       <svg width="48" height="48" viewBox="0 0 20 20" fill="currentColor">
                         <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
@@ -125,7 +138,8 @@ export default function Dashboard() {
                           <button
                             type="button"
                             className={styles['dashboard-filter-btn']}
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation()
                               try { sessionStorage.setItem('claimItem', JSON.stringify(item)) } catch { void 0 }
                               window.location.hash = '#/claim-request'
                             }}

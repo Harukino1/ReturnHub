@@ -3,6 +3,8 @@ import LandingPage from './pages/public/Landing.page'
 import AuthPage from './pages/public/Auth.page'
 import ContactPage from './pages/public/Contact.page'
 import Dashboard from './pages/user/Dashboard.page'
+import LostItemPage from './pages/user/LostItem.page'
+import FoundItemPage from './pages/user/FoundItem.page'
 import ClaimRequestPage from './pages/user/ClaimRequest.page'
 import ReportFormPage from './pages/user/ReportForm.page'
 import ProfilePage from './pages/user/Profile.page'
@@ -25,6 +27,8 @@ export default function App() {
     const m = {
       'contact': 'contact',
       'dashboard': 'dashboard',
+      'found-item': 'found-item',
+      'lost-item': 'lost-item',
       'claim-request': 'claim-request',
       'report/found': 'report-form',
       'report/lost': 'report-form',
@@ -108,6 +112,8 @@ export default function App() {
     if (target === 'auth') window.location.hash = `#/auth/${opts.mode === 'signup' ? 'signup' : 'login'}`
     else if (target === 'contact') window.location.hash = '#/contact'
     else if (target === 'dashboard') window.location.hash = '#/dashboard'
+    else if (target === 'found-item') window.location.hash = '#/found-item'
+    else if (target === 'lost-item') window.location.hash = '#/lost-item'
     else if (target === 'claim-request') window.location.hash = '#/claim-request'
     else if (target === 'report-found') window.location.hash = '#/report/found'
     else if (target === 'report-lost') window.location.hash = '#/report/lost'
@@ -143,6 +149,8 @@ export default function App() {
   if (currentPage === 'auth') return <AuthPage onNavigate={handleNavigate} authMode={authMode} />
   if (currentPage === 'contact') return <ContactPage onNavigate={handleNavigate} />
   if (currentPage === 'dashboard') return <Dashboard onNavigate={handleNavigate} />
+  if (currentPage === 'found-item') return <FoundItemPage onNavigate={handleNavigate} />
+  if (currentPage === 'lost-item') return <LostItemPage onNavigate={handleNavigate} />
   if (currentPage === 'claim-request') return <ClaimRequestPage onNavigate={handleNavigate} />
   if (currentPage === 'report-form') return <ReportFormPage onNavigate={handleNavigate} />
   if (currentPage === 'reports') return <ReportsPage onNavigate={handleNavigate} />
