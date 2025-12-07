@@ -113,6 +113,12 @@ export default function App() {
     else if (target === 'report-lost') window.location.hash = '#/report/lost'
     else if (target === 'reports') window.location.hash = '#/reports'
     else if (target === 'messages') window.location.hash = '#/messages'
+    else if (target === 'staff-dashboard') window.location.hash = '#/staff/dashboard'
+    else if (target === 'staff-reports') window.location.hash = '#/staff/reports'
+    else if (target === 'staff-inventory') window.location.hash = '#/staff/inventory'
+    else if (target === 'staff-claims') window.location.hash = '#/staff/claims'
+    else if (target === 'staff-messages') window.location.hash = '#/staff/messages'
+    else if (target === 'staff-profile') window.location.hash = '#/staff/profile'
     else if (target === 'admin') window.location.hash = '#/admin-panel'
     else window.location.hash = `#${target || 'home'}`
   }

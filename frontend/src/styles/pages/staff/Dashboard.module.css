@@ -1,0 +1,124 @@
+.dashboard-page { min-height: 100vh; background-color: var(--white); transition: background-color .3s ease; }
+
+.dashboard-container {
+  width: 100%;
+  height: calc(100vh - 9rem);
+  max-width: 1600px;
+  margin: 0 auto;
+  padding-top: 5rem;
+  padding-right: 2rem;
+  transition: padding-left .3s ease;
+  box-sizing: border-box;
+}
+
+.dashboard-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.dashboard-title { font-size: clamp(1.5rem, 2.5vw, 2rem); font-weight: 800; margin: 0; color: var(--gray-900); }
+
+/* --- METRICS --- */
+.metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin: .5rem 0 1rem; }
+.metric-card { display: flex; align-items: center; gap: 1rem; background: var(--white); border: 1px solid #e5e7eb; border-radius: .75rem; padding: 1rem; }
+.metric-card--link { cursor: pointer; transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+.metric-card--link:hover { border-color: var(--amber-600); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.15); transform: translateY(-2px); }
+.metric-card--hover { transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+.metric-card--hover:hover { border-color: var(--amber-600); box-shadow: 0 8px 20px rgba(245, 158, 11, 0.15); transform: translateY(-2px); }
+.metric-icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: var(--white); border: 2px solid #e5e7eb; border-radius: .75rem; color: var(--amber-700); flex-shrink: 0; }
+.metric-content { display: flex; flex-direction: column; gap: .2rem; }
+.metric-title { font-size: .9rem; color: #6b7280; font-weight: 700; }
+.metric-value { font-size: 1.5rem; font-weight: 800; color: var(--gray-900); }
+.metric-sub { font-size: .85rem; color: #9ca3af; }
+
+/* --- PANELS --- */
+.content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.panel { background: var(--white); border: 1px solid #e5e7eb; border-radius: .75rem; overflow: hidden; }
+.panel-header { display: flex; align-items: center; justify-content: space-between; padding: .75rem 1rem; border-bottom: 1px solid #e5e7eb; }
+.panel-title { margin: 0; font-size: 1rem; font-weight: 800; color: var(--gray-900); }
+.panel-body { padding: 1rem; }
+
+/* --- TABLE & SCROLLBAR STYLING (FIXED) --- */
+.table-responsive { 
+  width: 100%; 
+  overflow-x: auto; 
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 0.5rem; /* Prevents scrollbar from hugging content */
+  
+  /* Firefox Scrollbar Default */
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+/* Webkit Scrollbar (Chrome/Edge/Safari) - Default Light Mode */
+.table-responsive::-webkit-scrollbar {
+  height: 8px; /* Slim horizontal scrollbar */
+  width: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+  background-color: #d1d5db; /* Light gray thumb */
+  border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover {
+  background-color: #9ca3af; /* Darker gray on hover */
+}
+
+.table { width: 100%; border-collapse: collapse; min-width: 720px; }
+.table th, .table td { padding: .75rem; border-bottom: 1px solid #e5e7eb; text-align: left; }
+.table thead th { font-weight: 700; color: var(--gray-700); white-space: nowrap; }
+.table .item-cell { display: flex; align-items: center; gap: .75rem; }
+.thumb { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: var(--white); border: 2px solid #e5e7eb; border-radius: .5rem; color: var(--gray-400); flex-shrink: 0; }
+.thumb-image { width: 100%; height: 100%; object-fit: cover; border-radius: .5rem; }
+.item-name { font-weight: 700; color: var(--gray-900); }
+.status-pill { display: inline-block; padding: .25rem .5rem; border-radius: .5rem; border: 1px solid #d1d5db; background: var(--white); color: #6b7280; font-weight: 700; font-size: .8rem; }
+.view-btn { display: inline-flex; align-items: center; gap: .4rem; padding: .4rem .7rem; border-radius: .5rem; border: 1px solid #d1d5db; background: var(--white); color: var(--amber-700); font-weight: 700; cursor: pointer; }
+.view-btn:hover { background: #fff7ed; border-color: var(--amber-600); }
+.empty-cell { text-align: center; color: var(--gray-500); }
+
+/* --- MEDIA QUERIES --- */
+@media (max-width: 1024px) {
+  .dashboard-container { padding-left: 2rem !important; padding-right: 2rem !important; }
+  .content-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container { padding-left: 1rem !important; padding-right: 1rem !important; }
+}
+
+/* --- DARK THEME --- */
+[data-theme='dark'] .dashboard-page { background-color: #0b0e14; }
+[data-theme='dark'] .dashboard-title { color: #f8fafc; }
+[data-theme='dark'] .metric-card { background: #0b0e14; border-color: #334155; }
+[data-theme='dark'] .metric-card--link:hover { border-color: #fbbf24; box-shadow: 0 8px 20px rgba(255, 191, 36, 0.1); }
+[data-theme='dark'] .metric-card--hover:hover { border-color: #fbbf24; box-shadow: 0 8px 20px rgba(255, 191, 36, 0.1); }
+[data-theme='dark'] .metric-icon { background: #0b0e14; border-color: #334155; color: #fbbf24; }
+[data-theme='dark'] .metric-title { color: #cbd5e1; }
+[data-theme='dark'] .metric-value { color: #e5e7eb; }
+[data-theme='dark'] .metric-sub { color: #94a3b8; }
+[data-theme='dark'] .panel { background: #0b0e14; border-color: #334155; }
+[data-theme='dark'] .panel-header { border-bottom-color: #334155; }
+[data-theme='dark'] .panel-title { color: #e5e7eb; }
+[data-theme='dark'] .table th, [data-theme='dark'] .table td { border-bottom-color: #334155; }
+[data-theme='dark'] .table thead th { color: #e5e7eb; }
+[data-theme='dark'] .thumb { background: #0b0e14; border-color: #334155; color: #64748b; }
+[data-theme='dark'] .item-name { color: #f3f4f6; }
+[data-theme='dark'] .view-btn { background: #111827; border-color: #334155; color: #fbbf24; }
+
+/* DARK MODE SCROLLBAR OVERRIDES */
+[data-theme='dark'] .table-responsive {
+  scrollbar-color: #374151 transparent; /* Firefox */
+}
+
+[data-theme='dark'] .table-responsive::-webkit-scrollbar-thumb {
+  background-color: #374151; /* Dark gray thumb to match borders */
+}
+
+[data-theme='dark'] .table-responsive::-webkit-scrollbar-thumb:hover {
+  background-color: #4b5563; /* Lighter gray on hover */
+}
+
+[data-theme='dark'] .table-responsive::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02); /* Very subtle track background */
+}
