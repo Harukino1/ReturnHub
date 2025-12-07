@@ -4,7 +4,7 @@
   padding: 4rem 0;
   width: 100%;
   display: flex;
-  justify-content: center; /* Centers the inner grid */
+  justify-content: center;
 }
 
 .hero-grid {
@@ -18,7 +18,7 @@
 }
 
 .hero-title {
-  font-size: clamp(2.5rem, 5vw, 4rem); /* Slightly increased size for wider screens */
+  font-size: clamp(2.5rem, 5vw, 4rem);
   font-weight: 800;
   line-height: 1.15;
   color: var(--gray-900);
@@ -33,7 +33,7 @@
 
 .hero-text-xl {
   font-size: 1.25rem;
-  color: #374151;
+  color: var(--gray-700);
   line-height: 1.6;
 }
 
@@ -55,19 +55,21 @@
 .illustration-box {
   position: relative;
   width: 100%;
-  height: 42rem; /* Made slightly taller to match wider width */
+  height: 42rem; 
   border-radius: 1rem;
   background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  /* CHANGED: Removed overflow: hidden to prevent clipping shadow/edges */
 }
 
 .hero-logo {
-  width: min(3200px, 80%); 
-  height: auto;
-  object-fit: cover;
+  /* CHANGED: Adjusted dimensions and fit to prevent cropping */
+  width: 100%; 
+  height: 100%;
+  object-fit: contain; 
+  max-height: 38rem; /* Keeps it contained within the box with breathing room */
 }
 
 @media (min-width: 768px) {
@@ -85,4 +87,9 @@
     align-items: center;
     justify-content: center;
   }
+}
+
+/* --- DARK MODE OVERRIDES --- */
+[data-theme='dark'] .hero-text {
+  color: #9ca3af;
 }

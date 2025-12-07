@@ -1,10 +1,42 @@
-.about { background: var(--white); padding: 4rem 0; }
-.about-grid { display: grid; gap: 2rem; align-items: center; }
-.about-title { font-size: clamp(1.75rem, 3vw, 2.5rem); font-weight: 800; color: var(--gray-900); margin: 0 0 1rem; }
-.about-text { color: #374151; margin: 0 0 .75rem; }
+.about { 
+  background: var(--white); 
+  padding: 4rem 0; /* Matches Hero vertical padding */
+}
+
+/* Override global container to match Hero's wider layout */
+.about .container {
+  max-width: 1420px; 
+  padding: 0 2rem;
+}
+
+.about-grid { 
+  display: grid; 
+  gap: 3rem; /* Matches Hero grid gap */
+  align-items: center; 
+}
+
+.about-title { 
+  /* Matches Hero title scaling exactly */
+  font-size: clamp(2.5rem, 5vw, 4rem); 
+  font-weight: 800; 
+  color: var(--gray-900); 
+  margin: 0 0 1.5rem; 
+  line-height: 1.15;
+}
+
+.about-text { 
+  /* Matches Hero secondary text size */
+  font-size: 1.25rem; 
+  line-height: 1.6;
+  color: var(--gray-700); 
+  margin: 0 0 1rem; 
+}
+
 .about-illustration {
   width: 100%;
-  height: 16rem;
+  height: auto;
+  /* Slightly increased height to balance the larger title font */
+  min-height: 24rem; 
   border-radius: 1rem;
   background: transparent;
   display: flex;
@@ -12,9 +44,10 @@
   justify-content: center;
   overflow: hidden;
 }
+
 .about-image {
-  width: 100%;
-  height: 100%;
+  width: 50%;
+  height: 50%;
   object-fit: contain;
 }
 
@@ -22,3 +55,7 @@
   .about-grid { grid-template-columns: 1fr 1fr; }
 }
 
+/* Dark Mode Override */
+[data-theme='dark'] .about {
+  background: var(--white); /* Uses global var for dark mode bg */
+}

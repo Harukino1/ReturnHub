@@ -10,7 +10,6 @@ export default function ReportsPage() {
   const [query, setQuery] = useState('')
   const [activeTab, setActiveTab] = useState('all')
   const [showAdd, setShowAdd] = useState(false)
-  const [form, setForm] = useState({ name: '', date: '', category: '', location: '', status: 'pending' })
   const reportLostBtnRef = useRef(null)
 
   useEffect(() => {
@@ -26,7 +25,7 @@ export default function ReportsPage() {
     return () => { document.removeEventListener('keydown', onKey); clearTimeout(id) }
   }, [showAdd])
 
-  const [reports, setReports] = useState([
+  const [reports] = useState([
     { id: 1, name: 'Black Backpack', date: '11/28/2025', category: 'Bags', location: 'Cebu City', status: 'pending', photoUrl: '' },
     { id: 2, name: 'Wallet', date: '11/27/2025', category: 'Personal', location: 'Mandaue', status: 'approved', photoUrl: '' },
     { id: 3, name: 'Phone', date: '11/25/2025', category: 'Electronics', location: 'IT Park', status: 'rejected', photoUrl: '' }
