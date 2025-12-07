@@ -169,7 +169,15 @@ select.input {
   color: #e5e7eb; 
   border-color: #334155; 
   background-color: #0b0e14; 
+  color-scheme: dark; /* IMPORTANT: Fixes dropdown background */
 }
+
+/* IMPORTANT: Fixes invisible calendar icon in dark mode (Native Picker) */
+[data-theme='dark'] .input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
 [data-theme='dark'] .input:focus { border-color: #fbbf24; box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.1); }
 [data-theme='dark'] .input::placeholder { color: #64748b; }
 
@@ -194,3 +202,29 @@ select.input {
 }
 [data-theme='dark'] .form::-webkit-scrollbar-thumb { background-color: #374151; }
 [data-theme='dark'] .form::-webkit-scrollbar-thumb:hover { background-color: #4b5563; }
+
+/* --- GHOST CALENDAR ICON STYLES --- */
+.date-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.ghost-calendar-icon {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af; /* Light gray for Light Mode */
+  pointer-events: none; /* Allows click to pass through to the input */
+  transition: opacity 0.2s;
+}
+
+/* Dark Mode: Make the ghost icon white */
+[data-theme='dark'] .ghost-calendar-icon {
+  color: #e5e7eb;
+}
+
+/* TRICK: When input turns into type="date" (focused), HIDE our ghost icon so native one shows */
+.input[type='date'] + .ghost-calendar-icon {
+  opacity: 0;
+}
