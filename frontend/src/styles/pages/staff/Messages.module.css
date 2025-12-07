@@ -10,7 +10,7 @@
   /* padding-left handled via inline JS */
   transition: padding-left 0.3s ease;
   box-sizing: border-box;
-  height: calc(100vh - 1rem); 
+  height: calc(100vh - 9rem); 
   padding-bottom: 1rem;
 }
 
@@ -38,7 +38,52 @@
 .search-input::placeholder { color: var(--gray-400); }
 .search-btn { padding: .5rem .75rem; border: 0; background: transparent; color: var(--amber-700); cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-.conv-list { display: flex; flex-direction: column; overflow-y: auto; flex: 1; }
+/* --- SCROLLABLE AREAS --- */
+.conv-list { 
+  display: flex; 
+  flex-direction: column; 
+  overflow-y: auto; 
+  flex: 1; 
+  
+  /* Firefox Scrollbar Default */
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+.chat-body { 
+  padding: 1.5rem; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 1rem; 
+  overflow-y: auto; 
+  background: #fafafa; 
+  
+  /* Firefox Scrollbar Default */
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+/* Webkit Scrollbar (Chrome/Edge/Safari) - Light Mode */
+.conv-list::-webkit-scrollbar,
+.chat-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.conv-list::-webkit-scrollbar-track,
+.chat-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.conv-list::-webkit-scrollbar-thumb,
+.chat-body::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;
+  border-radius: 3px;
+}
+
+.conv-list::-webkit-scrollbar-thumb:hover,
+.chat-body::-webkit-scrollbar-thumb:hover {
+  background-color: #9ca3af;
+}
 
 .conv-item { 
   display: flex; 
@@ -77,7 +122,6 @@
 .chat-name { font-weight: 700; color: var(--gray-900); font-size: 1.1rem; }
 .chat-sub { font-size: .8rem; color: #6b7280; }
 
-.chat-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; overflow-y: auto; background: #fafafa; }
 .msg { max-width: 70%; display: inline-flex; flex-direction: column; gap: .25rem; }
 .msg-user { align-self: flex-start; }
 .msg-staff { align-self: flex-end; align-items: flex-end; }
@@ -148,3 +192,24 @@
 [data-theme='dark'] .input:focus { border-color: var(--amber-500); }
 [data-theme='dark'] .send { background: var(--amber-600); }
 [data-theme='dark'] .send:hover { background: var(--amber-500); }
+
+/* DARK MODE SCROLLBAR OVERRIDES */
+[data-theme='dark'] .conv-list,
+[data-theme='dark'] .chat-body {
+  scrollbar-color: #374151 transparent; /* Firefox */
+}
+
+[data-theme='dark'] .conv-list::-webkit-scrollbar-thumb,
+[data-theme='dark'] .chat-body::-webkit-scrollbar-thumb {
+  background-color: #374151; /* Dark gray to match borders */
+}
+
+[data-theme='dark'] .conv-list::-webkit-scrollbar-thumb:hover,
+[data-theme='dark'] .chat-body::-webkit-scrollbar-thumb:hover {
+  background-color: #4b5563; /* Slightly lighter on hover */
+}
+
+[data-theme='dark'] .conv-list::-webkit-scrollbar-track,
+[data-theme='dark'] .chat-body::-webkit-scrollbar-track {
+  background: transparent;
+}
