@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { Search } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Search, AlertCircle, BadgeCheck } from 'lucide-react'
 import Navbar from '../../components/layout/Navbar'
 import UserSidebar from '../../components/user/UserSidebar'
 import styles from '../../styles/pages/user/Dashboard.module.css'
@@ -32,11 +32,20 @@ export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const [showReportChoice, setShowReportChoice] = useState(false)
+  const reportLostBtnRef = useRef(null)
 
   useEffect(() => {
     const t = localStorage.getItem('theme') || 'light'
     document.documentElement.setAttribute('data-theme', t)
   }, [])
+
+  useEffect(() => {
+    if (!showReportChoice) return
+    const onKey = (e) => { if (e.key === 'Escape') setShowReportChoice(false) }
+    document.addEventListener('keydown', onKey)
+    const id = setTimeout(() => { reportLostBtnRef.current?.focus() }, 0)
+    return () => { document.removeEventListener('keydown', onKey); clearTimeout(id) }
+  }, [showReportChoice])
 
   const filteredItems = dummyItems.filter(item => {
     const matchesType = item.type === filterType
@@ -46,7 +55,6 @@ export default function Dashboard() {
     return matchesType && matchesSearch
   })
 
-  const isDark = (localStorage.getItem('theme') || 'light') === 'dark'
 
   const handleSearch = (e) => {
     e.preventDefault()
@@ -146,36 +154,38 @@ export default function Dashboard() {
             Report
           </button>
         </div>
-        {/* Report Type Modal */}
         {showReportChoice && (
-          <div className="overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.35)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000 }}>
-            <div className="modal" style={{ width: '100%', maxWidth: 420, background: isDark ? '#0b0e14' : 'var(--surface-1, #fff)', color: isDark ? '#e5e7eb' : 'var(--text-1, #111827)', border: `1px solid ${isDark ? '#334155' : 'var(--border, #e5e7eb)'}`, borderRadius: 12, boxShadow: '0 10px 30px rgba(0,0,0,0.15)' }}>
-              <div className="header" style={{ padding: '1rem 1rem 0.5rem' }}>
-                <h3 className="title" style={{ fontSize: '1.125rem', fontWeight: 600, margin: 0 }}>Choose Report Type</h3>
+          <div className={styles['report-overlay']} role="dialog" aria-modal="true" aria-labelledby="report-type-title" aria-describedby="report-type-desc">
+            <div className={styles['report-modal']}>
+              <div className={styles['report-header']}>
+                <h3 id="report-type-title" className={styles['report-title']}>Choose Report Type</h3>
               </div>
-              <div className="body" style={{ padding: '0 1rem 1rem' }}>
-                <p className="message" style={{ margin: 0, color: isDark ? '#cbd5e1' : 'var(--text-2, #4b5563)' }}>Select what you want to report.</p>
+              <div className={styles['report-body']}>
+                <p id="report-type-desc" className={styles['report-message']}>Select what you want to report.</p>
               </div>
-              <div className="footer" style={{ display: 'flex', gap: '.5rem', padding: '.75rem 1rem 1rem', justifyContent: 'flex-end' }}>
+              <div className={styles['report-actions']}>
                 <button
-                  className="btn cancel"
+                  type="button"
+                  className={styles['report-btn-cancel']}
                   onClick={() => setShowReportChoice(false)}
-                  style={{ border: `1px solid ${isDark ? '#334155' : 'var(--border, #e5e7eb)'}`, background: isDark ? '#1f2937' : 'var(--surface-2, #f9fafb)', color: isDark ? '#e5e7eb' : 'var(--text-1, #111827)', padding: '.5rem .9rem', borderRadius: 8, fontWeight: 500 }}
                 >
                   Cancel
                 </button>
                 <button
-                  className="btn primary"
+                  type="button"
+                  ref={reportLostBtnRef}
+                  className={styles['report-btn-option']}
                   onClick={() => { setShowReportChoice(false); window.location.hash = '#/report/lost' }}
-                  style={{ border: `1px solid ${isDark ? '#3d2b12' : 'var(--amber-200, #fed7aa)'}`, background: isDark ? '#1f2937' : 'var(--amber-50, #fff7ed)', color: isDark ? '#fbbf24' : 'var(--amber-800, #92400e)', padding: '.5rem .9rem', borderRadius: 8, fontWeight: 500 }}
                 >
+                  <AlertCircle size={18} />
                   Lost Item
                 </button>
                 <button
-                  className="btn primary"
+                  type="button"
+                  className={styles['report-btn-option']}
                   onClick={() => { setShowReportChoice(false); window.location.hash = '#/report/found' }}
-                  style={{ border: `1px solid ${isDark ? '#3d2b12' : 'var(--amber-200, #fed7aa)'}`, background: isDark ? '#1f2937' : 'var(--amber-50, #fff7ed)', color: isDark ? '#fbbf24' : 'var(--amber-800, #92400e)', padding: '.5rem .9rem', borderRadius: 8, fontWeight: 500 }}
                 >
+                  <BadgeCheck size={18} />
                   Found Item
                 </button>
               </div>

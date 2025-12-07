@@ -319,3 +319,85 @@
 [data-theme='dark'] .dashboard-item-location { color: #9ca3af; }
 [data-theme='dark'] .dashboard-item-date { color: #6b7280; }
 [data-theme='dark'] .dashboard-empty { color: #6b7280; }
+
+/* --- REPORT TYPE MODAL --- */
+.report-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 1rem;
+}
+
+.report-modal {
+  width: 100%;
+  max-width: 480px;
+  background: var(--white);
+  color: var(--gray-900);
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .15);
+  overflow: hidden;
+}
+
+.report-header { padding: 1rem 1rem .5rem; border-bottom: 1px solid #e5e7eb; }
+.report-title { margin: 0; font-size: 1.25rem; font-weight: 800; }
+.report-body { padding: .75rem 1rem 1rem; }
+.report-message { margin: 0; color: #4b5563; }
+
+.report-actions {
+  display: flex;
+  gap: .5rem;
+  padding: .75rem 1rem 1rem;
+  justify-content: flex-end;
+}
+
+.report-btn-cancel {
+  border: 2px solid #e5e7eb;
+  background: var(--white);
+  color: var(--gray-900);
+  padding: .6rem 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.report-btn-cancel:hover { background: var(--gray-50); }
+
+.report-btn-option {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  border: 2px solid var(--amber-600);
+  background: var(--amber-50);
+  color: var(--amber-700);
+  padding: .6rem 1rem;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.report-btn-option:hover { background: #fff7ed; box-shadow: 0 6px 16px rgba(245, 158, 11, 0.2); }
+.report-btn-option:focus { outline: 3px solid rgba(245, 158, 11, 0.4); outline-offset: 2px; }
+
+/* Dark mode variants for modal */
+[data-theme='dark'] .report-modal {
+  background: #0b0e14;
+  color: #e5e7eb;
+  border-color: #334155;
+}
+[data-theme='dark'] .report-header { border-bottom-color: #334155; }
+[data-theme='dark'] .report-message { color: #cbd5e1; }
+[data-theme='dark'] .report-btn-cancel {
+  background: #0b0e14;
+  color: #e5e7eb;
+  border-color: #334155;
+}
+[data-theme='dark'] .report-btn-cancel:hover { background: #111827; }
+[data-theme='dark'] .report-btn-option {
+  background: #1f2937;
+  color: #fbbf24;
+  border-color: #3d2b12;
+}
+[data-theme='dark'] .report-btn-option:hover { background: #0f172a; }

@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import Navbar from '../../components/layout/Navbar'
 import UserSidebar from '../../components/user/UserSidebar'
 import styles from '../../styles/pages/user/Reports.module.css'
-import { Search, Image, Eye, Plus } from 'lucide-react'
+import { Search, Image, Eye, Plus, AlertCircle, BadgeCheck } from 'lucide-react'
 
 export default function ReportsPage() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -11,11 +11,20 @@ export default function ReportsPage() {
   const [activeTab, setActiveTab] = useState('all')
   const [showAdd, setShowAdd] = useState(false)
   const [form, setForm] = useState({ name: '', date: '', category: '', location: '', status: 'pending' })
+  const reportLostBtnRef = useRef(null)
 
   useEffect(() => {
     const t = localStorage.getItem('theme') || 'light'
     document.documentElement.setAttribute('data-theme', t)
   }, [])
+
+  useEffect(() => {
+    if (!showAdd) return
+    const onKey = (e) => { if (e.key === 'Escape') setShowAdd(false) }
+    document.addEventListener('keydown', onKey)
+    const id = setTimeout(() => { reportLostBtnRef.current?.focus() }, 0)
+    return () => { document.removeEventListener('keydown', onKey); clearTimeout(id) }
+  }, [showAdd])
 
   const [reports, setReports] = useState([
     { id: 1, name: 'Black Backpack', date: '11/28/2025', category: 'Bags', location: 'Cebu City', status: 'pending', photoUrl: '' },
@@ -121,48 +130,40 @@ export default function ReportsPage() {
         </div>
 
         {showAdd && (
-          <div className={styles['modal-overlay']}>
-            <div className={styles['modal']}>
-              <div className={styles['modal-header']}>
-                <h3 className={styles['modal-title']}>New Report</h3>
+          <div className={styles['report-overlay']} role="dialog" aria-modal="true" aria-labelledby="report-type-title" aria-describedby="report-type-desc">
+            <div className={styles['report-modal']}>
+              <div className={styles['report-header']}>
+                <h3 id="report-type-title" className={styles['report-title']}>Choose Report Type</h3>
               </div>
-              <form
-                className={styles['modal-form']}
-                onSubmit={(e) => {
-                  e.preventDefault()
-                  const id = (reports[reports.length - 1]?.id || 0) + 1
-                  const payload = { id, ...form, photoUrl: '' }
-                  setReports((p) => [payload, ...p])
-                  setShowAdd(false)
-                  setForm({ name: '', date: '', category: '', location: '', status: 'pending' })
-                }}
-              >
-                <div className="form-grid">
-                  <div className="input-wrap">
-                    <input className="input" placeholder="Item name" value={form.name} onChange={(e) => setForm((x) => ({ ...x, name: e.target.value }))} required />
-                  </div>
-                  <div className="input-wrap">
-                    <input className="input" placeholder="mm/dd/yyyy" value={form.date} onChange={(e) => setForm((x) => ({ ...x, date: e.target.value }))} required />
-                  </div>
-                  <div className="input-wrap">
-                    <input className="input" placeholder="Category" value={form.category} onChange={(e) => setForm((x) => ({ ...x, category: e.target.value }))} required />
-                  </div>
-                  <div className="input-wrap">
-                    <input className="input" placeholder="Location" value={form.location} onChange={(e) => setForm((x) => ({ ...x, location: e.target.value }))} required />
-                  </div>
-                  <div className="input-wrap">
-                    <select className="input" value={form.status} onChange={(e) => setForm((x) => ({ ...x, status: e.target.value }))}>
-                      <option value="pending">Pending</option>
-                      <option value="approved">Approved</option>
-                      <option value="rejected">Rejected</option>
-                    </select>
-                  </div>
-                </div>
-                <div style={{ display: 'flex', gap: '.5rem', marginTop: '1rem' }}>
-                  <button type="button" className="btn btn-outline" onClick={() => setShowAdd(false)}>Cancel</button>
-                  <button type="submit" className="btn btn-primary">Save Report</button>
-                </div>
-              </form>
+              <div className={styles['report-body']}>
+                <p id="report-type-desc" className={styles['report-message']}>Select what you want to report.</p>
+              </div>
+              <div className={styles['report-actions']}>
+                <button
+                  type="button"
+                  className={styles['report-btn-cancel']}
+                  onClick={() => setShowAdd(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  ref={reportLostBtnRef}
+                  className={styles['report-btn-option']}
+                  onClick={() => { setShowAdd(false); window.location.hash = '#/report/lost' }}
+                >
+                  <AlertCircle size={18} />
+                  Lost Item
+                </button>
+                <button
+                  type="button"
+                  className={styles['report-btn-option']}
+                  onClick={() => { setShowAdd(false); window.location.hash = '#/report/found' }}
+                >
+                  <BadgeCheck size={18} />
+                  Found Item
+                </button>
+              </div>
             </div>
           </div>
         )}
