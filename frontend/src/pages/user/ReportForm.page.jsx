@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Navbar from '../../components/layout/Navbar'
 import UserSidebar from '../../components/user/UserSidebar'
 import styles from '../../styles/pages/user/ClaimRequest.module.css'
-import { Image, Upload, ArrowLeft } from 'lucide-react'
+import { Image, Upload, ArrowLeft, Calendar } from 'lucide-react'
 
 export default function ReportFormPage() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -16,6 +16,21 @@ export default function ReportFormPage() {
     description: '',
     uniqueDetail: ''
   })
+
+  const CATEGORIES = [
+    'Electronics & Gadgets',
+    'Clothing & Apparel',
+    'Home & Living',
+    'Kitchen & Dining',
+    'Health & Beauty',
+    'Sports & Outdoors',
+    'Toys & Hobbies',
+    'Automotive & Industrial',
+    'Office & School Supplies',
+    'Books & Media',
+    'Groceries & Pets',
+    'Miscellaneous'
+  ]
 
   const reportType = useMemo(() => {
     const h = window.location.hash || '#/report/found'
@@ -85,33 +100,69 @@ export default function ReportFormPage() {
             <form onSubmit={onSubmit} className={styles['form']}>
               <div className={styles['group']}>
                 <label className={styles['label']}>Item Name</label>
-                <input className={styles['input']} placeholder="Hint Text" value={form.itemName} onChange={(e) => setForm((x) => ({ ...x, itemName: e.target.value }))} />
+                <input 
+                  className={styles['input']} 
+                  placeholder="e.g. Black Leather Wallet" 
+                  value={form.itemName} 
+                  onChange={(e) => setForm((x) => ({ ...x, itemName: e.target.value }))} 
+                />
               </div>
               <div className={styles['group']}>
                 <label className={styles['label']}>Category</label>
                 <select className={styles['input']} value={form.category} onChange={(e) => setForm((x) => ({ ...x, category: e.target.value }))}>
                   <option value="">-- Select Category --</option>
-                  <option value="Bags">Bags</option>
-                  <option value="Electronics">Electronics</option>
-                  <option value="Personal">Personal</option>
+                  {CATEGORIES.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
                 </select>
               </div>
               <div className={styles['group']}>
                 <label className={styles['label']}>{reportType === 'lost' ? 'Location Lost' : 'Location Found'}</label>
-                <input className={styles['input']} placeholder="Hint Text" value={form.location} onChange={(e) => setForm((x) => ({ ...x, location: e.target.value }))} />
-                <div className={styles['helper']}>Provide a detail location on the item.</div>
+                <input 
+                  className={styles['input']} 
+                  placeholder="e.g. Central Park, near the fountain" 
+                  value={form.location} 
+                  onChange={(e) => setForm((x) => ({ ...x, location: e.target.value }))} 
+                />
+                <div className={styles['helper']}>Provide a specific landmark or area if possible.</div>
               </div>
+
+              {/* --- UPDATED DATE INPUT SECTION WITH GHOST ICON --- */}
               <div className={styles['group']}>
                 <label className={styles['label']}>{reportType === 'lost' ? 'Date lost' : 'Date found'}</label>
-                <input className={styles['input']} placeholder="mm/dd/yyyy" value={form.date} onChange={(e) => setForm((x) => ({ ...x, date: e.target.value }))} />
+                <div className={styles['date-wrapper']}>
+                  <input 
+                    className={styles['input']} 
+                    placeholder="mm/dd/yyyy"
+                    type={form.date ? "date" : "text"} 
+                    onFocus={(e) => (e.target.type = "date")}
+                    onBlur={(e) => { if (!e.target.value) e.target.type = "text"; }}
+                    value={form.date} 
+                    onChange={(e) => setForm((x) => ({ ...x, date: e.target.value }))} 
+                  />
+                  {/* Custom icon that sits over the input when in 'text' mode */}
+                  <Calendar className={styles['ghost-calendar-icon']} size={20} />
+                </div>
               </div>
+              {/* ------------------------------------------------ */}
+
               <div className={styles['group']}>
                 <label className={styles['label']}>Item Descriptions</label>
-                <input className={styles['input']} placeholder="Hint Text" value={form.description} onChange={(e) => setForm((x) => ({ ...x, description: e.target.value }))} />
+                <input 
+                  className={styles['input']} 
+                  placeholder="e.g. Brand, color, size, distinguishing marks" 
+                  value={form.description} 
+                  onChange={(e) => setForm((x) => ({ ...x, description: e.target.value }))} 
+                />
               </div>
               <div className={styles['group']}>
                 <label className={styles['label']}>Unique Identifying Detail</label>
-                <input className={styles['input']} placeholder="Hint Text" value={form.uniqueDetail} onChange={(e) => setForm((x) => ({ ...x, uniqueDetail: e.target.value }))} />
+                <input 
+                  className={styles['input']} 
+                  placeholder="e.g. Serial number, initials engraved, specific scratch" 
+                  value={form.uniqueDetail} 
+                  onChange={(e) => setForm((x) => ({ ...x, uniqueDetail: e.target.value }))} 
+                />
                 <div className={styles['helper']}>
                   <ul>
                     <li>Marks, scratches, engravings</li>
@@ -151,4 +202,3 @@ export default function ReportFormPage() {
     </div>
   )
 }
-
