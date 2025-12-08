@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Navbar from '../../components/layout/Navbar'
 import StaffSidebar from '../../components/staff/StaffSidebar'
 import styles from '../../styles/pages/staff/Reports.module.css'
-import { Search, Image, Eye, Plus, Filter, X, ChevronLeft, ChevronRight, ExternalLink, MapPin, Calendar, User, Tag, Camera } from 'lucide-react'
+import { Search, Image, Eye, Plus, Filter, X, ChevronLeft, ChevronRight, ExternalLink, MapPin, Calendar, User, Tag, Camera, Phone, Mail } from 'lucide-react'
 
 export default function StaffReportsPage() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -74,6 +74,8 @@ export default function StaffReportsPage() {
       category: 'Bags', 
       location: 'Cebu City Grandstand', 
       reporter: 'Pao Gwapo', 
+      reporterPhone: '0917 123 4567',
+      reporterEmail: 'pao@example.com',
       status: 'Pending', 
       description: 'Black Jansport bag. Contains a water bottle and some notebooks. Found near the bleachers.', 
       uniqueDetail: 'Sticker of a cat on the bottom right corner.', 
@@ -91,6 +93,8 @@ export default function StaffReportsPage() {
       category: 'Personal', 
       location: 'Mandaue Public Market', 
       reporter: 'Jane Doe', 
+      reporterPhone: '0922 555 7890',
+      reporterEmail: 'jane.doe@example.com',
       status: 'Published', 
       description: 'Lost somewhere near the fruit section. Contains ID and cards.', 
       uniqueDetail: 'Initials "JD" embossed on the inside.', 
@@ -105,6 +109,8 @@ export default function StaffReportsPage() {
       category: 'Electronics', 
       location: 'IT Park, Cebu', 
       reporter: 'Security Guard', 
+      reporterPhone: '0933 222 3344',
+      reporterEmail: 'security@itpark.ph',
       status: 'Pending', 
       description: 'Blue iPhone 13 Pro with a clear case. Found on a bench near the plaza.', 
       uniqueDetail: 'Lock screen is a picture of a Golden Retriever.', 
@@ -121,6 +127,8 @@ export default function StaffReportsPage() {
       category: 'Keys', 
       location: 'SM Seaside Parking', 
       reporter: 'Mark Cruz', 
+      reporterPhone: '0908 777 1122',
+      reporterEmail: 'mark.cruz@example.com',
       status: 'Rejected', 
       description: 'Toyota car keys with a leather keychain.', 
       uniqueDetail: 'Keychain has "Cebu" engraved on it.', 
@@ -135,6 +143,8 @@ export default function StaffReportsPage() {
       category: 'Others', 
       location: 'Ayala Terraces', 
       reporter: 'Cleaning Staff', 
+      reporterPhone: '0910 123 9876',
+      reporterEmail: 'clean@ayala.ph',
       status: 'Published', 
       description: 'Large golf umbrella, navy blue.', 
       uniqueDetail: 'Handle has a scratch near the button.', 
@@ -195,6 +205,8 @@ export default function StaffReportsPage() {
     const payload = { 
       id, ...form, 
       reporter: form.reporterName, 
+      reporterPhone: form.reporterPhone,
+      reporterEmail: form.reporterEmail,
       claimsCount: 0,
       photos: form.photos // Use the array directly
     }
@@ -399,16 +411,30 @@ export default function StaffReportsPage() {
                     </div>
                   </div>
 
-                  <div className={styles['info-group']}>
-                    <h4 className={styles['info-heading']}>Reporter</h4>
-                    <div className={styles['info-row']}>
-                      <User size={16} className={styles['info-icon']} />
-                      <div>
-                        <span className={styles['info-label']}>Reported By</span>
-                        <div className={styles['info-text']}>{selectedReport.reporter}</div>
-                      </div>
+                <div className={styles['info-group']}>
+                  <h4 className={styles['info-heading']}>Reporter</h4>
+                  <div className={styles['info-row']}>
+                    <User size={16} className={styles['info-icon']} />
+                    <div>
+                      <span className={styles['info-label']}>Reported By</span>
+                      <div className={styles['info-text']}>{selectedReport.reporter}</div>
                     </div>
                   </div>
+                  <div className={styles['info-row']}>
+                    <Phone size={16} className={styles['info-icon']} />
+                    <div>
+                      <span className={styles['info-label']}>Phone Number</span>
+                      <div className={styles['info-text']}>{selectedReport.reporterPhone || 'Not provided'}</div>
+                    </div>
+                  </div>
+                  <div className={styles['info-row']}>
+                    <Mail size={16} className={styles['info-icon']} />
+                    <div>
+                      <span className={styles['info-label']}>Email Address</span>
+                      <div className={styles['info-text']}>{selectedReport.reporterEmail || 'Not provided'}</div>
+                    </div>
+                  </div>
+                </div>
 
                   <div className={styles['info-group']}>
                     <h4 className={styles['info-heading']}>Description</h4>
