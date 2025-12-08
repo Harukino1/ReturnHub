@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import Navbar from '../../components/layout/Navbar'
 import StaffSidebar from '../../components/staff/StaffSidebar'
 import styles from '../../styles/pages/staff/Claims.module.css'
-import { Search, Image, Eye, FileText, User, X, Check, AlertTriangle, ShieldAlert } from 'lucide-react'
+import { Search, Image, Eye, FileText, User, X, Check, AlertTriangle, ShieldAlert, MessageSquare, Briefcase } from 'lucide-react'
 
 export default function StaffClaimsPage() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -29,7 +29,7 @@ export default function StaffClaimsPage() {
       claimantUser: {
         userId: 1,
         name: 'Jane Doe',
-        email: 'jane@example.com',
+        email: 'jane.doe@example.com',
         phone: '0917-123-4567'
       },
       foundItem: {
@@ -53,7 +53,7 @@ export default function StaffClaimsPage() {
       claimantUser: {
         userId: 2,
         name: 'John Smith',
-        email: 'john.s@example.com',
+        email: 'john.smith@university.edu',
         phone: '0999-888-7777'
       },
       foundItem: {
@@ -77,7 +77,7 @@ export default function StaffClaimsPage() {
       claimantUser: {
         userId: 3,
         name: 'Mark Lee',
-        email: 'mark@example.com',
+        email: 'mark.lee@corp.com',
         phone: '0922-333-4444'
       },
       foundItem: {
@@ -88,6 +88,30 @@ export default function StaffClaimsPage() {
           description: 'Blue umbrella, huge size.',
           uniqueDetail: 'Handle is broken at the tip.',
           location: 'Lobby',
+          photoUrl: ''
+        }
+      }
+    },
+    { 
+      id: 104, 
+      dateSubmitted: '2025-12-01T08:00:00',
+      status: 'claimed',
+      proofDocumentUrl: '',
+      claimantNote: 'Black tumbler with "Hydrate" sticker.',
+      claimantUser: {
+        userId: 4,
+        name: 'Sarah Connor',
+        email: 'sarah.c@future.net',
+        phone: '0918-555-1234'
+      },
+      foundItem: {
+        itemId: 99,
+        submittedReport: {
+          itemName: 'Hydroflask',
+          category: 'Personal',
+          description: '32oz Black Hydroflask.',
+          uniqueDetail: 'Dent on the bottom.',
+          location: 'Gym',
           photoUrl: ''
         }
       }
@@ -113,9 +137,16 @@ export default function StaffClaimsPage() {
     })
   }, [claims, query, activeTab])
 
-  const handleStatusChange = (id, newStatus) => {
-    setClaims(prev => prev.map(c => c.id === id ? { ...c, status: newStatus } : c))
-    setSelectedClaim(null)
+  const handleStatusChange = (newStatus) => {
+    if (!selectedClaim) return
+    setClaims(prev => prev.map(c => c.id === selectedClaim.id ? { ...c, status: newStatus } : c))
+    // Update local selected state to reflect immediate change
+    setSelectedClaim(prev => ({ ...prev, status: newStatus }))
+  }
+
+  const handleMessageUser = () => {
+    // Logic to start conversation with this specific user would go here
+    window.location.hash = '#/staff/messages'
   }
 
   return (
@@ -149,7 +180,7 @@ export default function StaffClaimsPage() {
 
         {/* Tabs */}
         <div className={styles['claims-tabs']}>
-          {['pending', 'approved', 'rejected', 'all'].map((tab) => (
+          {['pending', 'approved', 'claimed', 'rejected', 'all'].map((tab) => (
             <button 
               key={tab}
               className={`${styles['claims-tab']} ${activeTab === tab ? styles.active : ''}`} 
@@ -290,9 +321,10 @@ export default function StaffClaimsPage() {
                   <h4 className={styles['section-heading']}>Claimant's Proof</h4>
                   <div className={styles['user-header']}>
                     <div className={styles['avatar']}><User size={20} /></div>
-                    <div>
+                    <div style={{flex: 1, minWidth: 0}}>
                       <div className={styles['user-name']}>{selectedClaim.claimantUser.name}</div>
                       <div className={styles['user-contact']}>{selectedClaim.claimantUser.phone}</div>
+                      <div className={styles['user-contact']} style={{marginTop:'0.1rem'}}>{selectedClaim.claimantUser.email}</div>
                     </div>
                   </div>
                   
@@ -322,31 +354,76 @@ export default function StaffClaimsPage() {
               </div>
 
               <div className={styles['modal-footer']}>
+                
+                {/* 1. Status Indicator & Message Button */}
                 <div className={styles['footer-left']}>
+                  <button className={styles['btn-message']} onClick={handleMessageUser}>
+                    <MessageSquare size={16} /> Message
+                  </button>
                   <span className={`${styles['status-pill']} ${styles[selectedClaim.status]}`}>
-                    Current Status: {selectedClaim.status}
+                    {selectedClaim.status}
                   </span>
                 </div>
+
+                {/* 2. Action Buttons based on Status */}
                 <div className={styles['footer-actions']}>
+                  
+                  {/* Scenario: PENDING (Default) */}
                   {selectedClaim.status === 'pending' && (
                     <>
                       <button 
                         className={styles['btn-reject']}
-                        onClick={() => handleStatusChange(selectedClaim.id, 'rejected')}
+                        onClick={() => handleStatusChange('rejected')}
                       >
-                         Reject Claim
+                         Reject
                       </button>
                       <button 
                         className={styles['btn-approve']}
-                        onClick={() => handleStatusChange(selectedClaim.id, 'approved')}
+                        onClick={() => handleStatusChange('approved')}
                       >
                         <Check size={18} /> Approve Claim
                       </button>
                     </>
                   )}
-                  {selectedClaim.status !== 'pending' && (
-                     <button className={styles['btn-outline']} onClick={() => setSelectedClaim(null)}>Close Review</button>
+
+                  {/* Scenario: APPROVED (Can Claim or Reject) */}
+                  {selectedClaim.status === 'approved' && (
+                    <>
+                      <button 
+                        className={styles['btn-reject']}
+                        onClick={() => handleStatusChange('rejected')}
+                      >
+                         Revoke Approval
+                      </button>
+                      <button 
+                        className={styles['btn-approve']}
+                        onClick={() => handleStatusChange('claimed')}
+                      >
+                        <Briefcase size={18} /> Mark as Claimed
+                      </button>
+                    </>
                   )}
+
+                  {/* Scenario: REJECTED (Correction) */}
+                  {selectedClaim.status === 'rejected' && (
+                    <button 
+                      className={styles['btn-approve']}
+                      onClick={() => handleStatusChange('approved')}
+                    >
+                      Revert to Approved
+                    </button>
+                  )}
+
+                  {/* Scenario: CLAIMED (Revert if mistake) */}
+                  {selectedClaim.status === 'claimed' && (
+                    <button 
+                      className={styles['btn-outline']}
+                      onClick={() => handleStatusChange('approved')}
+                    >
+                      Revert to Approved
+                    </button>
+                  )}
+
                 </div>
               </div>
             </div>
