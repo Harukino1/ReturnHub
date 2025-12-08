@@ -51,6 +51,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none; /* Ensure link styling doesn't interfere */
+  position: relative; /* allow badges */
 }
 .theme-toggle:hover,
 .nav-icon-btn:hover { background: #f9fafb; }
@@ -132,3 +133,16 @@
   border-top-color: #1f2937;
 }
 [data-theme='dark'] .mobile-menu a { color: #e5e7eb; }
+[data-theme='dark'] .notif-dot { background: #fbbf24; }
+
+/* bell badge */
+.notif-dot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 10px;
+  height: 10px;
+  background: var(--amber-600);
+  border-radius: 50%;
+  border: 2px solid var(--white);
+}
