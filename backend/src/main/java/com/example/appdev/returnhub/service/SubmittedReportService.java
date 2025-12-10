@@ -43,8 +43,11 @@ public class SubmittedReportService {
         User submitterUser = userRepository.findById(requestDTO.getSubmitterUserId())
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + requestDTO.getSubmitterUserId()));
 
-        // For new reports, we might not have a reviewer yet
-        Staff defaultStaff = staffRepository.findById(1).orElse(null); // Default staff ID 1 or handle differently
+        // Handles default staff to find
+        Staff defaultStaff = staffRepository.findAll().stream()
+                .filter(s -> "STAFF".equalsIgnoreCase(s.getRole()) || "ADMIN".equalsIgnoreCase(s.getRole()))
+                .findFirst()
+                .orElse(null);
 
         // Create new report entity
         SubmittedReport report = new SubmittedReport();
@@ -108,6 +111,49 @@ public class SubmittedReportService {
                 .collect(Collectors.toList());
     }
 
+    public List<SubmittedReportResponseDTO> getReportsByUserIdAndType(int userId, String type) {
+        List<SubmittedReport> reports;
+
+        if (type == null || type.isEmpty() || "all".equalsIgnoreCase(type)) {
+            reports = submittedReportRepository.findByUserId(userId);
+        } else if ("lost".equalsIgnoreCase(type)) {
+            reports = submittedReportRepository.findBySubmitterUser_UserIdAndType(userId, "lost");
+        } else if ("found".equalsIgnoreCase(type)) {
+            reports = submittedReportRepository.findBySubmitterUser_UserIdAndType(userId, "found");
+        } else {
+            reports = submittedReportRepository.findByUserId(userId);
+        }
+
+        return reports.stream()
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public SubmittedReportResponseDTO cancelPendingReport(int reportId, int userId) {
+        SubmittedReport report = submittedReportRepository.findById(reportId)
+                .orElseThrow(() -> new RuntimeException("Report not found with id: " + reportId));
+
+        // Authorization check
+        if (report.getSubmitterUser().getUserId() != userId) {
+            throw new RuntimeException("Unauthorized: You can only cancel your own reports");
+        }
+
+        // Only allow cancellation if report is pending
+        if (!"pending".equalsIgnoreCase(report.getStatus())) {
+            throw new RuntimeException("Cannot cancel report. Status is: " + report.getStatus());
+        }
+
+        // Delete the report
+        submittedReportRepository.delete(report);
+
+        // Return response
+        SubmittedReportResponseDTO response = convertToResponseDTO(report);
+        response.setStatus("cancelled");
+        return response;
+    }
+
+
     // Update report status (approve/reject)
     @Transactional
     public SubmittedReportResponseDTO updateReportStatus(int reportId, ReportStatusUpdateDTO statusUpdateDTO) {
@@ -129,7 +175,6 @@ public class SubmittedReportService {
 
         SubmittedReport updatedReport = submittedReportRepository.save(report);
 
-        // TODO: Create corresponding LostItem or FoundItem if approved
         if ("approved".equalsIgnoreCase(statusUpdateDTO.getStatus())) {
             createItemFromReport(updatedReport, reviewerStaff);
         }
@@ -146,11 +191,21 @@ public class SubmittedReportService {
         submittedReportRepository.deleteById(reportId);
     }
 
+    // Delete report for user deletion
+    @Transactional
+    public void deleteUserReport(int reportId, int userId) {
+        SubmittedReport report = submittedReportRepository.findById(reportId)
+                .orElseThrow(() -> new RuntimeException("Report not found with id: " + reportId));
+
+        if (report.getSubmitterUser().getUserId() != userId) {
+            throw new RuntimeException("Unauthorized: You can only delete your own reports");
+        }
+
+        submittedReportRepository.delete(report);
+    }
+
     // Helper method to create LostItem or FoundItem when report is approved
     private void createItemFromReport(SubmittedReport report, Staff staff) {
-//        System.out.println("Creating " + report.getType() + " item from report ID: " + report.getReportId());
-
-        // Logic will be:
          if (report.getType().equalsIgnoreCase("lost")) {
              lostItemService.createLostItemFromReport(report, staff);
          } else if (report.getType().equalsIgnoreCase("found")) {

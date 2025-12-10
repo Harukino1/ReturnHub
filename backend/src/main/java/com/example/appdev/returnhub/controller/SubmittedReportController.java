@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/reports")
@@ -72,8 +74,105 @@ public class SubmittedReportController {
 
     // Delete report
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteReport(@PathVariable int id) {
-        submittedReportService.deleteReport(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<?> deleteReport(@PathVariable int id) {
+        try {
+            submittedReportService.deleteReport(id);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Report deleted successfully");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (RuntimeException e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    // ==================== ENHANCED USER REPORTS (MY REPORTS PAGE) ====================
+
+//    GET /api/reports/user/{userId}/filter
+//    Enhanced version with type filtering for "My Reports" page
+
+    @GetMapping("/user/{userId}/filter")
+    public ResponseEntity<?> getReportsByUserIdWithFilter(
+            @PathVariable int userId,
+            @RequestParam(required = false) String type) {
+
+        try {
+            List<SubmittedReportResponseDTO> reports;
+
+            if (type != null && !type.isEmpty()) {
+                reports = submittedReportService.getReportsByUserIdAndType(userId, type);
+            } else {
+                reports = submittedReportService.getReportsByUserId(userId);
+            }
+
+            return new ResponseEntity<>(reports, HttpStatus.OK);
+
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "Error fetching user reports: " + e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+//    DELETE /api/reports/{reportId}/cancel
+//    Cancel a pending report (user action)
+
+    @DeleteMapping("/{reportId}/cancel")
+    public ResponseEntity<?> cancelPendingReport(
+            @PathVariable int reportId,
+            @RequestParam int userId) {
+
+        try {
+            SubmittedReportResponseDTO cancelledReport =
+                    submittedReportService.cancelPendingReport(reportId, userId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Report cancelled successfully");
+            response.put("report", cancelledReport);
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (RuntimeException e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+//    DELETE /api/reports/{reportId}/user
+//    Delete user's own report (with authorization)
+//    Request param: userId (for authorization)
+//    Frontend: "Delete" button for approved/rejected reports
+
+    @DeleteMapping("/{reportId}/user")
+    public ResponseEntity<?> deleteUserReport(
+            @PathVariable int reportId,
+            @RequestParam int userId) {
+
+        try {
+            submittedReportService.deleteUserReport(reportId, userId);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "Report deleted successfully");
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+
+        } catch (RuntimeException e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        }
     }
 }

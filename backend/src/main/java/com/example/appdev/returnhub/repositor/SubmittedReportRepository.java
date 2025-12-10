@@ -36,7 +36,12 @@ public interface SubmittedReportRepository extends JpaRepository<SubmittedReport
     @Query("SELECT r FROM SubmittedReport r WHERE r.submitterUser.userId = :userId")
     List<SubmittedReport> findByUserId(@Param("userId") int userId);
 
+
+
     // Find reports by staff ID
     @Query("SELECT r FROM SubmittedReport r WHERE r.reviewerStaff.staffId = :staffId")
     List<SubmittedReport> findByStaffId(@Param("staffId") int staffId);
+
+    @Query("SELECT r FROM SubmittedReport r WHERE r.submitterUser.userId = :userId AND LOWER(r.type) = LOWER(:type)")
+    List<SubmittedReport> findBySubmitterUser_UserIdAndType(@Param("userId") int userId, @Param("type") String type);
 }
