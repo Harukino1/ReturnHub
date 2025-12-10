@@ -30,9 +30,8 @@ public class SubmittedReportService {
     private FoundItemService foundItemService;
     @Autowired
     private LostItemService lostItemService;
-
-    // @Autowired
-    // private NotificationService notificationService;
+    @Autowired
+    private NotificationService notificationService;
 
     public SubmittedReportResponseDTO createReport(SubmittedReportRequestDTO requestDTO) {
         if (requestDTO == null || requestDTO.getSubmitterUserId() == 0) {
@@ -57,11 +56,14 @@ public class SubmittedReportService {
         report.setPhotoUrl1(requestDTO.getPhotoUrl1());
         report.setPhotoUrl2(requestDTO.getPhotoUrl2());
         report.setPhotoUrl3(requestDTO.getPhotoUrl3());
+        
+        // Handle primary photo logic for backward compatibility if needed, though mostly redundant with separate fields
         String primary = requestDTO.getPhotoUrl1() != null ? requestDTO.getPhotoUrl1()
                 : (requestDTO.getPhotoUrl2() != null ? requestDTO.getPhotoUrl2() : requestDTO.getPhotoUrl3());
         if (primary == null)
             primary = "";
         report.setPhotoUrl(primary);
+        
         report.setStatus("pending");
         report.setDateSubmitted(LocalDateTime.now());
         report.setDateReviewed(LocalDateTime.now());
@@ -129,14 +131,25 @@ public class SubmittedReportService {
         report.setReviewerStaff(reviewerStaff);
         report.setDateReviewed(LocalDateTime.now());
 
-        // If description update is provided in review notes
         if (statusUpdateDTO.getReviewNotes() != null && !statusUpdateDTO.getReviewNotes().isEmpty()) {
             report.setDescription(report.getDescription() + "\n\nStaff Notes: " + statusUpdateDTO.getReviewNotes());
         }
 
         SubmittedReport updatedReport = submittedReportRepository.save(report);
 
-        // TODO: Create corresponding LostItem or FoundItem if approved
+        // Send notification (Added from master branch)
+        if ("approved".equalsIgnoreCase(statusUpdateDTO.getStatus()) ||
+                "rejected".equalsIgnoreCase(statusUpdateDTO.getStatus())) {
+            notificationService.createReportStatusNotification(
+                    report.getSubmitterUser().getUserId(),
+                    report.getType(),
+                    statusUpdateDTO.getStatus(),
+                    reportId,
+                    reviewerStaff.getName()
+            );
+        }
+
+        // Create corresponding LostItem or FoundItem if approved
         if ("approved".equalsIgnoreCase(statusUpdateDTO.getStatus())) {
             createItemFromReport(updatedReport, reviewerStaff);
         }
@@ -155,10 +168,6 @@ public class SubmittedReportService {
 
     // Helper method to create LostItem or FoundItem when report is approved
     private void createItemFromReport(SubmittedReport report, Staff staff) {
-        // System.out.println("Creating " + report.getType() + " item from report ID: "
-        // + report.getReportId());
-
-        // Logic will be:
         if (report.getType().equalsIgnoreCase("lost")) {
             lostItemService.createLostItemFromReport(report, staff);
         } else if (report.getType().equalsIgnoreCase("found")) {

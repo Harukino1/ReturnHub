@@ -25,6 +25,8 @@ public class ClaimService{
     private LostItemRepository lostItemRepository;
     @Autowired
     private FoundItemRepository foundItemRepository;
+    @Autowired
+    private NotificationService notificationService;
 
     @Transactional
     public ClaimResponseDTO submitClaim(ClaimRequestDTO requestDTO){
@@ -75,6 +77,14 @@ public class ClaimService{
         claim.setVerifiedByStaff(reviewer);
 
         Claim updatedClaim = claimRepository.save(claim);
+
+        notificationService.createClaimStatusNotification(
+                claim.getClaimantUser().getUserId(),
+                claim.getLostItem() != null ? "LOST" : "FOUND",
+                newStatus,
+                claimId,
+                reviewer.getName()
+        );
 
         // If approved, updates the status
         if ("approved".equalsIgnoreCase(newStatus)) {
