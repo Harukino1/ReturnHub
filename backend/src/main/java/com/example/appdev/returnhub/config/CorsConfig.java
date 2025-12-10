@@ -20,13 +20,13 @@ public class CorsConfig {
         
         // Allow all HTTP methods
         config.addAllowedMethod("*");
-        
+
         // Allow all headers
         config.addAllowedHeader("*");
         
         // Allow credentials
         config.setAllowCredentials(true);
-        
+
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
