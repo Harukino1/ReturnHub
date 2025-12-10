@@ -28,8 +28,14 @@ public class SubmittedReport {
     @Column(name = "location", length = 200, nullable = false)
     private String location;
 
-    @Column(name = "photo_url", length = 200, nullable = false)
-    private String photoUrl;
+    @Column(name = "photo_url1", length = 200)
+    private String photoUrl1;
+
+    @Column(name = "photo_url2", length = 200)
+    private String photoUrl2;
+
+    @Column(name = "photo_url3", length = 200)
+    private String photoUrl3;
 
     @Column(name = "status", length = 20, nullable = false)
     private String status;
@@ -37,7 +43,7 @@ public class SubmittedReport {
     @Column(name = "date_submitted", nullable = false)
     private LocalDateTime dateSubmitted;
 
-    @Column(name = "date_reviewed", nullable = false)
+    @Column(name = "date_reviewed")
     private LocalDateTime dateReviewed;
 
     // Relationships
@@ -47,14 +53,14 @@ public class SubmittedReport {
     private User submitterUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reviewer_staff_id", nullable = false)
+    @JoinColumn(name = "reviewer_staff_id")
     private Staff reviewerStaff;
 
     // Constructors
     public SubmittedReport() {}
     public SubmittedReport(User submitterUser, Staff reviewerStaff,
                            String type, String category, String description,
-                           LocalDate dateOfEvent, String location, String photoUrl,
+                           LocalDate dateOfEvent, String location, String photoUrl1, String photoUrl2, String photoUrl3,
                            String status, LocalDateTime dateSubmitted, LocalDateTime dateReviewed) {
         this.submitterUser = submitterUser;
         this.reviewerStaff = reviewerStaff;
@@ -63,7 +69,9 @@ public class SubmittedReport {
         this.description = description;
         this.dateOfEvent = dateOfEvent;
         this.location = location;
-        this.photoUrl = photoUrl;
+        this.photoUrl1 = photoUrl1;
+        this.photoUrl2 = photoUrl2;
+        this.photoUrl3 = photoUrl3;
         this.status = status;
         this.dateSubmitted = dateSubmitted;
         this.dateReviewed = dateReviewed;
@@ -125,12 +133,18 @@ public class SubmittedReport {
 
 
 
-    public String getPhotoUrl() {
-        return photoUrl;
-    }
-    public void setPhotoUrl(String photoUrl) {
-        this.photoUrl = photoUrl;
-    }
+    public String getPhotoUrl1() { return photoUrl1; }
+    public void setPhotoUrl1(String photoUrl1) { this.photoUrl1 = photoUrl1; }
+
+
+
+    public String getPhotoUrl2() { return photoUrl2; }
+    public void setPhotoUrl2(String photoUrl2) { this.photoUrl2 = photoUrl2; }
+
+
+
+    public String getPhotoUrl3() { return photoUrl3; }
+    public void setPhotoUrl3(String photoUrl3) { this.photoUrl3 = photoUrl3; }
 
 
 
