@@ -30,6 +30,8 @@ public class SubmittedReportService {
     private FoundItemService foundItemService;
     @Autowired
     private LostItemService lostItemService;
+    @Autowired
+    private NotificationService notificationService;
 
     // @Autowired
     // private NotificationService notificationService;
@@ -168,12 +170,22 @@ public class SubmittedReportService {
         report.setReviewerStaff(reviewerStaff);
         report.setDateReviewed(LocalDateTime.now());
 
-        // If description update is provided in review notes
         if (statusUpdateDTO.getReviewNotes() != null && !statusUpdateDTO.getReviewNotes().isEmpty()) {
             report.setDescription(report.getDescription() + "\n\nStaff Notes: " + statusUpdateDTO.getReviewNotes());
         }
 
         SubmittedReport updatedReport = submittedReportRepository.save(report);
+
+        if ("approved".equalsIgnoreCase(statusUpdateDTO.getStatus()) ||
+                "rejected".equalsIgnoreCase(statusUpdateDTO.getStatus())) {
+            notificationService.createReportStatusNotification(
+                    report.getSubmitterUser().getUserId(),
+                    report.getType(),
+                    statusUpdateDTO.getStatus(),
+                    reportId,
+                    reviewerStaff.getName()
+            );
+        }
 
         if ("approved".equalsIgnoreCase(statusUpdateDTO.getStatus())) {
             createItemFromReport(updatedReport, reviewerStaff);
