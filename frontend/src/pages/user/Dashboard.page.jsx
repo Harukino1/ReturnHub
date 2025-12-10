@@ -109,9 +109,9 @@ export default function Dashboard() {
           <div className={styles['dashboard-content']}>
             <div className={styles['dashboard-items-grid']}>
               {filteredItems.length > 0 ? (
-                filteredItems.map((item) => (
+                filteredItems.map((item, idx) => (
                   <div
-                    key={item.id}
+                    key={`${item.id}-${idx}`}
                     className={styles['dashboard-item-card']}
                     onClick={() => {
                       if (item.type === 'lost') {

@@ -5,7 +5,6 @@ public class ReportStatusUpdateDTO {
     private int reviewerStaffId;
     private String reviewNotes; // Optional notes from staff
 
-    // Constructors
     public ReportStatusUpdateDTO() {}
 
     public ReportStatusUpdateDTO(String status, int reviewerStaffId) {
@@ -13,7 +12,6 @@ public class ReportStatusUpdateDTO {
         this.reviewerStaffId = reviewerStaffId;
     }
 
-    // Getters and Setters
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 

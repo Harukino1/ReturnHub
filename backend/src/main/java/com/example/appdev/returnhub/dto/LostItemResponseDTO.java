@@ -14,9 +14,7 @@ public class LostItemResponseDTO {
     private String category;
     private String description;
     private String location;
-    private String photoUrl1;
-    private String photoUrl2;
-    private String photoUrl3;
+    private String photoUrl;
     private LocalDate dateOfEvent;
 
     public LostItemResponseDTO() {}
@@ -101,29 +99,8 @@ public class LostItemResponseDTO {
         this.location = location;
     }
 
-    public String getPhotoUrl1() {
-        return photoUrl1;
-    }
-
-    public void setPhotoUrl1(String photoUrl1) {
-        this.photoUrl1 = photoUrl1;
-    }
-
-    public String getPhotoUrl2() {
-        return photoUrl2;
-    }
-
-    public void setPhotoUrl2(String photoUrl2) {
-        this.photoUrl2 = photoUrl2;
-    }
-
-    public String getPhotoUrl3() {
-        return photoUrl3;
-    }
-
-    public void setPhotoUrl3(String photoUrl3) {
-        this.photoUrl3 = photoUrl3;
-    }
+    public String getPhotoUrl() { return photoUrl; }
+    public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
 
     public LocalDate getDateOfEvent() {
         return dateOfEvent;

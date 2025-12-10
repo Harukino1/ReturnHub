@@ -33,9 +33,6 @@ public class SubmittedReportService {
     @Autowired
     private NotificationService notificationService;
 
-    // @Autowired
-    // private NotificationService notificationService;
-
     public SubmittedReportResponseDTO createReport(SubmittedReportRequestDTO requestDTO) {
         if (requestDTO == null || requestDTO.getSubmitterUserId() == 0) {
             throw new RuntimeException("Invalid request: submitterUserId is required");
@@ -45,25 +42,31 @@ public class SubmittedReportService {
         User submitterUser = userRepository.findById(requestDTO.getSubmitterUserId())
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + requestDTO.getSubmitterUserId()));
 
-        // Handles default staff to find
-        Staff defaultStaff = staffRepository.findAll().stream()
-                .filter(s -> "STAFF".equalsIgnoreCase(s.getRole()) || "ADMIN".equalsIgnoreCase(s.getRole()))
-                .findFirst()
-                .orElse(null);
+        // For new reports, we might not have a reviewer yet
+        Staff defaultStaff = staffRepository.findById(1).orElse(null); // Default staff ID 1 or handle differently
 
         // Create new report entity
         SubmittedReport report = new SubmittedReport();
         report.setType(requestDTO.getType());
         report.setCategory(requestDTO.getCategory());
+        report.setItemName(requestDTO.getItemName());
         report.setDescription(requestDTO.getDescription());
         report.setDateOfEvent(requestDTO.getDateOfEvent());
         report.setLocation(requestDTO.getLocation());
         report.setPhotoUrl1(requestDTO.getPhotoUrl1());
         report.setPhotoUrl2(requestDTO.getPhotoUrl2());
         report.setPhotoUrl3(requestDTO.getPhotoUrl3());
-        report.setStatus("pending"); // Initial status
+        
+        // Handle primary photo logic for backward compatibility if needed, though mostly redundant with separate fields
+        String primary = requestDTO.getPhotoUrl1() != null ? requestDTO.getPhotoUrl1()
+                : (requestDTO.getPhotoUrl2() != null ? requestDTO.getPhotoUrl2() : requestDTO.getPhotoUrl3());
+        if (primary == null)
+            primary = "";
+        report.setPhotoUrl(primary);
+        
+        report.setStatus("pending");
         report.setDateSubmitted(LocalDateTime.now());
-        report.setDateReviewed(null); // Not reviewed yet
+        report.setDateReviewed(LocalDateTime.now());
         report.setSubmitterUser(submitterUser);
         report.setReviewerStaff(defaultStaff);
 
@@ -113,49 +116,6 @@ public class SubmittedReportService {
                 .collect(Collectors.toList());
     }
 
-    public List<SubmittedReportResponseDTO> getReportsByUserIdAndType(int userId, String type) {
-        List<SubmittedReport> reports;
-
-        if (type == null || type.isEmpty() || "all".equalsIgnoreCase(type)) {
-            reports = submittedReportRepository.findByUserId(userId);
-        } else if ("lost".equalsIgnoreCase(type)) {
-            reports = submittedReportRepository.findBySubmitterUser_UserIdAndType(userId, "lost");
-        } else if ("found".equalsIgnoreCase(type)) {
-            reports = submittedReportRepository.findBySubmitterUser_UserIdAndType(userId, "found");
-        } else {
-            reports = submittedReportRepository.findByUserId(userId);
-        }
-
-        return reports.stream()
-                .map(this::convertToResponseDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Transactional
-    public SubmittedReportResponseDTO cancelPendingReport(int reportId, int userId) {
-        SubmittedReport report = submittedReportRepository.findById(reportId)
-                .orElseThrow(() -> new RuntimeException("Report not found with id: " + reportId));
-
-        // Authorization check
-        if (report.getSubmitterUser().getUserId() != userId) {
-            throw new RuntimeException("Unauthorized: You can only cancel your own reports");
-        }
-
-        // Only allow cancellation if report is pending
-        if (!"pending".equalsIgnoreCase(report.getStatus())) {
-            throw new RuntimeException("Cannot cancel report. Status is: " + report.getStatus());
-        }
-
-        // Delete the report
-        submittedReportRepository.delete(report);
-
-        // Return response
-        SubmittedReportResponseDTO response = convertToResponseDTO(report);
-        response.setStatus("cancelled");
-        return response;
-    }
-
-
     // Update report status (approve/reject)
     @Transactional
     public SubmittedReportResponseDTO updateReportStatus(int reportId, ReportStatusUpdateDTO statusUpdateDTO) {
@@ -163,7 +123,8 @@ public class SubmittedReportService {
                 .orElseThrow(() -> new RuntimeException("Report not found with id: " + reportId));
 
         Staff reviewerStaff = staffRepository.findById(statusUpdateDTO.getReviewerStaffId())
-                .orElseThrow(() -> new RuntimeException("Staff not found with id: " + statusUpdateDTO.getReviewerStaffId()));
+                .orElseThrow(
+                        () -> new RuntimeException("Staff not found with id: " + statusUpdateDTO.getReviewerStaffId()));
 
         // Update report
         report.setStatus(statusUpdateDTO.getStatus());
@@ -176,6 +137,7 @@ public class SubmittedReportService {
 
         SubmittedReport updatedReport = submittedReportRepository.save(report);
 
+        // Send notification (Added from master branch)
         if ("approved".equalsIgnoreCase(statusUpdateDTO.getStatus()) ||
                 "rejected".equalsIgnoreCase(statusUpdateDTO.getStatus())) {
             notificationService.createReportStatusNotification(
@@ -187,6 +149,7 @@ public class SubmittedReportService {
             );
         }
 
+        // Create corresponding LostItem or FoundItem if approved
         if ("approved".equalsIgnoreCase(statusUpdateDTO.getStatus())) {
             createItemFromReport(updatedReport, reviewerStaff);
         }
@@ -203,26 +166,13 @@ public class SubmittedReportService {
         submittedReportRepository.deleteById(reportId);
     }
 
-    // Delete report for user deletion
-    @Transactional
-    public void deleteUserReport(int reportId, int userId) {
-        SubmittedReport report = submittedReportRepository.findById(reportId)
-                .orElseThrow(() -> new RuntimeException("Report not found with id: " + reportId));
-
-        if (report.getSubmitterUser().getUserId() != userId) {
-            throw new RuntimeException("Unauthorized: You can only delete your own reports");
-        }
-
-        submittedReportRepository.delete(report);
-    }
-
     // Helper method to create LostItem or FoundItem when report is approved
     private void createItemFromReport(SubmittedReport report, Staff staff) {
-         if (report.getType().equalsIgnoreCase("lost")) {
-             lostItemService.createLostItemFromReport(report, staff);
-         } else if (report.getType().equalsIgnoreCase("found")) {
-             foundItemService.createFoundItemFromReport(report, staff);
-         }
+        if (report.getType().equalsIgnoreCase("lost")) {
+            lostItemService.createLostItemFromReport(report, staff);
+        } else if (report.getType().equalsIgnoreCase("found")) {
+            foundItemService.createFoundItemFromReport(report, staff);
+        }
     }
 
     // Convert entity to response DTO
@@ -231,6 +181,7 @@ public class SubmittedReportService {
         dto.setReportId(report.getReportId());
         dto.setType(report.getType());
         dto.setCategory(report.getCategory());
+        dto.setItemName(report.getItemName());
         dto.setDescription(report.getDescription());
         dto.setDateOfEvent(report.getDateOfEvent());
         dto.setLocation(report.getLocation());

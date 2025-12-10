@@ -6,6 +6,8 @@ import com.example.appdev.returnhub.entity.Staff;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
@@ -36,12 +38,21 @@ public interface SubmittedReportRepository extends JpaRepository<SubmittedReport
     @Query("SELECT r FROM SubmittedReport r WHERE r.submitterUser.userId = :userId")
     List<SubmittedReport> findByUserId(@Param("userId") int userId);
 
-
-
     // Find reports by staff ID
     @Query("SELECT r FROM SubmittedReport r WHERE r.reviewerStaff.staffId = :staffId")
     List<SubmittedReport> findByStaffId(@Param("staffId") int staffId);
 
     @Query("SELECT r FROM SubmittedReport r WHERE r.submitterUser.userId = :userId AND LOWER(r.type) = LOWER(:type)")
     List<SubmittedReport> findBySubmitterUser_UserIdAndType(@Param("userId") int userId, @Param("type") String type);
+
+    // Maintenance: Backfill legacy photo fields
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE submittedreport SET photo_url1 = photo_url WHERE (photo_url1 IS NULL OR photo_url1 = '') AND photo_url IS NOT NULL AND photo_url <> ''", nativeQuery = true)
+    int backfillPhotoUrl1FromPhotoUrl();
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE submittedreport SET photo_url = COALESCE(NULLIF(photo_url1,''), NULLIF(photo_url2,''), NULLIF(photo_url3,''), '') WHERE photo_url IS NULL OR photo_url = ''", nativeQuery = true)
+    int ensurePrimaryPhotoUrlFromOthers();
 }

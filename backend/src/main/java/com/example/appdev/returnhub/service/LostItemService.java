@@ -22,28 +22,23 @@ public class LostItemService {
     @Transactional
     public LostItem createLostItemFromReport(SubmittedReport report, Staff staff) {
         LostItem lostItem = new LostItem();
-        lostItem.setStatus("active"); // or "pending", "claimed"
+        lostItem.setStatus("active");
         lostItem.setCreatedAt(LocalDateTime.now());
         lostItem.setPostedByStaff(staff);
         lostItem.setSubmittedReport(report);
-
         return lostItemRepository.save(lostItem);
     }
 
     public List<LostItemResponseDTO> getAllActiveLostItems() {
         List<LostItem> items = lostItemRepository.findByStatus("active");
-        return items.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+        return items.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     public LostItemResponseDTO updateLostItemStatus(int itemId, String status) {
         LostItem item = lostItemRepository.findById(itemId)
                 .orElseThrow(() -> new RuntimeException("Lost item not found with id: " + itemId));
-
         item.setStatus(status);
         LostItem updatedItem = lostItemRepository.save(item);
-
         return convertToDTO(updatedItem);
     }
 
@@ -52,24 +47,22 @@ public class LostItemService {
         dto.setItemId(item.getItemId());
         dto.setStatus(item.getStatus());
         dto.setCreatedAt(item.getCreatedAt());
-
         if (item.getPostedByStaff() != null) {
             dto.setPostedByStaffId(item.getPostedByStaff().getStaffId());
             dto.setPostedByStaffName(item.getPostedByStaff().getName());
         }
-
         if (item.getSubmittedReport() != null) {
-            dto.setReportId(item.getSubmittedReport().getReportId());
-            dto.setType(item.getSubmittedReport().getType());
-            dto.setCategory(item.getSubmittedReport().getCategory());
-            dto.setDescription(item.getSubmittedReport().getDescription());
-            dto.setLocation(item.getSubmittedReport().getLocation());
-            dto.setPhotoUrl1(item.getSubmittedReport().getPhotoUrl1());
-            dto.setPhotoUrl2(item.getSubmittedReport().getPhotoUrl2());
-            dto.setPhotoUrl3(item.getSubmittedReport().getPhotoUrl3());
-            dto.setDateOfEvent(item.getSubmittedReport().getDateOfEvent());
+            SubmittedReport report = item.getSubmittedReport();
+            dto.setReportId(report.getReportId());
+            dto.setType(report.getType());
+            dto.setCategory(report.getCategory());
+            dto.setDescription(report.getDescription());
+            dto.setLocation(report.getLocation());
+            String primary = report.getPhotoUrl1() != null ? report.getPhotoUrl1()
+                    : (report.getPhotoUrl2() != null ? report.getPhotoUrl2() : report.getPhotoUrl3());
+            dto.setPhotoUrl(primary);
+            dto.setDateOfEvent(report.getDateOfEvent());
         }
-
         return dto;
     }
 }

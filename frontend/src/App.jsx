@@ -12,7 +12,6 @@ import MessagesPage from './pages/user/Messages.page'
 import ReportsPage from './pages/user/Reports.page'
 import StaffDashboardPage from './pages/staff/StaffDashboard.page'
 import StaffReportsPage from './pages/staff/StaffReports.page'
-import StaffInventoryPage from './pages/staff/StaffInventory.page'
 import StaffClaimsPage from './pages/staff/StaffClaims.page'
 import StaffMessagesPage from './pages/staff/StaffMessages.page'
 import StaffProfilePage from './pages/staff/StaffProfile.page'
@@ -38,7 +37,6 @@ export default function App() {
       'staff/dashboard': 'staff-dashboard',
       'staff/profile': 'staff-profile',
       'staff/reports': 'staff-reports',
-      'staff/inventory': 'staff-inventory',
       'staff/claims': 'staff-claims',
       'staff/messages': 'staff-messages',
       'admin-panel': 'admin'
@@ -121,7 +119,6 @@ export default function App() {
     else if (target === 'messages') window.location.hash = '#/messages'
     else if (target === 'staff-dashboard') window.location.hash = '#/staff/dashboard'
     else if (target === 'staff-reports') window.location.hash = '#/staff/reports'
-    else if (target === 'staff-inventory') window.location.hash = '#/staff/inventory'
     else if (target === 'staff-claims') window.location.hash = '#/staff/claims'
     else if (target === 'staff-messages') window.location.hash = '#/staff/messages'
     else if (target === 'staff-profile') window.location.hash = '#/staff/profile'
@@ -158,7 +155,6 @@ export default function App() {
   if (currentPage === 'messages') return <MessagesPage onNavigate={handleNavigate} />
   if (currentPage === 'staff-dashboard') return <StaffDashboardPage onNavigate={handleNavigate} />
   if (currentPage === 'staff-reports') return <StaffReportsPage onNavigate={handleNavigate} />
-  if (currentPage === 'staff-inventory') return <StaffInventoryPage onNavigate={handleNavigate} />
   if (currentPage === 'staff-claims') return <StaffClaimsPage onNavigate={handleNavigate} />
   if (currentPage === 'staff-messages') return <StaffMessagesPage onNavigate={handleNavigate} />
   if (currentPage === 'staff-profile') return <StaffProfilePage onNavigate={handleNavigate} />

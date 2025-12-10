@@ -40,6 +40,7 @@ export default function StaffClaimsPage() {
           description: 'Black iPhone 13 with clear case. Found on bench near fountain.',
           uniqueDetail: 'Deep scratch near charging port. Sim tray is missing.',
           location: 'Ayala Terraces',
+          dateFound: '2025-12-05T15:20:00',
           photoUrl: 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=400&q=80'
         }
       }
@@ -64,6 +65,7 @@ export default function StaffClaimsPage() {
           description: 'Brown leather satchel, Jansport brand.',
           uniqueDetail: 'Inside pocket has ink stains. Name tag says "J.S."',
           location: 'Library 2nd Floor',
+          dateFound: '2025-12-04T11:05:00',
           photoUrl: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=400&q=80'
         }
       }
@@ -88,6 +90,7 @@ export default function StaffClaimsPage() {
           description: 'Blue umbrella, huge size.',
           uniqueDetail: 'Handle is broken at the tip.',
           location: 'Lobby',
+          dateFound: '2025-12-03T08:40:00',
           photoUrl: ''
         }
       }
@@ -112,6 +115,7 @@ export default function StaffClaimsPage() {
           description: '32oz Black Hydroflask.',
           uniqueDetail: 'Dent on the bottom.',
           location: 'Gym',
+          dateFound: '2025-11-30T17:25:00',
           photoUrl: ''
         }
       }
@@ -296,6 +300,10 @@ export default function StaffClaimsPage() {
                     <div className={styles['detail-row']}>
                       <span className={styles['label']}>Location Found</span>
                       <span className={styles['val']}>{selectedClaim.foundItem.submittedReport.location}</span>
+                    </div>
+                    <div className={styles['detail-row']}>
+                      <span className={styles['label']}>Date Found</span>
+                      <span className={styles['val']}>{formatDate(selectedClaim.foundItem.submittedReport.dateFound) || '—'}</span>
                     </div>
                     <div className={styles['detail-row']}>
                       <span className={styles['label']}>Description</span>

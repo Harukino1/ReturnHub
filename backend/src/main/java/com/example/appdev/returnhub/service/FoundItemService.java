@@ -22,28 +22,23 @@ public class FoundItemService {
     @Transactional
     public FoundItem createFoundItemFromReport(SubmittedReport report, Staff staff) {
         FoundItem foundItem = new FoundItem();
-        foundItem.setStatus("active"); // or "pending", "claimed"
+        foundItem.setStatus("active");
         foundItem.setCreatedAt(LocalDateTime.now());
         foundItem.setPostedByStaff(staff);
         foundItem.setSubmittedReport(report);
-
         return foundItemRepository.save(foundItem);
     }
 
     public List<FoundItemResponseDTO> getAllActiveFoundItems() {
         List<FoundItem> items = foundItemRepository.findByStatus("active");
-        return items.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+        return items.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     public FoundItemResponseDTO updateFoundItemStatus(int itemId, String status) {
         FoundItem item = foundItemRepository.findById(itemId)
                 .orElseThrow(() -> new RuntimeException("Found item not found with id: " + itemId));
-
         item.setStatus(status);
         FoundItem updatedItem = foundItemRepository.save(item);
-
         return convertToDTO(updatedItem);
     }
 
@@ -52,12 +47,10 @@ public class FoundItemService {
         dto.setItemId(item.getItemId());
         dto.setStatus(item.getStatus());
         dto.setCreatedAt(item.getCreatedAt());
-
         if (item.getPostedByStaff() != null) {
             dto.setPostedByStaffId(item.getPostedByStaff().getStaffId());
             dto.setPostedByStaffName(item.getPostedByStaff().getName());
         }
-
         if (item.getSubmittedReport() != null) {
             SubmittedReport report = item.getSubmittedReport();
             dto.setReportId(report.getReportId());
@@ -65,12 +58,11 @@ public class FoundItemService {
             dto.setCategory(report.getCategory());
             dto.setDescription(report.getDescription());
             dto.setLocation(report.getLocation());
-            dto.setPhotoUrl1(report.getPhotoUrl1());
-            dto.setPhotoUrl2(report.getPhotoUrl2());
-            dto.setPhotoUrl3(report.getPhotoUrl3());
+            String primary = report.getPhotoUrl1() != null ? report.getPhotoUrl1()
+                    : (report.getPhotoUrl2() != null ? report.getPhotoUrl2() : report.getPhotoUrl3());
+            dto.setPhotoUrl(primary);
             dto.setDateOfEvent(report.getDateOfEvent());
         }
-
         return dto;
     }
 }

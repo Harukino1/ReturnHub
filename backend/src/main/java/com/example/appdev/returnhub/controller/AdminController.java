@@ -4,6 +4,7 @@ import com.example.appdev.returnhub.entity.Staff;
 import com.example.appdev.returnhub.entity.User;
 import com.example.appdev.returnhub.service.StaffService;
 import com.example.appdev.returnhub.service.UserService;
+import com.example.appdev.returnhub.service.MaintenanceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,11 +22,14 @@ public class AdminController {
     private final StaffService staffService;
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final MaintenanceService maintenanceService;
 
-    public AdminController(StaffService staffService, UserService userService, PasswordEncoder passwordEncoder) {
+    public AdminController(StaffService staffService, UserService userService, PasswordEncoder passwordEncoder,
+            MaintenanceService maintenanceService) {
         this.staffService = staffService;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.maintenanceService = maintenanceService;
     }
 
     @PostMapping("/login")
@@ -84,6 +88,13 @@ public class AdminController {
     @PutMapping("/staff/{id}")
     public Staff updateStaff(@PathVariable int id, @RequestBody Staff staff) {
         return staffService.updateStaff(id, staff);
+    }
+
+    // Maintenance endpoint: backfill legacy photo columns
+    @PostMapping("/reports/backfill-photos")
+    public ResponseEntity<Map<String, Integer>> backfillPhotos() {
+        Map<String, Integer> result = maintenanceService.backfillReportPhotos();
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/staff/{id}")
