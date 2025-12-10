@@ -28,6 +28,7 @@ public class User {
     @Column(name = "profile_image", columnDefinition = "TEXT")
     private String profileImage;
 
+
     @JsonIgnore
     @Column(name = "password", length = 100, nullable = false)
     private String password;
@@ -37,6 +38,23 @@ public class User {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    // Relationship
+
+    @OneToMany(mappedBy = "submitterUser")
+    private List<SubmittedReport> submittedReports;
+
+    @OneToMany(mappedBy = "claimantUser")
+    private List<Claim> claims;
+
+    @OneToMany(mappedBy = "user")
+    private List<Notification> notifications;
+
+    @OneToMany(mappedBy = "user")
+    private List<Conversation> conversations;
+
+    @OneToMany(mappedBy = "senderUser")
+    private List<Message> messages;
 
     // Constructors
 
