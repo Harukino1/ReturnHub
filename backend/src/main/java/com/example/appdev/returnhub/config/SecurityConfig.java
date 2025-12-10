@@ -21,15 +21,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity in this phase, enabling it requires frontend token handling
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/admin/login").permitAll()
-                .requestMatchers("/api/admin/**").authenticated() // Require auth for other admin routes
-                .requestMatchers("/api/users/**").permitAll() // Allow public access to user routes (handled manually)
-                .anyRequest().permitAll() // Default permit all for other endpoints for now
-            )
-            .httpBasic(basic -> {}); // Enable Basic Auth for testing, or we can use custom filter
+                .csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity in this phase, enabling it requires
+                                              // frontend token handling
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/admin/login").permitAll()
+                        .requestMatchers("/api/admin/reports/backfill-photos").permitAll()
+                        .requestMatchers("/api/admin/**").authenticated() // Require auth for other admin routes
+                        .requestMatchers("/api/users/**").permitAll() // Allow public access to user routes (handled
+                                                                      // manually)
+                        .anyRequest().permitAll() // Default permit all for other endpoints for now
+                )
+                .httpBasic(basic -> {
+                }); // Enable Basic Auth for testing, or we can use custom filter
 
         return http.build();
     }

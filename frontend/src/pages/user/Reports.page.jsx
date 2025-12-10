@@ -14,14 +14,9 @@ export default function ReportsPage() {
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [pendingAction, setPendingAction] = useState(null) // { id, status, type, source }
 
-  // Mock Data for Reports (Lost & Found)
-  const [reports, setReports] = useState([
-    { id: 101, item: 'MacBook Pro', type: 'lost', date: '10-25-2023', status: 'Pending', location: 'Library' },
-    { id: 102, item: 'Blue Umbrella', type: 'found', date: '10-26-2023', status: 'Approved', location: 'Canteen' },
-    { id: 103, item: 'Car Keys', type: 'lost', date: '10-24-2023', status: 'Resolved', location: 'Parking Lot' },
-    { id: 104, item: 'Water Bottle', type: 'found', date: '10-28-2023', status: 'Pending', location: 'Gym' },
-    { id: 105, item: 'ID Lanyard', type: 'found', date: '11-02-2023', status: 'Rejected', location: 'Walkway' },
-  ])
+  const [reports, setReports] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [notification, setNotification] = useState(null)
 
   // Mock Data for Claims (Dummy Data as requested)
   const [claims, setClaims] = useState([
@@ -33,6 +28,35 @@ export default function ReportsPage() {
   useEffect(() => {
     const t = localStorage.getItem('theme') || 'light'
     document.documentElement.setAttribute('data-theme', t)
+  }, [])
+
+  useEffect(() => {
+    const loadReports = async () => {
+      try {
+        setLoading(true)
+        const uStr = localStorage.getItem('user')
+        if (!uStr) { setReports([]); return }
+        const u = JSON.parse(uStr)
+        const userId = u.userId
+        const res = await fetch(`http://localhost:8080/api/reports/user/${userId}`)
+        if (!res.ok) throw new Error('Failed to fetch reports')
+        const data = await res.json()
+        const rows = (data || []).map(r => ({
+          id: r.reportId,
+          item: (r.itemName && r.itemName.trim()) || (r.description ? String(r.description).split('|')[0].trim() : 'Item'),
+          type: (r.type || '').toLowerCase(),
+          date: r.dateOfEvent || '',
+          location: r.location || '',
+          status: (r.status || 'pending').charAt(0).toUpperCase() + (r.status || 'pending').slice(1)
+        }))
+        setReports(rows)
+      } catch {
+        setNotification({ type: 'error', message: 'Unable to load your reports. Please try again later.' })
+      } finally {
+        setLoading(false)
+      }
+    }
+    loadReports()
   }, [])
 
   // --- Logic: Filter Reports & Claims ---
@@ -95,6 +119,11 @@ export default function ReportsPage() {
             <h1 className={styles['page-title']}>My Dashboard</h1>
             <p className={styles['page-subtitle']}>Track your reports and claimed items.</p>
           </div>
+          {notification && (
+            <div className={`${styles['notice']} ${styles[notification.type]}`}>
+              {notification.message}
+            </div>
+          )}
           
           <div className={styles['controls']}>
             {/* Search Box */}
@@ -169,7 +198,11 @@ export default function ReportsPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredItems.length > 0 ? (
+                {loading ? (
+                  <tr>
+                    <td colSpan="6" className={styles['empty-state']}>Loading...</td>
+                  </tr>
+                ) : filteredItems.length > 0 ? (
                   filteredItems.map((item) => (
                     <tr key={item.id}>
                       <td className={styles['fw-bold']}>{item.item}</td>

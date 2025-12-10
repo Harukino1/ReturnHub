@@ -50,15 +50,21 @@ public class SubmittedReportService {
         SubmittedReport report = new SubmittedReport();
         report.setType(requestDTO.getType());
         report.setCategory(requestDTO.getCategory());
+        report.setItemName(requestDTO.getItemName());
         report.setDescription(requestDTO.getDescription());
         report.setDateOfEvent(requestDTO.getDateOfEvent());
         report.setLocation(requestDTO.getLocation());
         report.setPhotoUrl1(requestDTO.getPhotoUrl1());
         report.setPhotoUrl2(requestDTO.getPhotoUrl2());
         report.setPhotoUrl3(requestDTO.getPhotoUrl3());
-        report.setStatus("pending"); // Initial status
+        String primary = requestDTO.getPhotoUrl1() != null ? requestDTO.getPhotoUrl1()
+                : (requestDTO.getPhotoUrl2() != null ? requestDTO.getPhotoUrl2() : requestDTO.getPhotoUrl3());
+        if (primary == null)
+            primary = "";
+        report.setPhotoUrl(primary);
+        report.setStatus("pending");
         report.setDateSubmitted(LocalDateTime.now());
-        report.setDateReviewed(null); // Not reviewed yet
+        report.setDateReviewed(LocalDateTime.now());
         report.setSubmitterUser(submitterUser);
         report.setReviewerStaff(defaultStaff);
 
@@ -115,7 +121,8 @@ public class SubmittedReportService {
                 .orElseThrow(() -> new RuntimeException("Report not found with id: " + reportId));
 
         Staff reviewerStaff = staffRepository.findById(statusUpdateDTO.getReviewerStaffId())
-                .orElseThrow(() -> new RuntimeException("Staff not found with id: " + statusUpdateDTO.getReviewerStaffId()));
+                .orElseThrow(
+                        () -> new RuntimeException("Staff not found with id: " + statusUpdateDTO.getReviewerStaffId()));
 
         // Update report
         report.setStatus(statusUpdateDTO.getStatus());
@@ -148,14 +155,15 @@ public class SubmittedReportService {
 
     // Helper method to create LostItem or FoundItem when report is approved
     private void createItemFromReport(SubmittedReport report, Staff staff) {
-//        System.out.println("Creating " + report.getType() + " item from report ID: " + report.getReportId());
+        // System.out.println("Creating " + report.getType() + " item from report ID: "
+        // + report.getReportId());
 
         // Logic will be:
-         if (report.getType().equalsIgnoreCase("lost")) {
-             lostItemService.createLostItemFromReport(report, staff);
-         } else if (report.getType().equalsIgnoreCase("found")) {
-             foundItemService.createFoundItemFromReport(report, staff);
-         }
+        if (report.getType().equalsIgnoreCase("lost")) {
+            lostItemService.createLostItemFromReport(report, staff);
+        } else if (report.getType().equalsIgnoreCase("found")) {
+            foundItemService.createFoundItemFromReport(report, staff);
+        }
     }
 
     // Convert entity to response DTO
@@ -164,6 +172,7 @@ public class SubmittedReportService {
         dto.setReportId(report.getReportId());
         dto.setType(report.getType());
         dto.setCategory(report.getCategory());
+        dto.setItemName(report.getItemName());
         dto.setDescription(report.getDescription());
         dto.setDateOfEvent(report.getDateOfEvent());
         dto.setLocation(report.getLocation());

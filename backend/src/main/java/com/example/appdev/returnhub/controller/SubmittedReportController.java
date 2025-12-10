@@ -21,9 +21,25 @@ public class SubmittedReportController {
 
     // Create a new report
     @PostMapping
-    public ResponseEntity<SubmittedReportResponseDTO> createReport(@RequestBody SubmittedReportRequestDTO requestDTO) {
-        SubmittedReportResponseDTO createdReport = submittedReportService.createReport(requestDTO);
-        return new ResponseEntity<>(createdReport, HttpStatus.CREATED);
+    public ResponseEntity<?> createReport(@RequestBody SubmittedReportRequestDTO requestDTO) {
+        try {
+            SubmittedReportResponseDTO createdReport = submittedReportService.createReport(requestDTO);
+            return new ResponseEntity<>(createdReport, HttpStatus.CREATED);
+        } catch (RuntimeException ex) {
+            String msg = ex.getMessage() != null ? ex.getMessage() : "Invalid request";
+            HttpStatus status;
+            if (msg.toLowerCase().contains("user not found")) {
+                status = HttpStatus.NOT_FOUND;
+            } else if (msg.toLowerCase().contains("invalid request")) {
+                status = HttpStatus.BAD_REQUEST;
+            } else {
+                status = HttpStatus.BAD_REQUEST;
+            }
+            return ResponseEntity.status(status).body(java.util.Map.of("success", false, "message", msg));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(java.util.Map.of("success", false, "message", "Failed to create report"));
+        }
     }
 
     // Get all reports

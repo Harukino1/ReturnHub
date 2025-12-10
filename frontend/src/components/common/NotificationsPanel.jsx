@@ -49,8 +49,8 @@ export default function NotificationsPanel({ open, notifications = [], onClose, 
             </div>
           ) : (
             <ul className="notifs-list">
-              {notifications.map(n => (
-                <li key={n.notification_id || n.id} className={`notifs-item ${n.isRead ? 'read' : 'unread'}`}>
+              {notifications.map((n, idx) => (
+                <li key={`${n.notification_id || n.id}-${idx}`} className={`notifs-item ${n.isRead ? 'read' : 'unread'}`}>
                   
                   <div className="notifs-icon-col">
                     {n.isRead ? (

@@ -30,6 +30,26 @@ public class Staff{
 
     // Relationships
 
+    @OneToMany(mappedBy = "postedByStaff")
+    private List<FoundItem> foundItems;
+
+    @OneToMany(mappedBy = "postedByStaff")
+    private List<LostItem> lostItems;
+
+    @OneToMany(mappedBy = "reviewerStaff")
+    private List<SubmittedReport> reviewedReports;
+
+    @OneToMany(mappedBy = "verifiedByStaff")
+    private List<Claim> verifiedClaims;
+
+    @OneToMany(mappedBy = "staff")
+    private List<Conversation> conversations;
+
+    @OneToMany(mappedBy = "senderStaff")
+    private List<Message> messages;
+
+    // Constructor
+
     public Staff() {}
     public Staff(String name, String email, String password, String role) {
         this.name = name;
