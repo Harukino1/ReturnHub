@@ -5,7 +5,9 @@ import org.springframework.stereotype.Repository;
 
 import com.example.appdev.returnhub.entity.FoundItem;
 
+import java.util.List;
+
 @Repository
 public interface FoundItemRepository extends JpaRepository<FoundItem, Integer> {
-    
+    List<FoundItem> findByStatus(String active);
 }
