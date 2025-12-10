@@ -105,30 +105,25 @@ export default function StaffDashboardPage({ onNavigate }) {
     }
   ])
 
-  // Inventory / Published Items Stats
-  const [inventoryStats] = useState({
-    totalInHub: 45,
-    currentlyPublished: 12,
-    readyForPickup: 5
-  })
-  
   // Messages Stats
   const [messageStats] = useState({
     unread: 3
   })
 
-  // Calculate Metrics
-  const metrics = useMemo(() => ({
-    pendingClaims: recentClaims.filter(c => c.status === 'pending').length,
-    pendingReports: recentReports.filter(r => r.status === 'pending').length,
-    publishedItems: inventoryStats.currentlyPublished,
-    unreadMessages: messageStats.unread
-  }), [recentClaims, recentReports, inventoryStats, messageStats])
-
   // Filter for Published Items Table
   const publishedReports = useMemo(() => {
     return recentReports.filter(r => r.status === 'published')
   }, [recentReports])
+
+  // Calculate Metrics
+  const metrics = useMemo(() => ({
+    pendingClaims: recentClaims.filter(c => c.status === 'pending').length,
+    pendingReports: recentReports.filter(r => r.status === 'pending').length,
+    publishedItems: publishedReports.length,
+    unreadMessages: messageStats.unread
+  }), [recentClaims, recentReports, publishedReports.length, messageStats])
+
+  
 
   // Helper for Status Badge Styling
   const getStatusClass = (status) => {

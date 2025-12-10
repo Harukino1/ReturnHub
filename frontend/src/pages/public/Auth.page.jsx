@@ -185,9 +185,6 @@ export default function AuthPage({ authMode = 'login' }) {
         <div style={{ width: '100%', padding: '0 2rem', display: 'flex', justifyContent: 'center' }}>
           <div className={styles['auth-grid']}>
             <div className={styles['auth-left']}>
-              <div>
-                <p className={styles['auth-desc']}>Find or report your lost items easily.</p>
-              </div>
               <div className={styles['auth-illustration']}>
                 <img className={styles['auth-image']} src={randomStuff} alt="Assortment of recovered belongings" />
               </div>

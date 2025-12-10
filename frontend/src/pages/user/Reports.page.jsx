@@ -8,13 +8,13 @@ import ConfirmModal from '../../components/common/ConfirmModal'
 export default function ReportsPage() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [activeTab, setActiveTab] = useState('all') // 'all' | 'lost' | 'found'
+  const [activeTab, setActiveTab] = useState('all') // 'all' | 'lost' | 'found' | 'claims'
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState('All') // Filter by Status
   const [confirmOpen, setConfirmOpen] = useState(false)
-  const [pendingAction, setPendingAction] = useState(null) // { id, status, type }
+  const [pendingAction, setPendingAction] = useState(null) // { id, status, type, source }
 
-  // Mock Data with MM-DD-YYYY date format
+  // Mock Data for Reports (Lost & Found)
   const [reports, setReports] = useState([
     { id: 101, item: 'MacBook Pro', type: 'lost', date: '10-25-2023', status: 'Pending', location: 'Library' },
     { id: 102, item: 'Blue Umbrella', type: 'found', date: '10-26-2023', status: 'Approved', location: 'Canteen' },
@@ -23,33 +23,64 @@ export default function ReportsPage() {
     { id: 105, item: 'ID Lanyard', type: 'found', date: '11-02-2023', status: 'Rejected', location: 'Walkway' },
   ])
 
+  // Mock Data for Claims (Dummy Data as requested)
+  const [claims, setClaims] = useState([
+    { id: 201, item: 'Canon Camera', type: 'claim', date: '11-15-2023', status: 'Pending', location: 'Lost & Found Office' },
+    { id: 202, item: 'Beige Trench Coat', type: 'claim', date: '11-10-2023', status: 'Approved', location: 'Admin Office' },
+    { id: 203, item: 'Scientific Calculator', type: 'claim', date: '11-18-2023', status: 'Rejected', location: 'Library' },
+  ])
+
   useEffect(() => {
     const t = localStorage.getItem('theme') || 'light'
     document.documentElement.setAttribute('data-theme', t)
   }, [])
 
-  // --- Logic: Filter Reports ---
-  const filteredReports = useMemo(() => {
-    return reports.filter((report) => {
-      // 1. Filter by Tab (Type: Lost/Found)
-      const matchesTab = activeTab === 'all' || report.type === activeTab
-      
-      // 2. Filter by Search (Item Name or Location)
-      const matchesSearch = report.item.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                            report.location.toLowerCase().includes(searchTerm.toLowerCase())
+  // --- Logic: Filter Reports & Claims ---
+  const filteredItems = useMemo(() => {
+    let dataToFilter = []
 
-      // 3. Filter by Status Dropdown
-      const matchesStatus = statusFilter === 'All' || report.status === statusFilter
+    // Select Source Data based on Tab
+    if (activeTab === 'claims') {
+      dataToFilter = claims
+    } else {
+      // For 'all', 'lost', or 'found', we look at the reports array
+      dataToFilter = reports.filter(item => {
+        if (activeTab === 'all') return true
+        return item.type === activeTab
+      })
+    }
 
-      return matchesTab && matchesSearch && matchesStatus
+    // Apply Search and Status Filters
+    return dataToFilter.filter((item) => {
+      // Filter by Search (Item Name or Location)
+      const matchesSearch = item.item.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                            item.location.toLowerCase().includes(searchTerm.toLowerCase())
+
+      // Filter by Status Dropdown
+      const matchesStatus = statusFilter === 'All' || item.status === statusFilter
+
+      return matchesSearch && matchesStatus
     })
-  }, [reports, activeTab, searchTerm, statusFilter])
+  }, [reports, claims, activeTab, searchTerm, statusFilter])
 
   // --- Logic: Handle Actions ---
-  const handleRemoveReport = (id, status) => {
+  const handleRemoveItem = (id, status, source) => {
     const actionType = status === 'Pending' ? 'cancel' : 'delete'
-    setPendingAction({ id, status, type: actionType })
+    setPendingAction({ id, status, type: actionType, source })
     setConfirmOpen(true)
+  }
+
+  const confirmAction = () => {
+    if (!pendingAction) return
+
+    if (pendingAction.source === 'claims') {
+      setClaims((prev) => prev.filter((c) => c.id !== pendingAction.id))
+    } else {
+      setReports((prev) => prev.filter((r) => r.id !== pendingAction.id))
+    }
+    
+    setConfirmOpen(false)
+    setPendingAction(null)
   }
 
   return (
@@ -61,8 +92,8 @@ export default function ReportsPage() {
         
         <div className={styles['page-header']}>
           <div>
-            <h1 className={styles['page-title']}>My Reports</h1>
-            <p className={styles['page-subtitle']}>Track and manage your lost and found items.</p>
+            <h1 className={styles['page-title']}>My Dashboard</h1>
+            <p className={styles['page-subtitle']}>Track your reports and claimed items.</p>
           </div>
           
           <div className={styles['controls']}>
@@ -115,6 +146,12 @@ export default function ReportsPage() {
           >
             Found Items
           </button>
+          <button 
+            className={`${styles['tab']} ${activeTab === 'claims' ? styles['active'] : ''}`}
+            onClick={() => setActiveTab('claims')}
+          >
+            My Claims
+          </button>
       </div>
       
       {/* --- TABLE --- */}
@@ -125,44 +162,44 @@ export default function ReportsPage() {
                 <tr>
                   <th>Item Name</th>
                   <th>Type</th>
-                  <th>Date</th>
+                  <th>Date {activeTab === 'claims' ? 'Claimed' : ''}</th>
                   <th>Location</th>
                   <th>Status</th>
                   <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filteredReports.length > 0 ? (
-                  filteredReports.map((report) => (
-                    <tr key={report.id}>
-                      <td className={styles['fw-bold']}>{report.item}</td>
+                {filteredItems.length > 0 ? (
+                  filteredItems.map((item) => (
+                    <tr key={item.id}>
+                      <td className={styles['fw-bold']}>{item.item}</td>
                       <td>
-                        {/* Pure text class, no color badge */}
                         <span className={styles['type-text']}>
-                          {report.type === 'lost' ? 'Lost' : 'Found'}
+                          {/* Display nicely formatted type */}
+                          {item.type.charAt(0).toUpperCase() + item.type.slice(1)}
                         </span>
                       </td>
-                      <td>{report.date}</td>
-                      <td>{report.location}</td>
+                      <td>{item.date}</td>
+                      <td>{item.location}</td>
                       <td>
-                        <span className={`${styles['status-badge']} ${styles[report.status.toLowerCase()]}`}>
-                          {report.status}
+                        <span className={`${styles['status-badge']} ${styles[item.status.toLowerCase()]}`}>
+                          {item.status}
                         </span>
                       </td>
                       <td style={{ textAlign: 'right' }}>
-                        {report.status === 'Pending' ? (
+                        {item.status === 'Pending' ? (
                           <button 
                             className={`${styles['action-btn']} ${styles['btn-cancel']}`}
-                            onClick={() => handleRemoveReport(report.id, report.status)}
-                            title="Cancel Report"
+                            onClick={() => handleRemoveItem(item.id, item.status, activeTab === 'claims' ? 'claims' : 'reports')}
+                            title={activeTab === 'claims' ? "Cancel Claim" : "Cancel Report"}
                           >
                             <XCircle size={16} /> Cancel
                           </button>
                         ) : (
                           <button 
                             className={`${styles['action-btn']} ${styles['btn-delete']}`}
-                            onClick={() => handleRemoveReport(report.id, report.status)}
-                            title="Delete Report History"
+                            onClick={() => handleRemoveItem(item.id, item.status, activeTab === 'claims' ? 'claims' : 'reports')}
+                            title="Delete History"
                           >
                             <Trash2 size={16} /> Delete
                           </button>
@@ -173,7 +210,7 @@ export default function ReportsPage() {
                 ) : (
                   <tr>
                     <td colSpan="6" className={styles['empty-state']}>
-                      No {activeTab !== 'all' ? activeTab : ''} reports found.
+                      No {activeTab === 'all' ? 'reports' : activeTab} found.
                     </td>
                   </tr>
                 )}
@@ -184,20 +221,14 @@ export default function ReportsPage() {
         
         <ConfirmModal
           open={confirmOpen}
-          title={pendingAction?.type === 'cancel' ? 'Cancel Report' : 'Delete Report'}
+          title={pendingAction?.type === 'cancel' ? 'Cancel Item' : 'Delete History'}
           message={pendingAction?.type === 'cancel' 
-            ? 'Are you sure you want to cancel this report? It will be removed from your list.'
-            : 'Are you sure you want to delete this report history? This action cannot be undone.'}
-          confirmText={pendingAction?.type === 'cancel' ? 'Cancel Report' : 'Delete Report'}
+            ? 'Are you sure you want to cancel this request? It will be removed from your list.'
+            : 'Are you sure you want to delete this history? This action cannot be undone.'}
+          confirmText={pendingAction?.type === 'cancel' ? 'Yes, Cancel' : 'Yes, Delete'}
           cancelText="Keep"
           onCancel={() => { setConfirmOpen(false); setPendingAction(null) }}
-          onConfirm={() => {
-            if (pendingAction) {
-              setReports((prev) => prev.filter((r) => r.id !== pendingAction.id))
-            }
-            setConfirmOpen(false)
-            setPendingAction(null)
-          }}
+          onConfirm={confirmAction}
           tone="danger"
         />
       </div>
