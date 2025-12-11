@@ -45,7 +45,6 @@ public interface SubmittedReportRepository extends JpaRepository<SubmittedReport
     @Query("SELECT r FROM SubmittedReport r WHERE r.submitterUser.userId = :userId AND LOWER(r.type) = LOWER(:type)")
     List<SubmittedReport> findBySubmitterUser_UserIdAndType(@Param("userId") int userId, @Param("type") String type);
 
-    // Maintenance: Backfill legacy photo fields
     @Modifying
     @Transactional
     @Query(value = "UPDATE submittedreport SET photo_url1 = photo_url WHERE (photo_url1 IS NULL OR photo_url1 = '') AND photo_url IS NOT NULL AND photo_url <> ''", nativeQuery = true)

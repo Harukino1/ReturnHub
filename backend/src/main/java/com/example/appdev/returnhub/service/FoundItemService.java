@@ -58,9 +58,9 @@ public class FoundItemService {
             dto.setCategory(report.getCategory());
             dto.setDescription(report.getDescription());
             dto.setLocation(report.getLocation());
-            String primary = report.getPhotoUrl1() != null ? report.getPhotoUrl1()
-                    : (report.getPhotoUrl2() != null ? report.getPhotoUrl2() : report.getPhotoUrl3());
-            dto.setPhotoUrl(primary);
+            dto.setPhotoUrl1(report.getPhotoUrl1());
+            dto.setPhotoUrl2(report.getPhotoUrl2());
+            dto.setPhotoUrl3(report.getPhotoUrl3());
             dto.setDateOfEvent(report.getDateOfEvent());
         }
         return dto;
