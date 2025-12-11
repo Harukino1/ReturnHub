@@ -72,7 +72,9 @@ public class LostItemService {
             
             // Fallback to the main photoUrl if the numbered ones are empty
             if (primary == null) {
-                primary = report.getPhotoUrl();
+                primary = report.getPhotoUrl1();
+                primary = report.getPhotoUrl2();
+                primary = report.getPhotoUrl3();
             }
             
             dto.setPhotoUrl(primary);

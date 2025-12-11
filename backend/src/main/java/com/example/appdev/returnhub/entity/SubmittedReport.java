@@ -49,6 +49,8 @@ public class SubmittedReport {
     @Column(name = "date_reviewed")
     private LocalDateTime dateReviewed;
 
+    // Relationships
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "submitter_user_id", nullable = false)
     private User submitterUser;
@@ -56,6 +58,8 @@ public class SubmittedReport {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reviewer_staff_id")
     private Staff reviewerStaff;
+
+    // Constructors
 
     public SubmittedReport() {}
 

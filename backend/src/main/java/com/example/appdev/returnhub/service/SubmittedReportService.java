@@ -70,7 +70,9 @@ public class SubmittedReportService {
         if (primary == null) primary = "";
 
         // FIXED: Removed conflict markers and kept setPhotoUrl to satisfy the nullable=false constraint in your Entity
-        report.setPhotoUrl(primary);
+        report.setPhotoUrl1(primary);
+        report.setPhotoUrl2(primary);
+        report.setPhotoUrl3(primary);
 
         report.setStatus("pending");
         report.setDateSubmitted(LocalDateTime.now());
