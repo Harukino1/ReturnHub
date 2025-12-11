@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/notifications")
@@ -21,25 +22,29 @@ public class NotificationController {
 
     // ==================== GET ENDPOINTS ====================
 
-    /**
-     * GET /api/notifications/user/{userId}
-     * Get all notifications for user (sidebar)
-     */
+
+//    GET /api/notifications/user/{userId}
+//    Get all notifications for user (sidebar)
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getUserNotifications(@PathVariable int userId) {
         try {
             List<Notification> notifications = notificationService.getUserNotifications(userId);
-            return ResponseEntity.ok(notifications);
+
+            // Convert to DTOs instead of returning entities directly
+            List<Map<String, Object>> notificationDTOs = notifications.stream()
+                    .map(this::convertToDTO)
+                    .collect(Collectors.toList());
+
+            return ResponseEntity.ok(notificationDTOs);
         } catch (Exception e) {
             return createErrorResponse("Error fetching notifications: " + e.getMessage());
         }
     }
 
-    /**
-     * GET /api/notifications/user/{userId}/recent
-     * Get recent notifications (for initial sidebar load)
-     * Query param: limit (default 20)
-     */
+//    GET /api/notifications/user/{userId}/recent
+//    Get recent notifications (for initial sidebar load)
+
     @GetMapping("/user/{userId}/recent")
     public ResponseEntity<?> getRecentNotifications(
             @PathVariable int userId,
@@ -52,10 +57,10 @@ public class NotificationController {
         }
     }
 
-    /**
-     * GET /api/notifications/user/{userId}/unread-count
-     * Get unread notifications count (for bell badge)
-     */
+
+//    GET /api/notifications/user/{userId}/unread-count
+//    Get unread notifications count (for bell badge)
+
     @GetMapping("/user/{userId}/unread-count")
     public ResponseEntity<?> getUnreadCount(@PathVariable int userId) {
         try {
@@ -71,11 +76,10 @@ public class NotificationController {
 
     // ==================== POST/PUT ENDPOINTS ====================
 
-    /**
-     * PUT /api/notifications/{notificationId}/read
-     * Mark a notification as read (when user clicks on it)
-     * Query param: userId (for authorization)
-     */
+
+//    PUT /api/notifications/{notificationId}/read
+//    Mark a notification as read (when user clicks on it)
+
     @PutMapping("/{notificationId}/read")
     public ResponseEntity<?> markAsRead(
             @PathVariable int notificationId,
@@ -96,10 +100,9 @@ public class NotificationController {
         }
     }
 
-    /**
-     * PUT /api/notifications/user/{userId}/read-all
-     * Mark all notifications as read for user
-     */
+//    PUT /api/notifications/user/{userId}/read-all
+//    Mark all notifications as read for user
+
     @PutMapping("/user/{userId}/read-all")
     public ResponseEntity<?> markAllAsRead(@PathVariable int userId) {
         try {
@@ -118,11 +121,9 @@ public class NotificationController {
 
     // ==================== DELETE ENDPOINTS ====================
 
-    /**
-     * DELETE /api/notifications/{notificationId}
-     * Delete a specific notification
-     * Query param: userId (for authorization)
-     */
+//    DELETE /api/notifications/{notificationId}
+//    Delete a specific notification
+
     @DeleteMapping("/{notificationId}")
     public ResponseEntity<?> deleteNotification(
             @PathVariable int notificationId,
@@ -143,10 +144,9 @@ public class NotificationController {
         }
     }
 
-    /**
-     * DELETE /api/notifications/user/{userId}/clear
-     * Clear all notifications for user
-     */
+//    DELETE /api/notifications/user/{userId}/clear
+//    Clear all notifications for user
+
     @DeleteMapping("/user/{userId}/clear")
     public ResponseEntity<?> clearAllNotifications(@PathVariable int userId) {
         try {
@@ -165,10 +165,9 @@ public class NotificationController {
 
     // ==================== TEST ENDPOINTS (for development) ====================
 
-    /**
-     * POST /api/notifications/test/{userId}
-     * Send a test notification (development only)
-     */
+//    POST /api/notifications/test/{userId}
+//    Send a test notification (development only)
+
     @PostMapping("/test/{userId}")
     public ResponseEntity<?> sendTestNotification(@PathVariable int userId) {
         try {
@@ -192,5 +191,19 @@ public class NotificationController {
         error.put("success", false);
         error.put("message", message);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+
+    private Map<String, Object> convertToDTO(Notification notification) {
+        Map<String, Object> dto = new HashMap<>();
+        dto.put("notificationId", notification.getNotificationId());
+        dto.put("message", notification.getMessage());
+        dto.put("read", notification.isRead());
+        dto.put("createdAt", notification.getCreatedAt());
+
+        if (notification.getUser() != null) {
+            dto.put("userId", notification.getUser().getUserId());
+        }
+
+        return dto;
     }
 }

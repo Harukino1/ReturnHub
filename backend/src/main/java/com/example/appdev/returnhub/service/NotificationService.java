@@ -45,7 +45,7 @@ public class NotificationService {
 
         Notification saved = notificationRepository.save(notification);
 
-        // Send WebSocket notification
+        // s WebSocket notification
         sendWebSocketNotification(userId, saved, "REPORT", reportId, reportType.toLowerCase());
     }
 
@@ -67,7 +67,7 @@ public class NotificationService {
 
         Notification saved = notificationRepository.save(notification);
 
-        // Send WebSocket notification
+        // Sends WebSocket notification
         sendWebSocketNotification(userId, saved, "CLAIM", claimId, itemType.toLowerCase());
     }
 
@@ -88,7 +88,7 @@ public class NotificationService {
 
         Notification saved = notificationRepository.save(notification);
 
-        // Send WebSocket notification
+        // Sends WebSocket notification
         sendWebSocketNotification(userId, saved, "MESSAGE", conversationId, "conversation");
     }
 
@@ -123,8 +123,6 @@ public class NotificationService {
     public void markAsRead(int notificationId, int userId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new RuntimeException("Notification not found with id: " + notificationId));
-
-        // Authorization: user can only mark their own notifications as read
         if (notification.getUser().getUserId() != userId) {
             throw new RuntimeException("Unauthorized: Cannot mark another user's notification as read");
         }

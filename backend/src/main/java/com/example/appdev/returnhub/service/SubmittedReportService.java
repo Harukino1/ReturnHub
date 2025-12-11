@@ -49,7 +49,7 @@ public class SubmittedReportService {
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + requestDTO.getSubmitterUserId()));
 
         // For new reports, we might not have a reviewer yet
-        Staff defaultStaff = staffRepository.findById(1).orElse(null); // Default staff ID 1 or handle differently
+        Staff defaultStaff = staffRepository.findById(1).orElse(null);
 
         // Create new report entity
         SubmittedReport report = new SubmittedReport();
@@ -63,12 +63,13 @@ public class SubmittedReportService {
         report.setPhotoUrl2(requestDTO.getPhotoUrl2());
         report.setPhotoUrl3(requestDTO.getPhotoUrl3());
 
-        // Handle primary photo logic for backward compatibility if needed, though
-        // mostly redundant with separate fields
+        // Handle primary photo logic for backward compatibility
         String primary = requestDTO.getPhotoUrl1() != null ? requestDTO.getPhotoUrl1()
                 : (requestDTO.getPhotoUrl2() != null ? requestDTO.getPhotoUrl2() : requestDTO.getPhotoUrl3());
-        if (primary == null)
-            primary = "";
+        
+        if (primary == null) primary = "";
+
+        // FIXED: Removed conflict markers and kept setPhotoUrl to satisfy the nullable=false constraint in your Entity
         report.setPhotoUrl(primary);
 
         report.setStatus("pending");
