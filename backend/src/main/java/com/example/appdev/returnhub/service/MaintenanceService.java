@@ -21,4 +21,3 @@ public class MaintenanceService {
         return Map.of("photoUrl1Filled", filled, "primaryPhotoUrlSet", primaries);
     }
 }
-

@@ -52,8 +52,6 @@ public class SubmittedReport {
     @Column(name = "date_reviewed")
     private LocalDateTime dateReviewed;
 
-    // Relationships
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "submitter_user_id", nullable = false)
     private User submitterUser;
@@ -62,156 +60,51 @@ public class SubmittedReport {
     @JoinColumn(name = "reviewer_staff_id")
     private Staff reviewerStaff;
 
-    public String getPhotoUrl() {
-        return photoUrl;
-    }
+    public int getReportId() { return reportId; }
+    public void setReportId(int reportId) { this.reportId = reportId; }
 
-    public void setPhotoUrl(String photoUrl) {
-        this.photoUrl = photoUrl;
-    }
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
 
-    // Constructors
-    public SubmittedReport() {
-    }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 
-    public SubmittedReport(User submitterUser, Staff reviewerStaff,
-            String type, String category, String description,
-            LocalDate dateOfEvent, String location, String photoUrl1, String photoUrl2, String photoUrl3,
-            String status, LocalDateTime dateSubmitted, LocalDateTime dateReviewed) {
-        this.submitterUser = submitterUser;
-        this.reviewerStaff = reviewerStaff;
-        this.type = type;
-        this.category = category;
-        this.description = description;
-        this.dateOfEvent = dateOfEvent;
-        this.location = location;
-        this.photoUrl1 = photoUrl1;
-        this.photoUrl2 = photoUrl2;
-        this.photoUrl3 = photoUrl3;
-        this.status = status;
-        this.dateSubmitted = dateSubmitted;
-        this.dateReviewed = dateReviewed;
-    }
+    public String getItemName() { return itemName; }
+    public void setItemName(String itemName) { this.itemName = itemName; }
 
-    // Getters and Setters
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 
-    public int getReportId() {
-        return reportId;
-    }
+    public LocalDate getDateOfEvent() { return dateOfEvent; }
+    public void setDateOfEvent(LocalDate dateOfEvent) { this.dateOfEvent = dateOfEvent; }
 
-    public void setReportId(int reportId) {
-        this.reportId = reportId;
-    }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
 
-    public String getType() {
-        return type;
-    }
+    public String getPhotoUrl() { return photoUrl; }
+    public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
 
-    public void setType(String type) {
-        this.type = type;
-    }
+    public String getPhotoUrl1() { return photoUrl1; }
+    public void setPhotoUrl1(String photoUrl1) { this.photoUrl1 = photoUrl1; }
 
-    public String getCategory() {
-        return category;
-    }
+    public String getPhotoUrl2() { return photoUrl2; }
+    public void setPhotoUrl2(String photoUrl2) { this.photoUrl2 = photoUrl2; }
 
-    public void setCategory(String category) {
-        this.category = category;
-    }
+    public String getPhotoUrl3() { return photoUrl3; }
+    public void setPhotoUrl3(String photoUrl3) { this.photoUrl3 = photoUrl3; }
 
-    public String getDescription() {
-        return description;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public LocalDateTime getDateSubmitted() { return dateSubmitted; }
+    public void setDateSubmitted(LocalDateTime dateSubmitted) { this.dateSubmitted = dateSubmitted; }
 
-    public String getItemName() {
-        return itemName;
-    }
+    public LocalDateTime getDateReviewed() { return dateReviewed; }
+    public void setDateReviewed(LocalDateTime dateReviewed) { this.dateReviewed = dateReviewed; }
 
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
-    }
+    public User getSubmitterUser() { return submitterUser; }
+    public void setSubmitterUser(User submitterUser) { this.submitterUser = submitterUser; }
 
-    public LocalDate getDateOfEvent() {
-        return dateOfEvent;
-    }
-
-    public void setDateOfEvent(LocalDate dateOfEvent) {
-        this.dateOfEvent = dateOfEvent;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getPhotoUrl1() {
-        return photoUrl1;
-    }
-
-    public void setPhotoUrl1(String photoUrl1) {
-        this.photoUrl1 = photoUrl1;
-    }
-
-    public String getPhotoUrl2() {
-        return photoUrl2;
-    }
-
-    public void setPhotoUrl2(String photoUrl2) {
-        this.photoUrl2 = photoUrl2;
-    }
-
-    public String getPhotoUrl3() {
-        return photoUrl3;
-    }
-
-    public void setPhotoUrl3(String photoUrl3) {
-        this.photoUrl3 = photoUrl3;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public LocalDateTime getDateSubmitted() {
-        return dateSubmitted;
-    }
-
-    public void setDateSubmitted(LocalDateTime dateSubmitted) {
-        this.dateSubmitted = dateSubmitted;
-    }
-
-    public LocalDateTime getDateReviewed() {
-        return dateReviewed;
-    }
-
-    public void setDateReviewed(LocalDateTime dateReviewed) {
-        this.dateReviewed = dateReviewed;
-    }
-
-    public User getSubmitterUser() {
-        return submitterUser;
-    }
-
-    public void setSubmitterUser(User submitterUser) {
-        this.submitterUser = submitterUser;
-    }
-
-    public Staff getReviewerStaff() {
-        return reviewerStaff;
-    }
-
-    public void setReviewerStaff(Staff reviewerStaff) {
-        this.reviewerStaff = reviewerStaff;
-    }
+    public Staff getReviewerStaff() { return reviewerStaff; }
+    public void setReviewerStaff(Staff reviewerStaff) { this.reviewerStaff = reviewerStaff; }
 }
