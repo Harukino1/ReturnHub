@@ -28,7 +28,6 @@ public class User {
     @Column(name = "profile_image", columnDefinition = "TEXT")
     private String profileImage;
 
-
     @JsonIgnore
     @Column(name = "password", length = 100, nullable = false)
     private String password;
@@ -39,21 +38,26 @@ public class User {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    // Relationship
+    // --- RELATIONSHIPS (FIXED: Added @JsonIgnore to stop infinite loops) ---
 
     @OneToMany(mappedBy = "submitterUser")
+    @JsonIgnore // <--- PREVENTS LOOP: User -> Report -> User
     private List<SubmittedReport> submittedReports;
 
     @OneToMany(mappedBy = "claimantUser")
+    @JsonIgnore // <--- PREVENTS LOOP
     private List<Claim> claims;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore // <--- PREVENTS LOOP
     private List<Notification> notifications;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore // <--- PREVENTS LOOP
     private List<Conversation> conversations;
 
     @OneToMany(mappedBy = "senderUser")
+    @JsonIgnore // <--- PREVENTS LOOP
     private List<Message> messages;
 
     // Constructors
@@ -136,4 +140,8 @@ public class User {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+    
+    // Getters for lists are optional if you ignored them, but safe to keep
+    public List<SubmittedReport> getSubmittedReports() { return submittedReports; }
+    public void setSubmittedReports(List<SubmittedReport> submittedReports) { this.submittedReports = submittedReports; }
 }

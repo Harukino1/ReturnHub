@@ -1,8 +1,8 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState, useMemo, useRef } from 'react'
 import Navbar from '../../components/layout/Navbar'
 import UserSidebar from '../../components/user/UserSidebar'
 import styles from '../../styles/pages/user/Reports.module.css'
-import { Trash2, XCircle, Search, Filter } from 'lucide-react'
+import { Trash2, XCircle, Search, Filter, AlertCircle, BadgeCheck } from 'lucide-react'
 import ConfirmModal from '../../components/common/ConfirmModal'
 
 export default function ReportsPage() {
@@ -13,6 +13,9 @@ export default function ReportsPage() {
   const [statusFilter, setStatusFilter] = useState('All') // Filter by Status
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [pendingAction, setPendingAction] = useState(null) // { id, status, type, source }
+
+  const [showReportChoice, setShowReportChoice] = useState(false)
+  const reportLostBtnRef = useRef(null)
 
   const [reports, setReports] = useState([])
   const [loading, setLoading] = useState(false)
@@ -30,6 +33,14 @@ export default function ReportsPage() {
     const t = localStorage.getItem('theme') || 'light'
     document.documentElement.setAttribute('data-theme', t)
   }, [])
+
+  useEffect(() => {
+    if (!showReportChoice) return
+    const onKey = (e) => { if (e.key === 'Escape') setShowReportChoice(false) }
+    document.addEventListener('keydown', onKey)
+    const id = setTimeout(() => { reportLostBtnRef.current?.focus() }, 0)
+    return () => { document.removeEventListener('keydown', onKey); clearTimeout(id) }
+  }, [showReportChoice])
 
   useEffect(() => {
     const loadReports = async () => {
@@ -126,7 +137,7 @@ export default function ReportsPage() {
         
         <div className={styles['page-header']}>
           <div>
-            <h1 className={styles['page-title']}>My Dashboard</h1>
+            <h1 className={styles['page-title']}>My Reports</h1>
             <p className={styles['page-subtitle']}>Track your reports and claimed items.</p>
           </div>
           {notification && (
@@ -158,6 +169,7 @@ export default function ReportsPage() {
                 <option value="All">All Status</option>
                 <option value="Pending">Pending</option>
                 <option value="Approved">Approved</option>
+                <option value="Published">Published</option>
                 <option value="Resolved">Resolved</option>
                 <option value="Rejected">Rejected</option>
               </select>
@@ -264,6 +276,55 @@ export default function ReportsPage() {
           </div>
         </div>
         
+        {/* Report Button */}
+        <button
+          className={styles['dashboard-report-btn']}
+          aria-label="Report item"
+          onClick={() => setShowReportChoice(true)}
+        >
+          Report
+        </button>
+
+        {/* Report Type Modal */}
+        {showReportChoice && (
+          <div className={styles['report-overlay']} role="dialog" aria-modal="true" aria-labelledby="report-type-title" aria-describedby="report-type-desc">
+            <div className={styles['report-modal']}>
+              <div className={styles['report-header']}>
+                <h3 id="report-type-title" className={styles['report-title']}>Choose Report Type</h3>
+              </div>
+              <div className={styles['report-body']}>
+                <p id="report-type-desc" className={styles['report-message']}>Select what you want to report.</p>
+              </div>
+              <div className={styles['report-actions']}>
+                <button
+                  type="button"
+                  className={styles['report-btn-cancel']}
+                  onClick={() => setShowReportChoice(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  ref={reportLostBtnRef}
+                  className={styles['report-btn-option']}
+                  onClick={() => { setShowReportChoice(false); window.location.hash = '#/report/lost' }}
+                >
+                  <AlertCircle size={18} />
+                  Lost Item
+                </button>
+                <button
+                  type="button"
+                  className={styles['report-btn-option']}
+                  onClick={() => { setShowReportChoice(false); window.location.hash = '#/report/found' }}
+                >
+                  <BadgeCheck size={18} />
+                  Found Item
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <ConfirmModal
           open={confirmOpen}
           title={pendingAction?.type === 'cancel' ? 'Cancel Item' : 'Delete History'}

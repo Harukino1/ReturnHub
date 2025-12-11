@@ -70,7 +70,8 @@ export default function StaffReportsPage() {
 
   const mapStatus = (s) => {
     const v = (s || '').toLowerCase()
-    if (v === 'approved' || v === 'published') return 'Published'
+    if (v === 'approved') return 'Approved'
+    if (v === 'published') return 'Published'
     if (v === 'pending' || v === 'submitted' || v === 'draft') return 'Pending'
     if (v === 'rejected') return 'Rejected'
     if (v === 'completed' || v === 'resolved') return 'Resolved'
@@ -120,7 +121,8 @@ export default function StaffReportsPage() {
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     return reports.filter((r) => {
-      const matchTab = activeTab === 'all' || r.status.toLowerCase() === activeTab.toLowerCase()
+      const tab = activeTab.toLowerCase()
+      const matchTab = tab === 'all' || r.status.toLowerCase() === tab
       const matchType = typeFilter === 'All' || r.type.toLowerCase() === typeFilter.toLowerCase()
       const matchSearch = !q || [r.name, r.category, r.location, r.reporter].some(v => v?.toLowerCase().includes(q))
       return matchTab && matchType && matchSearch
@@ -261,6 +263,9 @@ export default function StaffReportsPage() {
         <div className={styles['reports-tabs']}>
           <button className={`${styles['reports-tab']} ${activeTab === 'pending' ? styles.active : ''}`} onClick={() => setActiveTab('pending')}>
             Pending <span className={styles['tab-count']}>{reports.filter(r => r.status === 'Pending').length}</span>
+          </button>
+          <button className={`${styles['reports-tab']} ${activeTab === 'approved' ? styles.active : ''}`} onClick={() => setActiveTab('approved')}>
+            Approved
           </button>
           <button className={`${styles['reports-tab']} ${activeTab === 'published' ? styles.active : ''}`} onClick={() => setActiveTab('published')}>
             Published
@@ -483,15 +488,50 @@ export default function StaffReportsPage() {
                       Reject
                     </button>
                   )}
-                  {selectedReport.status === 'Pending' ? (
+
+                  {selectedReport.status === 'Pending' && (
                     <button className={styles['btn-action-primary']} onClick={() => applyStatus('approved')}>
-                      Approve & Publish
-                    </button>
-                  ) : (
-                    <button className={styles['btn-outline']} onClick={() => setSelectedReport(null)}>
-                      Close
+                      Approve
                     </button>
                   )}
+
+                  {selectedReport.status === 'Approved' && (
+                    <button className={styles['btn-action-primary']} onClick={() => applyStatus('published')}>
+                      Publish
+                    </button>
+                  )}
+
+                  {selectedReport.status === 'Published' && (
+                    <>
+                      <button className={styles['btn-outline']} onClick={() => applyStatus('approved')}>
+                        Unpublish
+                      </button>
+                      <button className={styles['btn-action-primary']} onClick={() => applyStatus('resolved')}>
+                        Mark Resolved
+                      </button>
+                    </>
+                  )}
+
+                  {selectedReport.status === 'Rejected' && (
+                    <button className={styles['btn-action-primary']} onClick={() => applyStatus('pending')}>
+                      Mark as Pending
+                    </button>
+                  )}
+
+                  {selectedReport.status === 'Resolved' && (
+                    <>
+                      <button className={styles['btn-outline']} onClick={() => applyStatus('approved')}>
+                        Reopen (Approved)
+                      </button>
+                      <button className={styles['btn-action-primary']} onClick={() => applyStatus('published')}>
+                        Publish
+                      </button>
+                    </>
+                  )}
+
+                  <button className={styles['btn-outline']} onClick={() => setSelectedReport(null)}>
+                    Close
+                  </button>
                 </div>
               </div>
 

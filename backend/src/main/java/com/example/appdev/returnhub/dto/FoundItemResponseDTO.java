@@ -12,6 +12,10 @@ public class FoundItemResponseDTO {
     private int reportId;
     private String type;
     private String category;
+    
+    // ADDED FIELD: itemName
+    private String itemName;
+    
     private String description;
     private String location;
     // Resolved to use multiple photos from master branch
@@ -47,6 +51,10 @@ public class FoundItemResponseDTO {
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
+    // ADDED GETTER AND SETTER FOR itemName
+    public String getItemName() { return itemName; }
+    public void setItemName(String itemName) { this.itemName = itemName; }
 
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
