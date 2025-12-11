@@ -43,7 +43,7 @@ public class SubmittedReportService {
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + requestDTO.getSubmitterUserId()));
 
         // For new reports, we might not have a reviewer yet
-        Staff defaultStaff = staffRepository.findById(1).orElse(null); // Default staff ID 1 or handle differently
+        Staff defaultStaff = staffRepository.findById(1).orElse(null);
 
         // Create new report entity
         SubmittedReport report = new SubmittedReport();
@@ -62,7 +62,7 @@ public class SubmittedReportService {
                 : (requestDTO.getPhotoUrl2() != null ? requestDTO.getPhotoUrl2() : requestDTO.getPhotoUrl3());
         if (primary == null)
             primary = "";
-        report.setPhotoUrl(primary);
+        report.setPhotoUrl1(primary);
         
         report.setStatus("pending");
         report.setDateSubmitted(LocalDateTime.now());

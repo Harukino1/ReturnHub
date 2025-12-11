@@ -31,9 +31,6 @@ public class SubmittedReport {
     @Column(name = "location", length = 200, nullable = false)
     private String location;
 
-    @Column(name = "photo_url", length = 200, nullable = false)
-    private String photoUrl;
-
     @Column(name = "photo_url1", length = 200)
     private String photoUrl1;
 
@@ -60,6 +57,29 @@ public class SubmittedReport {
     @JoinColumn(name = "reviewer_staff_id")
     private Staff reviewerStaff;
 
+    public SubmittedReport() {}
+
+    public SubmittedReport(int reportId, String type, String category, String itemName,
+                           String description, LocalDate dateOfEvent, String location, String photoUrl1,
+                           String photoUrl2, String photoUrl3, String status, LocalDateTime dateSubmitted,
+                           LocalDateTime dateReviewed, User submitterUser, Staff reviewerStaff) {
+        this.reportId = reportId;
+        this.type = type;
+        this.category = category;
+        this.itemName = itemName;
+        this.description = description;
+        this.dateOfEvent = dateOfEvent;
+        this.location = location;
+        this.photoUrl1 = photoUrl1;
+        this.photoUrl2 = photoUrl2;
+        this.photoUrl3 = photoUrl3;
+        this.status = status;
+        this.dateSubmitted = dateSubmitted;
+        this.dateReviewed = dateReviewed;
+        this.submitterUser = submitterUser;
+        this.reviewerStaff = reviewerStaff;
+    }
+
     public int getReportId() { return reportId; }
     public void setReportId(int reportId) { this.reportId = reportId; }
 
@@ -80,9 +100,6 @@ public class SubmittedReport {
 
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
-
-    public String getPhotoUrl() { return photoUrl; }
-    public void setPhotoUrl(String photoUrl) { this.photoUrl = photoUrl; }
 
     public String getPhotoUrl1() { return photoUrl1; }
     public void setPhotoUrl1(String photoUrl1) { this.photoUrl1 = photoUrl1; }

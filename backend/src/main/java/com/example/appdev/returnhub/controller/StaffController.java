@@ -39,29 +39,23 @@ public class StaffController{
         try {
             Map<String, Object> stats = new HashMap<>();
 
-            // Gets the pending reports count
             List<SubmittedReportResponseDTO> pendingReports = submittedReportService.getPendingReports();
             stats.put("pendingReports", pendingReports.size());
 
-            // Gets the pending claims count
             List<ClaimResponseDTO> pendingClaims = claimService.getAllClaims("pending");
             stats.put("pendingClaims", pendingClaims.size());
 
-            // Get active lost items count (from LostItemService - need to add method)
-            // For now, we'll get all and filter
             List<SubmittedReportResponseDTO> allReports = submittedReportService.getAllReports();
             long activeLostItems = allReports.stream()
                     .filter(r -> "lost".equalsIgnoreCase(r.getType()) && "approved".equalsIgnoreCase(r.getStatus()))
                     .count();
             stats.put("activeLostItems", activeLostItems);
 
-            // Gets the active found items count
             long activeFoundItems = allReports.stream()
                     .filter(r -> "found".equalsIgnoreCase(r.getType()) && "approved".equalsIgnoreCase(r.getStatus()))
                     .count();
             stats.put("activeFoundItems", activeFoundItems);
 
-            // Total resolved cases
             long resolvedCases = allReports.stream()
                     .filter(r -> "approved".equalsIgnoreCase(r.getStatus()) || "rejected".equalsIgnoreCase(r.getStatus()))
                     .count();
@@ -85,11 +79,9 @@ public class StaffController{
         try {
             Map<String, Object> tasks = new HashMap<>();
 
-            // Gets the pending reports
             List<SubmittedReportResponseDTO> pendingReports = submittedReportService.getPendingReports();
             tasks.put("pendingReports", pendingReports);
 
-            // Gets the pending claims
             List<ClaimResponseDTO> pendingClaims = claimService.getAllClaims("pending");
             tasks.put("pendingClaims", pendingClaims);
 
@@ -141,7 +133,6 @@ public class StaffController{
 
 //    PUT /api/staff/inventory/items/{itemId}/status
 //    Update status of an item (lost or found)
-//    Request body: {"status": "claimed", "itemType": "lost"} or {"status": "claimed", "itemType": "found"}
 
     @PutMapping("/inventory/items/{itemId}/status")
     public ResponseEntity<?> updateItemStatus(

@@ -18,6 +18,9 @@ public class Message{
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    @Column(name = "is_read", nullable = false)
+    private boolean isRead = false;
+
     // Relationships
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -25,23 +28,24 @@ public class Message{
     private Conversation conversation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_user_id", nullable = false)
+    @JoinColumn(name = "sender_user_id")
     private User senderUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_staff_id", nullable = false)
+    @JoinColumn(name = "sender_staff_id")
     private Staff senderStaff;
 
     // Constructors
 
     public Message() {}
     public Message(Conversation conversation, User senderUser, Staff senderStaff,
-                   String content, LocalDateTime createdAt) {
+                   String content, LocalDateTime createdAt, boolean isRead) {
         this.conversation = conversation;
         this.senderUser = senderUser;
         this.senderStaff = senderStaff;
         this.content = content;
         this.createdAt = createdAt;
+        this.isRead = isRead;
     }
 
     // Getters and Setters
@@ -97,4 +101,7 @@ public class Message{
     public void setSenderStaff(Staff senderStaff) {
         this.senderStaff = senderStaff;
     }
+
+    public boolean isRead() { return isRead; }
+    public void setRead(boolean read) { isRead = read; }
 }
