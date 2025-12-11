@@ -10,6 +10,8 @@ export default function StaffReportsPage() {
   const [query, setQuery] = useState('')
   const [activeTab, setActiveTab] = useState('pending') 
   const [typeFilter, setTypeFilter] = useState('All')
+  const API_BASE_STAFF = 'http://localhost:8080/api/staff'
+  const API_BASE_USERS = 'http://localhost:8080/api/users'
   
   // --- REVIEW MODAL & SLIDER STATE ---
   const [selectedReport, setSelectedReport] = useState(null)
@@ -64,97 +66,55 @@ export default function StaffReportsPage() {
     return `${mm}-${dd}-${yy}`
   }
 
-  // --- MOCK DATA ---
-  const [reports, setReports] = useState([
-    { 
-      id: 1, 
-      name: 'Black Backpack', 
-      type: 'found', 
-      date: '11/28/2025', 
-      category: 'Bags', 
-      location: 'Cebu City Grandstand', 
-      reporter: 'Pao Gwapo', 
-      reporterPhone: '0917 123 4567',
-      reporterEmail: 'pao@example.com',
-      status: 'Pending', 
-      description: 'Black Jansport bag. Contains a water bottle and some notebooks. Found near the bleachers.', 
-      uniqueDetail: 'Sticker of a cat on the bottom right corner.', 
-      claimsCount: 2, 
-      photos: [
-        'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1547949003-9792a18a2601?auto=format&fit=crop&w=600&q=80'
-      ] 
-    },
-    { 
-      id: 2, 
-      name: 'Brown Leather Wallet', 
-      type: 'lost', 
-      date: '11/27/2025', 
-      category: 'Personal', 
-      location: 'Mandaue Public Market', 
-      reporter: 'Jane Doe', 
-      reporterPhone: '0922 555 7890',
-      reporterEmail: 'jane.doe@example.com',
-      status: 'Published', 
-      description: 'Lost somewhere near the fruit section. Contains ID and cards.', 
-      uniqueDetail: 'Initials "JD" embossed on the inside.', 
-      claimsCount: 0, 
-      photos: [] 
-    },
-    { 
-      id: 3, 
-      name: 'iPhone 13 Pro', 
-      type: 'found', 
-      date: '11/26/2025', 
-      category: 'Electronics', 
-      location: 'IT Park, Cebu', 
-      reporter: 'Security Guard', 
-      reporterPhone: '0933 222 3344',
-      reporterEmail: 'security@itpark.ph',
-      status: 'Pending', 
-      description: 'Blue iPhone 13 Pro with a clear case. Found on a bench near the plaza.', 
-      uniqueDetail: 'Lock screen is a picture of a Golden Retriever.', 
-      claimsCount: 5, 
-      photos: [
-        'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?auto=format&fit=crop&w=600&q=80'
-      ] 
-    },
-    { 
-      id: 4, 
-      name: 'Silver Car Keys', 
-      type: 'lost', 
-      date: '11/25/2025', 
-      category: 'Keys', 
-      location: 'SM Seaside Parking', 
-      reporter: 'Mark Cruz', 
-      reporterPhone: '0908 777 1122',
-      reporterEmail: 'mark.cruz@example.com',
-      status: 'Rejected', 
-      description: 'Toyota car keys with a leather keychain.', 
-      uniqueDetail: 'Keychain has "Cebu" engraved on it.', 
-      claimsCount: 0, 
-      photos: [] 
-    },
-    { 
-      id: 5, 
-      name: 'Blue Umbrella', 
-      type: 'found', 
-      date: '11/29/2025', 
-      category: 'Others', 
-      location: 'Ayala Terraces', 
-      reporter: 'Cleaning Staff', 
-      reporterPhone: '0910 123 9876',
-      reporterEmail: 'clean@ayala.ph',
-      status: 'Published', 
-      description: 'Large golf umbrella, navy blue.', 
-      uniqueDetail: 'Handle has a scratch near the button.', 
-      claimsCount: 1, 
-      photos: [
-        'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1535498730771-e735b998cd64?auto=format&fit=crop&w=600&q=80'
-      ] 
-    },
-  ])
+  const [reports, setReports] = useState([])
+
+  const mapStatus = (s) => {
+    const v = (s || '').toLowerCase()
+    if (v === 'approved' || v === 'published') return 'Published'
+    if (v === 'pending' || v === 'submitted' || v === 'draft') return 'Pending'
+    if (v === 'rejected') return 'Rejected'
+    if (v === 'completed' || v === 'resolved') return 'Resolved'
+    return (s || 'Pending').charAt(0).toUpperCase() + (s || 'Pending').slice(1)
+  }
+
+  const toRow = (dto) => {
+    const photos = [dto.photoUrl1, dto.photoUrl2, dto.photoUrl3].filter((u) => !!u)
+    return {
+      id: dto.reportId,
+      name: dto.itemName,
+      type: (dto.type || '').toLowerCase(),
+      date: dto.dateOfEvent || dto.dateSubmitted,
+      category: dto.category || '',
+      location: dto.location || '',
+      reporter: dto.submitterUserName || 'Unknown',
+      submitterUserId: dto.submitterUserId || null,
+      status: mapStatus(dto.status),
+      description: dto.description || '',
+      uniqueDetail: '',
+      claimsCount: 0,
+      photos
+    }
+  }
+
+  const loadReports = async () => {
+    try {
+      const url = `${API_BASE_STAFF}/reports`
+      const res = await fetch(url)
+      if (!res.ok) throw new Error('Failed to load reports')
+      const data = await res.json()
+      if (Array.isArray(data)) {
+        const rows = data.map(toRow)
+        setReports(rows)
+      } else if (data && data.success === false && data.data) {
+        const rows = (data.data || []).map(toRow)
+        setReports(rows)
+      } else {
+        setReports([])
+      }
+    } catch {
+      setReports([])
+    }
+  }
 
   // --- FILTER LOGIC ---
   const filtered = useMemo(() => {
@@ -166,6 +126,28 @@ export default function StaffReportsPage() {
       return matchTab && matchType && matchSearch
     })
   }, [reports, query, activeTab, typeFilter])
+
+  useEffect(() => {
+    loadReports()
+  }, [loadReports])
+
+  useEffect(() => {
+    if (!selectedReport || selectedReport.reporterPhone || !selectedReport.submitterUserId) return
+    const run = async () => {
+      try {
+        const res = await fetch(`${API_BASE_USERS}/${selectedReport.submitterUserId}`)
+        const j = await res.json()
+        if (j && j.success) {
+          setSelectedReport((prev) => ({
+            ...prev,
+            reporterPhone: j.phone || prev.reporterPhone,
+            reporterEmail: j.email || prev.reporterEmail
+          }))
+        }
+      } catch { void 0 }
+    }
+    run()
+  }, [selectedReport])
 
   // --- ACTIONS: REVIEW MODAL ---
   const handleViewClaims = () => {
@@ -182,6 +164,34 @@ export default function StaffReportsPage() {
     e.stopPropagation()
     if (!selectedReport?.photos?.length) return
     setCurrentImageIndex((prev) => (prev - 1 + selectedReport.photos.length) % selectedReport.photos.length)
+  }
+
+  const getReviewerStaffId = () => {
+    try {
+      const s = localStorage.getItem('user')
+      if (!s) return 1
+      const u = JSON.parse(s)
+      return u.staffId || u.userId || 1
+    } catch {
+      return 1
+    }
+  }
+
+  const applyStatus = async (status, notes = '') => {
+    if (!selectedReport) return
+    const reviewerStaffId = getReviewerStaffId()
+    try {
+      const res = await fetch(`http://localhost:8080/api/reports/${selectedReport.id}/status`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status, reviewerStaffId, reviewNotes: notes })
+      })
+      if (!res.ok) throw new Error('Failed to update status')
+      const updated = await res.json()
+      const row = toRow(updated)
+      setReports((prev) => prev.map(r => (r.id === row.id ? row : r)))
+      setSelectedReport(row)
+    } catch { void 0 }
   }
 
   // --- ACTIONS: CREATE MODAL ---
@@ -225,7 +235,7 @@ export default function StaffReportsPage() {
         {/* Header */}
         <div className={styles['reports-header']}>
           <div className={styles['reports-title-group']}>
-            <h1 className={styles['reports-title']}>Reports Management</h1>
+            <h1 className={styles['reports-title']}>Reports Triage</h1>
             <p className={styles['reports-subtitle']}>Triaging pending reports and managing published items.</p>
           </div>
           <div className={styles['controls']}>
@@ -469,12 +479,12 @@ export default function StaffReportsPage() {
 
                 <div className={styles['footer-actions']}>
                   {selectedReport.status === 'Pending' && (
-                    <button className={styles['btn-text-danger']} onClick={() => setSelectedReport(null)}>
+                    <button className={styles['btn-text-danger']} onClick={() => applyStatus('rejected')}>
                       Reject
                     </button>
                   )}
                   {selectedReport.status === 'Pending' ? (
-                    <button className={styles['btn-action-primary']} onClick={() => alert('Publish Logic')}>
+                    <button className={styles['btn-action-primary']} onClick={() => applyStatus('approved')}>
                       Approve & Publish
                     </button>
                   ) : (
