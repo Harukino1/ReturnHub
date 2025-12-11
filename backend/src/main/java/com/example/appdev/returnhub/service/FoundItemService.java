@@ -47,15 +47,21 @@ public class FoundItemService {
         dto.setItemId(item.getItemId());
         dto.setStatus(item.getStatus());
         dto.setCreatedAt(item.getCreatedAt());
+        
         if (item.getPostedByStaff() != null) {
             dto.setPostedByStaffId(item.getPostedByStaff().getStaffId());
             dto.setPostedByStaffName(item.getPostedByStaff().getName());
         }
+        
         if (item.getSubmittedReport() != null) {
             SubmittedReport report = item.getSubmittedReport();
             dto.setReportId(report.getReportId());
             dto.setType(report.getType());
             dto.setCategory(report.getCategory());
+            
+            // FIX: Map the item name from the report to the DTO
+            dto.setItemName(report.getItemName());
+            
             dto.setDescription(report.getDescription());
             dto.setLocation(report.getLocation());
             dto.setPhotoUrl1(report.getPhotoUrl1());

@@ -1,12 +1,13 @@
 package com.example.appdev.returnhub.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore; // Import this
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "staffs")
-public class Staff{
+public class Staff {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,6 +21,7 @@ public class Staff{
     private String email;
 
     @Column(name = "password", length = 100, nullable = false)
+    @JsonIgnore // Added for security (hides password in JSON response)
     private String password;
 
     @Column(name = "role", length = 20, nullable = false)
@@ -28,24 +30,30 @@ public class Staff{
     @Column(name = "profile_image", columnDefinition = "TEXT")
     private String profileImage;
 
-    // Relationships
+    // --- RELATIONSHIPS (FIXED: Added @JsonIgnore to stop infinite loops) ---
 
     @OneToMany(mappedBy = "postedByStaff")
+    @JsonIgnore // Prevents loop: Staff -> FoundItem -> Staff
     private List<FoundItem> foundItems;
 
     @OneToMany(mappedBy = "postedByStaff")
+    @JsonIgnore // Prevents loop: Staff -> LostItem -> Staff
     private List<LostItem> lostItems;
 
     @OneToMany(mappedBy = "reviewerStaff")
+    @JsonIgnore // <--- CRITICAL FIX: Stops the specific loop currently crashing your app
     private List<SubmittedReport> reviewedReports;
 
     @OneToMany(mappedBy = "verifiedByStaff")
+    @JsonIgnore // Prevents loop: Staff -> Claim -> Staff
     private List<Claim> verifiedClaims;
 
     @OneToMany(mappedBy = "staff")
+    @JsonIgnore // Prevents loop
     private List<Conversation> conversations;
 
     @OneToMany(mappedBy = "senderStaff")
+    @JsonIgnore // Prevents loop
     private List<Message> messages;
 
     // Constructor
@@ -67,16 +75,12 @@ public class Staff{
         this.staffId = staffId;
     }
 
-
-
     public String getName() {
         return name;
     }
     public void setName(String name) {
         this.name = name;
     }
-
-
 
     public String getEmail() {
         return email;
@@ -85,16 +89,12 @@ public class Staff{
         this.email = email;
     }
 
-
-
     public String getPassword() {
         return password;
     }
     public void setPassword(String password) {
         this.password = password;
     }
-
-
 
     public String getRole() {
         return role;

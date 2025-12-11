@@ -1,20 +1,15 @@
 import { Menu, X, Sun, Moon, User, Bell } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import NotificationsPanel from '../common/NotificationsPanel'
+import notificationService from '../../services/notificationService'
 import '../../styles/components/Navbar.css'
 
 export default function Navbar({ menuOpen, setMenuOpen, variant = 'public', onHamburgerClick }) {
   const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light')
   const [user, setUser] = useState(null)
   const [showNotifs, setShowNotifs] = useState(false)
-  const [notifications, setNotifications] = useState(() => {
-    const seed = [
-      { notification_id: 1, created_at: '12/08/2025 10:15', is_read: 0, isRead: false, message: 'Your claim #102 has been approved', user_id: 7 },
-      { notification_id: 2, created_at: '12/07/2025 18:40', is_read: 1, isRead: true, message: 'Report “Wallet” was reviewed', user_id: 7 },
-      { notification_id: 3, created_at: '12/07/2025 09:12', is_read: 0, isRead: false, message: 'New message from Support', user_id: 7 }
-    ]
-    return seed
-  })
+  const [notifications, setNotifications] = useState([])
+  const [loadingNotifications, setLoadingNotifications] = useState(false)
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem('theme', theme)
@@ -41,9 +36,87 @@ export default function Navbar({ menuOpen, setMenuOpen, variant = 'public', onHa
   }, [isPrivate])
 
   const profileHref = isPrivate && user ? ((user.role === 'ADMIN' || user.role === 'STAFF') ? '#/staff/profile' : '#/profile') : '#/profile'
-  const hasUnread = notifications.some(n => !(n.is_read ?? n.isRead))
-  const markAllRead = () => setNotifications(prev => prev.map(n => ({ ...n, is_read: 1, isRead: true })))
-  const markRead = (id) => setNotifications(prev => prev.map(n => (n.notification_id === id || n.id === id) ? { ...n, is_read: 1, isRead: true } : n))
+  const hasUnread = notifications.some(n => !n.isRead)
+  
+  const loadNotifications = useCallback(async () => {
+    if (!user?.userId) return
+    
+    try {
+      setLoadingNotifications(true)
+      const userNotifications = await notificationService.getRecentNotifications(user.userId, 20)
+      setNotifications(userNotifications)
+    } catch (error) {
+      console.error('Failed to load notifications:', error)
+      setNotifications([])
+    } finally {
+      setLoadingNotifications(false)
+    }
+  }, [user?.userId])
+  
+  const markAllRead = useCallback(async () => {
+    if (!user?.userId) return
+    
+    try {
+      await notificationService.markAllAsRead(user.userId)
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true })))
+    } catch (error) {
+      console.error('Failed to mark all as read:', error)
+    }
+  }, [user?.userId])
+  
+  const markRead = useCallback(async (notificationId) => {
+    if (!user?.userId) return
+    
+    try {
+      await notificationService.markAsRead(notificationId, user.userId)
+      setNotifications(prev => prev.map(n => 
+        n.notificationId === notificationId ? { ...n, isRead: true } : n
+      ))
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error)
+    }
+  }, [user?.userId])
+  
+  // Load notifications when user changes or panel opens
+  useEffect(() => {
+    if (user?.userId && showNotifs) {
+      loadNotifications()
+    }
+  }, [user?.userId, showNotifs, loadNotifications])
+  
+  // Load initial notifications count for badge
+  useEffect(() => {
+    if (user?.userId) {
+      notificationService.getUnreadCount(user.userId)
+        .then(count => {
+          // Update badge count if needed
+          console.log('Unread notifications count:', count)
+        })
+        .catch(console.error)
+    }
+  }, [user?.userId])
+
+  // WebSocket for real-time notifications
+  useEffect(() => {
+    if (user?.userId) {
+      // Connect to WebSocket
+      notificationService.connectWebSocket(user.userId);
+      
+      // Subscribe to real-time notifications
+      const unsubscribe = notificationService.subscribeToNotifications(
+        user.userId,
+        (realTimeNotification) => {
+          console.log('Real-time notification received:', realTimeNotification);
+          notificationService.handleRealTimeNotification(realTimeNotification, setNotifications);
+        }
+      );
+
+      return () => {
+        unsubscribe();
+        notificationService.disconnectWebSocket();
+      };
+    }
+  }, [user?.userId]);
 
   return (
     <>
@@ -142,10 +215,10 @@ export default function Navbar({ menuOpen, setMenuOpen, variant = 'public', onHa
       <NotificationsPanel
         open={showNotifs}
         notifications={notifications.map(n => ({
-          id: n.notification_id,
-          notification_id: n.notification_id,
-          created_at: n.created_at,
-          isRead: n.is_read ?? n.isRead,
+          id: n.notificationId || n.notification_id,
+          notification_id: n.notificationId || n.notification_id,
+          created_at: n.createdAt ? new Date(n.createdAt).toLocaleString() : n.created_at,
+          isRead: n.isRead ?? n.is_read,
           message: n.message
         }))}
         onClose={() => setShowNotifs(false)}

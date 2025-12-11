@@ -12,6 +12,10 @@ public class LostItemResponseDTO {
     private int reportId;
     private String type;
     private String category;
+    
+    // ADDED FIELD: itemName
+    private String itemName;
+    
     private String description;
     private String location;
     private String photoUrl;
@@ -82,6 +86,15 @@ public class LostItemResponseDTO {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    // ADDED GETTER AND SETTER FOR itemName
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
     }
 
     public String getDescription() {

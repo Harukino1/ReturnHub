@@ -89,6 +89,7 @@ export default function FoundItemPage() {
           <div className={styles['details']}>
             <div className={styles['detail-row']}>
               <div className={styles['mini']}>Item Name</div>
+              {/* This will now display the correct name because Dashboard passed it correctly */}
               <div className={styles['value']}>{item.title}</div>
             </div>
             

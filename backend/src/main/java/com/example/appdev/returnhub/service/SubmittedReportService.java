@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import com.example.appdev.returnhub.entity.LostItem;
+import com.example.appdev.returnhub.entity.FoundItem;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +32,10 @@ public class SubmittedReportService {
     private FoundItemService foundItemService;
     @Autowired
     private LostItemService lostItemService;
+    @Autowired
+    private com.example.appdev.returnhub.repositor.FoundItemRepository foundItemRepository;
+    @Autowired
+    private com.example.appdev.returnhub.repositor.LostItemRepository lostItemRepository;
     @Autowired
     private NotificationService notificationService;
 
@@ -56,14 +62,15 @@ public class SubmittedReportService {
         report.setPhotoUrl1(requestDTO.getPhotoUrl1());
         report.setPhotoUrl2(requestDTO.getPhotoUrl2());
         report.setPhotoUrl3(requestDTO.getPhotoUrl3());
-        
-        // Handle primary photo logic for backward compatibility if needed, though mostly redundant with separate fields
+
+        // Handle primary photo logic for backward compatibility if needed, though
+        // mostly redundant with separate fields
         String primary = requestDTO.getPhotoUrl1() != null ? requestDTO.getPhotoUrl1()
                 : (requestDTO.getPhotoUrl2() != null ? requestDTO.getPhotoUrl2() : requestDTO.getPhotoUrl3());
         if (primary == null)
             primary = "";
         report.setPhotoUrl(primary);
-        
+
         report.setStatus("pending");
         report.setDateSubmitted(LocalDateTime.now());
         report.setDateReviewed(LocalDateTime.now());
@@ -137,21 +144,53 @@ public class SubmittedReportService {
 
         SubmittedReport updatedReport = submittedReportRepository.save(report);
 
-        // Send notification (Added from master branch)
+        // Send notification for key status changes
         if ("approved".equalsIgnoreCase(statusUpdateDTO.getStatus()) ||
-                "rejected".equalsIgnoreCase(statusUpdateDTO.getStatus())) {
+                "rejected".equalsIgnoreCase(statusUpdateDTO.getStatus()) ||
+                "published".equalsIgnoreCase(statusUpdateDTO.getStatus())) {
             notificationService.createReportStatusNotification(
                     report.getSubmitterUser().getUserId(),
                     report.getType(),
                     statusUpdateDTO.getStatus(),
                     reportId,
-                    reviewerStaff.getName()
-            );
+                    reviewerStaff.getName());
         }
 
-        // Create corresponding LostItem or FoundItem if approved
+        // Handle item linkage based on status
         if ("approved".equalsIgnoreCase(statusUpdateDTO.getStatus())) {
-            createItemFromReport(updatedReport, reviewerStaff);
+            // Approved = reviewed but not publicly visible
+            if ("lost".equalsIgnoreCase(updatedReport.getType())) {
+                LostItem li = lostItemRepository.findBySubmittedReport_ReportId(reportId);
+                if (li != null) {
+                    li.setStatus("archived");
+                    lostItemRepository.save(li);
+                }
+            } else if ("found".equalsIgnoreCase(updatedReport.getType())) {
+                FoundItem fi = foundItemRepository.findBySubmittedReport_ReportId(reportId);
+                if (fi != null) {
+                    fi.setStatus("archived");
+                    foundItemRepository.save(fi);
+                }
+            }
+        } else if ("published".equalsIgnoreCase(statusUpdateDTO.getStatus())) {
+            // Published = visible in public listings
+            if ("lost".equalsIgnoreCase(updatedReport.getType())) {
+                LostItem li = lostItemRepository.findBySubmittedReport_ReportId(reportId);
+                if (li != null) {
+                    li.setStatus("active");
+                    lostItemRepository.save(li);
+                } else {
+                    lostItemService.createLostItemFromReport(report, reviewerStaff);
+                }
+            } else if ("found".equalsIgnoreCase(updatedReport.getType())) {
+                FoundItem fi = foundItemRepository.findBySubmittedReport_ReportId(reportId);
+                if (fi != null) {
+                    fi.setStatus("active");
+                    foundItemRepository.save(fi);
+                } else {
+                    foundItemService.createFoundItemFromReport(report, reviewerStaff);
+                }
+            }
         }
 
         return convertToResponseDTO(updatedReport);

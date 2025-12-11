@@ -47,19 +47,34 @@ public class LostItemService {
         dto.setItemId(item.getItemId());
         dto.setStatus(item.getStatus());
         dto.setCreatedAt(item.getCreatedAt());
+        
         if (item.getPostedByStaff() != null) {
             dto.setPostedByStaffId(item.getPostedByStaff().getStaffId());
             dto.setPostedByStaffName(item.getPostedByStaff().getName());
         }
+        
         if (item.getSubmittedReport() != null) {
             SubmittedReport report = item.getSubmittedReport();
             dto.setReportId(report.getReportId());
             dto.setType(report.getType());
+            
+            // This was previously missing
             dto.setCategory(report.getCategory());
+            
+            // FIX: Map the item name from the report to the DTO
+            dto.setItemName(report.getItemName()); 
+            
             dto.setDescription(report.getDescription());
             dto.setLocation(report.getLocation());
+            
             String primary = report.getPhotoUrl1() != null ? report.getPhotoUrl1()
                     : (report.getPhotoUrl2() != null ? report.getPhotoUrl2() : report.getPhotoUrl3());
+            
+            // Fallback to the main photoUrl if the numbered ones are empty
+            if (primary == null) {
+                primary = report.getPhotoUrl();
+            }
+            
             dto.setPhotoUrl(primary);
             dto.setDateOfEvent(report.getDateOfEvent());
         }
