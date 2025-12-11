@@ -17,6 +17,7 @@ export default function ReportsPage() {
   const [reports, setReports] = useState([])
   const [loading, setLoading] = useState(false)
   const [notification, setNotification] = useState(null)
+  const [actionLoading, setActionLoading] = useState(false)
 
   // Mock Data for Claims (Dummy Data as requested)
   const [claims, setClaims] = useState([
@@ -94,17 +95,26 @@ export default function ReportsPage() {
     setConfirmOpen(true)
   }
 
-  const confirmAction = () => {
+  const confirmAction = async () => {
     if (!pendingAction) return
-
-    if (pendingAction.source === 'claims') {
-      setClaims((prev) => prev.filter((c) => c.id !== pendingAction.id))
-    } else {
-      setReports((prev) => prev.filter((r) => r.id !== pendingAction.id))
+    try {
+      setActionLoading(true)
+      if (pendingAction.source === 'claims') {
+        setClaims((prev) => prev.filter((c) => c.id !== pendingAction.id))
+        setNotification({ type: 'success', message: pendingAction.type === 'cancel' ? 'Claim cancelled.' : 'Claim history deleted.' })
+      } else {
+        const res = await fetch(`http://localhost:8080/api/reports/${pendingAction.id}`, { method: 'DELETE' })
+        if (!res.ok) throw new Error('Failed to process action')
+        setReports((prev) => prev.filter((r) => r.id !== pendingAction.id))
+        setNotification({ type: 'success', message: pendingAction.type === 'cancel' ? 'Report cancelled.' : 'Report history deleted.' })
+      }
+    } catch {
+      setNotification({ type: 'error', message: 'Action failed. Please try again.' })
+    } finally {
+      setActionLoading(false)
+      setConfirmOpen(false)
+      setPendingAction(null)
     }
-    
-    setConfirmOpen(false)
-    setPendingAction(null)
   }
 
   return (
@@ -225,6 +235,7 @@ export default function ReportsPage() {
                             className={`${styles['action-btn']} ${styles['btn-cancel']}`}
                             onClick={() => handleRemoveItem(item.id, item.status, activeTab === 'claims' ? 'claims' : 'reports')}
                             title={activeTab === 'claims' ? "Cancel Claim" : "Cancel Report"}
+                            disabled={actionLoading}
                           >
                             <XCircle size={16} /> Cancel
                           </button>
@@ -233,6 +244,7 @@ export default function ReportsPage() {
                             className={`${styles['action-btn']} ${styles['btn-delete']}`}
                             onClick={() => handleRemoveItem(item.id, item.status, activeTab === 'claims' ? 'claims' : 'reports')}
                             title="Delete History"
+                            disabled={actionLoading}
                           >
                             <Trash2 size={16} /> Delete
                           </button>
