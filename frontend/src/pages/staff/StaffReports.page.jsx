@@ -814,27 +814,36 @@ export default function StaffReportsPage() {
                                     {/* Description */}
                                     <div className={styles['info-group']}>
                                         <h4 className={styles['info-heading']}>Description</h4>
-                                        <p className={styles['desc-text']}>{selectedReport.description}</p>
+                                        <div className={styles['desc-container']}>
+                                            <p className={styles['desc-text']}>
+                                                {selectedReport.description?.split('|')[0]?.trim() || 'No description provided'}
+                                            </p>
+                                        </div>
                                     </div>
 
-                                    {/* Unique Detail (Staff Only) */}
-                                    {selectedReport.uniqueDetail && (
-                                        <div className={`${styles['info-group']} ${styles['highlight']}`}>
-                                            <h4 className={styles['info-heading']}>Hidden Detail (Staff Only)</h4>
-                                            <p className={styles['desc-text']}>{selectedReport.uniqueDetail}</p>
+                                    {/* Unique Detail - Second Part */}
+                                    <div className={styles['info-group']}>
+                                        <h4 className={styles['info-heading']}>
+                                            Unique Identifying Detail
+                                        </h4>
+                                        <div className={styles['unique-detail-container']}>
+                                            <div className={styles['unique-detail-text']}>
+                                                {selectedReport.description?.split('|')[1]?.trim() || 'No unique detail provided'}
+                                            </div>
                                         </div>
-                                    )}
+                                    </div>
                                 </div>
                             </div>
 
+                            {/* Modal Footer - Action Buttons */}
                             {/* Modal Footer - Action Buttons */}
                             <div className={styles['review-footer']}>
                                 {/* Claims Info (for published found items) */}
                                 {selectedReport.status === 'Published' && selectedReport.claimsCount > 0 ? (
                                     <div className={styles['footer-left']}>
-                    <span className={styles['claims-alert']}>
-                      {selectedReport.claimsCount} Potential Claim{selectedReport.claimsCount > 1 ? 's' : ''}
-                    </span>
+      <span className={styles['claims-alert']}>
+        {selectedReport.claimsCount} Potential Claim{selectedReport.claimsCount > 1 ? 's' : ''}
+      </span>
                                         <button className={styles['btn-link']} onClick={handleViewClaims}>
                                             View Claims <ExternalLink size={14}/>
                                         </button>
@@ -865,14 +874,22 @@ export default function StaffReportsPage() {
                                         </>
                                     )}
 
-                                    {/* Approved Status Actions */}
+                                    {/* Approved Status Actions - WITH REJECT BUTTON ADDED */}
                                     {selectedReport.status === 'Approved' && (
-                                        <button
-                                            className={styles['btn-action-primary']}
-                                            onClick={() => applyStatus('published')}
-                                        >
-                                            Publish
-                                        </button>
+                                        <>
+                                            <button
+                                                className={styles['btn-text-danger']}
+                                                onClick={() => applyStatus('rejected')}
+                                            >
+                                                Reject
+                                            </button>
+                                            <button
+                                                className={styles['btn-action-primary']}
+                                                onClick={() => applyStatus('published')}
+                                            >
+                                                Publish
+                                            </button>
+                                        </>
                                     )}
 
                                     {/* Published Status Actions */}
@@ -1114,27 +1131,42 @@ export default function StaffReportsPage() {
                                 <div>
                                     <h4 className={styles['form-section-title']}>Details</h4>
 
+                                    {/* Public Description */}
                                     <div className={styles['input-wrap']} style={{marginBottom: '1rem'}}>
-                                        <label>Description</label>
+                                        <label>Public Description *</label>
                                         <textarea
                                             className={styles['textarea']}
-                                            placeholder="Color, brand, distinguishing marks..."
+                                            placeholder="Visible to public. Describe the item: color, brand, size, condition, distinguishing marks..."
                                             value={form.description}
                                             onChange={e => setForm({...form, description: e.target.value})}
+                                            rows={4}
                                         />
+                                        <small className={styles['help-text']}>
+                                            This description will be visible to all users on the public listings.
+                                        </small>
                                     </div>
 
+                                    {/* Hidden Unique Detail */}
                                     <div className={styles['input-wrap']}>
-                                        <label style={{color: 'var(--amber-600)'}}>
-                                            Unique Identifying Detail (Internal)
+                                        <label style={{color: 'var(--amber-600)', fontWeight: '600'}}>
+                                            <Camera size={14} style={{marginRight: '6px', verticalAlign: 'middle'}} />
+                                            Unique Identifying Detail (Staff Only)
                                         </label>
                                         <textarea
                                             className={styles['textarea']}
-                                            style={{borderColor: 'var(--amber-400)'}}
-                                            placeholder="Serial number, hidden scratch (Staff Only)"
+                                            style={{
+                                                borderColor: 'var(--amber-400)',
+                                                backgroundColor: 'var(--amber-50)',
+                                                fontFamily: 'monospace'
+                                            }}
+                                            placeholder="For verification purposes only. Example: 'Serial number: XYZ123', 'Hidden scratch on back', 'Inside pocket label reads...'"
                                             value={form.uniqueDetail}
                                             onChange={e => setForm({...form, uniqueDetail: e.target.value})}
+                                            rows={3}
                                         />
+                                        <small className={styles['help-text']} style={{color: 'var(--amber-600)'}}>
+                                            Hidden from public view. Used to verify legitimate claims. Include specific, verifiable details.
+                                        </small>
                                     </div>
                                 </div>
 
