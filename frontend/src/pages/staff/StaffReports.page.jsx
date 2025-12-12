@@ -163,6 +163,45 @@ export default function StaffReportsPage() {
         fetchUserInfo()
     }, [selectedReport])
 
+    // Alternative: Fetch claims for each published found item
+    const loadClaimsForReport = useCallback(async (reportId) => {
+        try {
+            const res = await fetch(`${API_BASE_URL}/api/claims/staff/items/${reportId}`, {
+                credentials: 'include'
+            })
+            if (res.ok) {
+                const data = await res.json()
+                return Array.isArray(data) ? data.length : 0
+            }
+            return 0
+        } catch {
+            return 0
+        }
+    }, [])
+
+// Update the useEffect to load claims count
+    useEffect(() => {
+        const loadReportsWithClaims = async () => {
+            await loadReports()
+
+            // For published found items, load claims count
+            const publishedFoundItems = reports.filter(r =>
+                r.status === 'Published' && r.type === 'found'
+            )
+
+            for (const report of publishedFoundItems) {
+                const claimsCount = await loadClaimsForReport(report.id)
+                if (claimsCount > 0) {
+                    setReports(prev => prev.map(r =>
+                        r.id === report.id ? { ...r, claimsCount } : r
+                    ))
+                }
+            }
+        }
+
+        loadReportsWithClaims()
+    }, [loadReports, loadClaimsForReport])
+
     // Filter reports based on tab, type, and search query
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase()

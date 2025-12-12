@@ -395,7 +395,7 @@ export default function ClaimRequestPage() {
                     <section className={styles['right']}>
                         <form onSubmit={onSubmit} className={styles['form']}>
                             <div className={styles['group']}>
-                                <label className={styles['label']}>Note (Optional)</label>
+                                <label className={styles['label']}>Note)</label>
                                 <textarea
                                     className={styles['input']}
                                     placeholder="Explain why this item belongs to you."
@@ -407,7 +407,7 @@ export default function ClaimRequestPage() {
                             </div>
 
                             <div className={styles['group']}>
-                                <label className={styles['label']}>Unique Identifying Detail *</label>
+                                <label className={styles['label']}>Unique Identifying Detail</label>
                                 <input
                                     className={styles['input']}
                                     placeholder="Enter Your Detail"
