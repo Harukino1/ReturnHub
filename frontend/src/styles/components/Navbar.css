@@ -146,3 +146,76 @@
   border-radius: 50%;
   border: 2px solid var(--white);
 }
+.notif-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: #ef4444;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9px;
+    padding: 0 5px;
+    border: 2px solid var(--white);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    z-index: 1;
+}
+
+/* Unread Notification Dot (simple indicator) */
+.notif-dot {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 10px;
+    height: 10px;
+    background: var(--amber-600);
+    border-radius: 50%;
+    border: 2px solid var(--white);
+    z-index: 1;
+}
+
+/* Dark Mode Badge Styles */
+[data-theme='dark'] .notif-badge {
+    background: #fbbf24;
+    color: #0b0e14;
+    border-color: #0b0e14;
+}
+
+[data-theme='dark'] .notif-dot {
+    background: #fbbf24;
+    border-color: #0b0e14;
+}
+
+/* Badge Animation (pulse effect for new notifications) */
+@keyframes pulse-badge {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.notif-badge.new {
+    animation: pulse-badge 1s ease-in-out 3;
+}
+
+/* Hover effect for bell with badge */
+.nav-icon-btn:has(.notif-badge):hover .notif-badge {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+}
+
+/* Ensure badge doesn't interfere with click area */
+.nav-icon-btn {
+    position: relative;
+    isolation: isolate;
+}
