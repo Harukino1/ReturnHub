@@ -3,7 +3,12 @@ package com.example.appdev.returnhub.controller;
 import com.example.appdev.returnhub.dto.ClaimRequestDTO;
 import com.example.appdev.returnhub.dto.ClaimResponseDTO;
 import com.example.appdev.returnhub.dto.ClaimStatusUpdateDTO;
+import com.example.appdev.returnhub.entity.Claim;
+import com.example.appdev.returnhub.repositor.ClaimRepository;
 import com.example.appdev.returnhub.service.ClaimService;
+import com.example.appdev.returnhub.entity.SubmittedReport;
+import com.example.appdev.returnhub.entity.User;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/claims")
@@ -19,6 +25,9 @@ import java.util.Map;
 public class ClaimController {
     @Autowired
     private ClaimService claimService;
+
+    @Autowired
+    ClaimRepository claimRepository;
 
     // ==================== USER ENDPOINTS ====================
 
@@ -195,6 +204,89 @@ public class ClaimController {
             Map<String, Object> error = new HashMap<>();
             error.put("success", false);
             error.put("message", "Error fetching item claims: " + e.getMessage());
+            return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // In ClaimController.java
+    @GetMapping("/staff/with-details")
+    public ResponseEntity<?> getAllClaimsWithDetails(
+            @RequestParam(required = false) String status) {
+        try {
+            List<Claim> claims;
+            if (status != null && !status.isEmpty()) {
+                claims = claimRepository.findByStatus(status);
+            } else {
+                claims = claimRepository.findAll();
+            }
+
+            List<Map<String, Object>> response = claims.stream().map(claim -> {
+                Map<String, Object> claimWithDetails = new HashMap<>();
+
+                // Basic claim info
+                claimWithDetails.put("claimId", claim.getClaimId());
+                claimWithDetails.put("status", claim.getStatus());
+                claimWithDetails.put("dateSubmitted", claim.getDateSubmitted());
+                claimWithDetails.put("proofDocumentUrl", claim.getProofDocumentUrl());
+
+                // Item info
+                if (claim.getLostItem() != null) {
+                    claimWithDetails.put("lostItemId", claim.getLostItem().getItemId());
+                    claimWithDetails.put("foundItemId", null);
+                    claimWithDetails.put("itemType", "lost");
+
+                    // Add item details from report
+                    if (claim.getLostItem().getSubmittedReport() != null) {
+                        SubmittedReport report = claim.getLostItem().getSubmittedReport();
+                        claimWithDetails.put("itemName", report.getItemName());
+                        claimWithDetails.put("category", report.getCategory());
+                        claimWithDetails.put("description", report.getDescription());
+                        claimWithDetails.put("location", report.getLocation());
+                        claimWithDetails.put("photoUrl", report.getPhotoUrl1() != null ? report.getPhotoUrl1() :
+                                (report.getPhotoUrl2() != null ? report.getPhotoUrl2() : report.getPhotoUrl3()));
+                        claimWithDetails.put("dateOfEvent", report.getDateOfEvent());
+                    }
+                } else if (claim.getFoundItem() != null) {
+                    claimWithDetails.put("foundItemId", claim.getFoundItem().getItemId());
+                    claimWithDetails.put("lostItemId", null);
+                    claimWithDetails.put("itemType", "found");
+
+                    // Add item details from report
+                    if (claim.getFoundItem().getSubmittedReport() != null) {
+                        SubmittedReport report = claim.getFoundItem().getSubmittedReport();
+                        claimWithDetails.put("itemName", report.getItemName());
+                        claimWithDetails.put("category", report.getCategory());
+                        claimWithDetails.put("description", report.getDescription());
+                        claimWithDetails.put("location", report.getLocation());
+                        claimWithDetails.put("photoUrl", report.getPhotoUrl1() != null ? report.getPhotoUrl1() :
+                                (report.getPhotoUrl2() != null ? report.getPhotoUrl2() : report.getPhotoUrl3()));
+                        claimWithDetails.put("dateOfEvent", report.getDateOfEvent());
+                    }
+                }
+
+                // User info
+                if (claim.getClaimantUser() != null) {
+                    User user = claim.getClaimantUser();
+                    claimWithDetails.put("claimantUserId", user.getUserId());
+                    claimWithDetails.put("claimantUserName", user.getName());
+                    claimWithDetails.put("claimantUserEmail", user.getEmail());
+                    claimWithDetails.put("claimantUserPhone", user.getPhone());
+                }
+
+                // Staff info if verified
+                if (claim.getVerifiedByStaff() != null) {
+                    claimWithDetails.put("verifiedByStaffId", claim.getVerifiedByStaff().getStaffId());
+                    claimWithDetails.put("verifiedByStaffName", claim.getVerifiedByStaff().getName());
+                }
+
+                return claimWithDetails;
+            }).collect(Collectors.toList());
+
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("message", "Error fetching claims with details: " + e.getMessage());
             return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

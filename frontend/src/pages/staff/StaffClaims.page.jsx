@@ -55,9 +55,9 @@ export default function StaffClaimsPage() {
         return {
             id: dto.claimId,
             dateSubmitted: dto.claimDate || dto.createdAt,
-            status: (dto.status || 'pending').toLowerCase(),
             proofDocumentUrl: dto.proofDocumentUrl || dto.proofPhotoUrl || '',
             claimantNote: dto.claimantNote || dto.uniqueDetail || '',
+            status: dto.status || 'pending',  // ← ADD THIS LINE
             claimantUser: {
                 userId: dto.userId || dto.claimantUserId,
                 name: dto.userName || dto.claimantName || 'Unknown User',
@@ -85,7 +85,8 @@ export default function StaffClaimsPage() {
         setError('')
 
         try {
-            const res = await fetch(`${API_BASE_CLAIMS}/staff`, {
+            // Use the new endpoint
+            const res = await fetch(`${API_BASE_CLAIMS}/staff/with-details`, {
                 credentials: 'include'
             })
 

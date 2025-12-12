@@ -56,25 +56,38 @@ export default function StaffDashboardPage({ onNavigate }) {
 
                 // Fetch all required data in parallel
                 const [claimsRes, reportsRes, statsRes] = await Promise.all([
-                    // Get all claims (we'll filter pending on frontend)
-                    fetch(`${API_BASE_URL}/api/claims/staff`, {
+                    // Use the enhanced claims endpoint with details
+                    fetch(`${API_BASE_URL}/api/claims/staff/with-details`, {
                         credentials: 'include'
-                    }),
-                    // Get all reports
+                    }).catch(() => ({ ok: false })), // Fallback if endpoint doesn't exist
+
+                    // Get all reports (or use enhanced endpoint if available)
                     fetch(`${API_BASE_URL}/api/reports`, {
                         credentials: 'include'
                     }),
+
                     // Get dashboard stats
                     fetch(`${API_BASE_URL}/api/staff/dashboard/stats`, {
                         credentials: 'include'
                     }).catch(() => null) // Optional endpoint
                 ])
 
-                if (!claimsRes.ok || !reportsRes.ok) {
-                    throw new Error('Failed to fetch dashboard data')
+                // Check if enhanced claims endpoint exists, fallback to regular
+                let claimsData = []
+                if (claimsRes.ok) {
+                    claimsData = await claimsRes.json()
+                } else {
+                    // Fallback to regular endpoint
+                    const fallbackRes = await fetch(`${API_BASE_URL}/api/claims/staff`, {
+                        credentials: 'include'
+                    })
+                    if (fallbackRes.ok) {
+                        const fallbackData = await fallbackRes.json()
+                        // If we only get IDs, we need to fetch user details separately
+                        claimsData = fallbackData
+                    }
                 }
 
-                const claimsData = await claimsRes.json()
                 const reportsData = await reportsRes.json()
 
                 // Parse stats if available
@@ -85,31 +98,53 @@ export default function StaffDashboardPage({ onNavigate }) {
                 }
 
                 if (!cancelled) {
-                    // Normalize claims data
+                    // Normalize claims data - handle both enhanced and regular endpoints
                     const normalizedClaims = Array.isArray(claimsData)
-                        ? claimsData.map(claim => ({
-                            id: claim.claimId,
-                            itemTitle: claim.itemName || claim.itemTitle || 'Unknown Item',
-                            claimant: claim.userName || claim.claimantName || 'Unknown User',
-                            dateSubmitted: formatDate(claim.createdAt || claim.claimDate),
-                            status: claim.status || 'pending',
-                            photoUrl: claim.photoUrl || claim.itemPhotoUrl || ''
-                        }))
+                        ? claimsData.map(claim => {
+                            // Check if it's enhanced format (has claimantUserName)
+                            if (claim.claimantUserName) {
+                                return {
+                                    id: claim.claimId || claim.id,
+                                    itemTitle: claim.itemName || claim.itemTitle || 'Unknown Item',
+                                    claimant: claim.claimantUserName || 'Unknown User',
+                                    dateSubmitted: formatDate(claim.dateSubmitted || claim.createdAt || claim.claimDate),
+                                    status: claim.status || 'pending',
+                                    photoUrl: claim.photoUrl || claim.itemPhotoUrl || ''
+                                }
+                            } else {
+                                // Regular format - fetch user details separately
+                                return {
+                                    id: claim.claimId || claim.id,
+                                    itemTitle: 'Unknown Item', // Will be updated later
+                                    claimant: 'Loading...', // Placeholder
+                                    dateSubmitted: formatDate(claim.createdAt || claim.claimDate),
+                                    status: claim.status || 'pending',
+                                    photoUrl: '',
+                                    claimantUserId: claim.claimantUserId // Save for later fetching
+                                }
+                            }
+                        })
                         : []
 
                     // Normalize reports data
                     const normalizedReports = Array.isArray(reportsData)
                         ? reportsData.map(report => ({
-                            id: report.reportId,
+                            id: report.reportId || report.id,
                             title: report.itemName || report.title || 'Unknown Item',
                             type: report.type || 'lost',
                             category: report.category || 'N/A',
-                            reporter: report.userName || report.reporterName || 'Unknown User',
-                            dateSubmitted: formatDate(report.createdAt || report.submittedDate),
+                            reporter: report.submitterUserName || report.reporterName || 'Unknown User',
+                            dateSubmitted: formatDate(report.dateSubmitted || report.createdAt || report.submittedDate),
                             status: report.status || 'pending',
-                            photoUrl: report.photoUrl || ''
+                            photoUrl: report.photoUrl1 || report.photoUrl || ''
                         }))
                         : []
+
+                    // If we have claims without user names, fetch user details in batch
+                    const claimsWithoutUserNames = normalizedClaims.filter(c => !c.claimant || c.claimant === 'Loading...')
+                    if (claimsWithoutUserNames.length > 0) {
+                        await fetchUserDetailsForClaims(claimsWithoutUserNames, normalizedClaims)
+                    }
 
                     setRecentClaims(normalizedClaims)
                     setRecentReports(normalizedReports)
@@ -159,6 +194,48 @@ export default function StaffDashboardPage({ onNavigate }) {
             case 'rejected': return 'rejected'
             case 'completed': return 'resolved'
             default: return 'pending'
+        }
+    }
+
+    const fetchUserDetailsForClaims = async (claimsToUpdate, allClaims) => {
+        try {
+            // Create a set of unique user IDs to fetch
+            const userIds = [...new Set(claimsToUpdate
+                .filter(c => c.claimantUserId)
+                .map(c => c.claimantUserId)
+            )]
+
+            // Fetch user details in parallel
+            const userPromises = userIds.map(userId =>
+                fetch(`${API_BASE_URL}/api/users/${userId}`)
+                    .then(res => res.ok ? res.json() : null)
+                    .catch(() => null)
+            )
+
+            const userResults = await Promise.all(userPromises)
+
+            // Create a map of userId -> user details
+            const userMap = {}
+            userResults.forEach((user, index) => {
+                if (user) {
+                    userMap[userIds[index]] = user
+                }
+            })
+
+            // Update claims with user names
+            const updatedClaims = allClaims.map(claim => {
+                if (claim.claimantUserId && userMap[claim.claimantUserId]) {
+                    return {
+                        ...claim,
+                        claimant: userMap[claim.claimantUserId].name || 'Unknown User'
+                    }
+                }
+                return claim
+            })
+
+            setRecentClaims(updatedClaims)
+        } catch (err) {
+            console.error('Error fetching user details:', err)
         }
     }
 
