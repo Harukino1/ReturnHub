@@ -175,11 +175,19 @@ export default function Dashboard() {
         }
     }
 
-    // Handle claim button click
+    // Handle claim button click (Found items)
     const handleClaimClick = (e, item) => {
         e.stopPropagation() // Prevent card click event
         sessionStorage.setItem('claimItem', JSON.stringify(item))
         window.location.hash = '#/claim-request'
+    }
+
+    // Handle message button click (Lost items)
+    const handleMessageClick = (e, item) => {
+        e.stopPropagation() // Prevent card click event
+        // Store item context in case the message page can pre-fill information
+        sessionStorage.setItem('messageItem', JSON.stringify(item))
+        window.location.hash = '#/messages'
     }
 
     return (
@@ -321,7 +329,7 @@ export default function Dashboard() {
                                                     📅 {item.date}
                                                 </p>
 
-                                                {/* Claim button for found items only */}
+                                                {/* Claim button for found items */}
                                                 {item.type === 'found' && (
                                                     <button
                                                         type="button"
@@ -330,6 +338,18 @@ export default function Dashboard() {
                                                         onClick={(e) => handleClaimClick(e, item)}
                                                     >
                                                         Request Claim
+                                                    </button>
+                                                )}
+
+                                                {/* Message button for lost items */}
+                                                {item.type === 'lost' && (
+                                                    <button
+                                                        type="button"
+                                                        className={styles['message-btn']}
+                                                        aria-label="Message Return|Hub"
+                                                        onClick={(e) => handleMessageClick(e, item)}
+                                                    >
+                                                        Message Return|Hub
                                                     </button>
                                                 )}
                                             </div>
