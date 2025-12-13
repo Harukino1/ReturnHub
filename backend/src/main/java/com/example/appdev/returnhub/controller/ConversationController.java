@@ -34,8 +34,8 @@ public class ConversationController {
 
     // ==================== REST ENDPOINTS ====================
 
-//    GET /api/conversations/user/{userId}
-//    Get all conversations for a user
+    // GET /api/conversations/user/{userId}
+    // Get all conversations for a user
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<?> getUserConversations(@PathVariable int userId) {
@@ -47,9 +47,8 @@ public class ConversationController {
         }
     }
 
-
-//    GET /api/conversations/staff/{staffId}
-//    Get all conversations for a staff member
+    // GET /api/conversations/staff/{staffId}
+    // Get all conversations for a staff member
 
     @GetMapping("/staff/{staffId}")
     public ResponseEntity<?> getStaffConversations(@PathVariable int staffId) {
@@ -61,8 +60,8 @@ public class ConversationController {
         }
     }
 
-//    GET /api/conversations/{conversationId}
-//    Get specific conversation by ID
+    // GET /api/conversations/{conversationId}
+    // Get specific conversation by ID
 
     @GetMapping("/{conversationId}")
     public ResponseEntity<?> getConversation(@PathVariable int conversationId) {
@@ -76,8 +75,8 @@ public class ConversationController {
         }
     }
 
-//    POST /api/conversations
-//    Create or get existing conversation between user and staff
+    // POST /api/conversations
+    // Create or get existing conversation between user and staff
 
     @PostMapping
     public ResponseEntity<?> createOrGetConversation(@RequestBody Map<String, Integer> request) {
@@ -85,11 +84,13 @@ public class ConversationController {
             Integer userId = request.get("userId");
             Integer staffId = request.get("staffId");
 
-            if (userId == null || staffId == null) {
-                return createErrorResponse("Both userId and staffId are required", HttpStatus.BAD_REQUEST);
+            if (userId == null) {
+                return createErrorResponse("userId is required", HttpStatus.BAD_REQUEST);
             }
 
-            ConversationDTO conversation = conversationService.getOrCreateConversation(userId, staffId);
+            ConversationDTO conversation = (staffId == null)
+                    ? conversationService.getOrCreateConversationAuto(userId)
+                    : conversationService.getOrCreateConversation(userId, staffId);
             return ResponseEntity.ok(conversation);
         } catch (RuntimeException e) {
             return createErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -98,9 +99,8 @@ public class ConversationController {
         }
     }
 
-
-//    GET /api/conversations/{conversationId}/messages
-//    Get all messages in a conversation
+    // GET /api/conversations/{conversationId}/messages
+    // Get all messages in a conversation
 
     @GetMapping("/{conversationId}/messages")
     public ResponseEntity<?> getConversationMessages(@PathVariable int conversationId) {
@@ -112,8 +112,8 @@ public class ConversationController {
         }
     }
 
-//    GET /api/conversations/{conversationId}/recent
-//    Get recent messages with pagination
+    // GET /api/conversations/{conversationId}/recent
+    // Get recent messages with pagination
 
     @GetMapping("/{conversationId}/recent")
     public ResponseEntity<?> getRecentMessages(
@@ -127,9 +127,8 @@ public class ConversationController {
         }
     }
 
-
-//    POST /api/conversations/{conversationId}/messages
-//    Send a message in a conversation (REST endpoint as fallback)
+    // POST /api/conversations/{conversationId}/messages
+    // Send a message in a conversation (REST endpoint as fallback)
 
     @PostMapping("/{conversationId}/messages")
     public ResponseEntity<?> sendMessage(
@@ -145,6 +144,10 @@ public class ConversationController {
             }
 
             MessageDTO message = conversationService.sendMessage(conversationId, senderId, senderType, content);
+
+            // Broadcast to conversation topic for real-time updates
+            messagingTemplate.convertAndSend("/topic/conversation/" + conversationId, message);
+
             return ResponseEntity.ok(message);
         } catch (RuntimeException e) {
             return createErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -153,8 +156,8 @@ public class ConversationController {
         }
     }
 
-//    PUT /api/conversations/{conversationId}/read
-//    Mark messages as read in a conversation
+    // PUT /api/conversations/{conversationId}/read
+    // Mark messages as read in a conversation
 
     @PutMapping("/{conversationId}/read")
     public ResponseEntity<?> markMessagesAsRead(
@@ -175,8 +178,8 @@ public class ConversationController {
         }
     }
 
-//    GET /api/conversations/{conversationId}/unread-count
-//    Get unread message count for a user in conversation
+    // GET /api/conversations/{conversationId}/unread-count
+    // Get unread message count for a user in conversation
 
     @GetMapping("/{conversationId}/unread-count")
     public ResponseEntity<?> getUnreadCount(
@@ -198,11 +201,10 @@ public class ConversationController {
 
     // ==================== WEB SOCKET ENDPOINTS ====================
 
-//    WebSocket endpoint for sending messages
-//    MessageMapping: /app/chat.sendMessage
+    // WebSocket endpoint for sending messages
+    // MessageMapping: /app/chat.sendMessage
 
     @MessageMapping("/chat.sendMessage")
-    @SendTo("/topic/conversation/{conversationId}")
     public MessageDTO sendMessageViaWebSocket(@Payload Map<String, Object> payload) {
         try {
             Integer conversationId = (Integer) payload.get("conversationId");
@@ -216,10 +218,13 @@ public class ConversationController {
 
             MessageDTO message = conversationService.sendMessage(conversationId, senderId, senderType, content);
 
+            // Broadcast to conversation topic for all participants
+            messagingTemplate.convertAndSend("/topic/conversation/" + conversationId, message);
+
             String destination = "/user/" +
-                    ("USER".equals(senderType) ?
-                            conversationService.getConversation(conversationId).getStaffId() :
-                            conversationService.getConversation(conversationId).getUserId()) +
+                    ("USER".equals(senderType) ? conversationService.getConversation(conversationId).getStaffId()
+                            : conversationService.getConversation(conversationId).getUserId())
+                    +
                     "/queue/messages";
 
             messagingTemplate.convertAndSend(destination, message);

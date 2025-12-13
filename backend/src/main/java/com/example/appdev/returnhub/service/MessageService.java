@@ -38,7 +38,7 @@ public class MessageService {
 
     // ==================== MESSAGE MANAGEMENT ====================
 
-//    Send a new message in a conversation
+    // Send a new message in a conversation
 
     @Transactional
     public MessageDTO sendMessage(int conversationId, Integer senderUserId, Integer senderStaffId, String content) {
@@ -68,28 +68,24 @@ public class MessageService {
             User user = userRepository.findById(senderUserId)
                     .orElseThrow(() -> new RuntimeException("User not found with id: " + senderUserId));
             message.setSenderUser(user);
-            message.setSenderStaff(null);
 
             // Send notification to staff
             notificationService.createNewMessageNotification(
                     conversation.getStaff().getStaffId(),
                     conversationId,
-                    user.getName()
-            );
+                    user.getName());
 
         } else if (senderStaffId != null) {
             // Message from staff
             Staff staff = staffRepository.findById(senderStaffId)
                     .orElseThrow(() -> new RuntimeException("Staff not found with id: " + senderStaffId));
             message.setSenderStaff(staff);
-            message.setSenderUser(null);
 
             // Send notification to user
             notificationService.createNewMessageNotification(
                     conversation.getUser().getUserId(),
                     conversationId,
-                    staff.getName()
-            );
+                    staff.getName());
 
         } else {
             throw new RuntimeException("Either senderUserId or senderStaffId must be provided");
@@ -102,7 +98,7 @@ public class MessageService {
         return convertToDTO(savedMessage);
     }
 
-//    Get all messages in a conversation
+    // Get all messages in a conversation
 
     public List<MessageDTO> getMessagesByConversationId(int conversationId) {
         List<Message> messages = messageRepository.findByConversation_ConversationIdOrderByCreatedAtAsc(conversationId);
@@ -111,7 +107,7 @@ public class MessageService {
                 .collect(Collectors.toList());
     }
 
-//    Get specific message by ID
+    // Get specific message by ID
 
     public MessageDTO getMessageById(int messageId) {
         Message message = messageRepository.findById(messageId)
@@ -119,7 +115,7 @@ public class MessageService {
         return convertToDTO(message);
     }
 
-//    Mark a message as read
+    // Mark a message as read
 
     @Transactional
     public void markAsRead(int messageId) {
@@ -130,7 +126,7 @@ public class MessageService {
         messageRepository.save(message);
     }
 
-//    Mark all messages in a conversation as read for a specific user/staff
+    // Mark all messages in a conversation as read for a specific user/staff
 
     @Transactional
     public void markAllAsRead(int conversationId, Integer userId, Integer staffId) {
@@ -149,8 +145,7 @@ public class MessageService {
         }
     }
 
-
-//    Get unread message count for a conversation
+    // Get unread message count for a conversation
 
     public long getUnreadCount(int conversationId, Integer userId, Integer staffId) {
         if (userId != null && staffId != null) {
@@ -166,7 +161,7 @@ public class MessageService {
         }
     }
 
-//    Delete a message (soft delete - just sets content to "[Deleted]")
+    // Delete a message (soft delete - just sets content to "[Deleted]")
 
     @Transactional
     public void deleteMessage(int messageId) {
@@ -178,10 +173,13 @@ public class MessageService {
         messageRepository.save(message);
     }
 
-//    Get recent messages with limit
+    // Get recent messages with limit
 
     public List<MessageDTO> getRecentMessages(int conversationId, int limit) {
-        List<Message> messages = messageRepository.findTopNByConversation_ConversationIdOrderByCreatedAtDesc(conversationId, limit);
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(0,
+                Math.max(1, limit));
+        List<Message> messages = messageRepository.findByConversation_ConversationIdOrderByCreatedAtDesc(conversationId,
+                pageable);
         return messages.stream()
                 .map(this::convertToDTO)
                 .sorted((m1, m2) -> m1.getCreatedAt().compareTo(m2.getCreatedAt()))
@@ -190,8 +188,7 @@ public class MessageService {
 
     // ==================== HELPER METHODS ====================
 
-
-//    Convert Message entity to MessageDTO
+    // Convert Message entity to MessageDTO
 
     private MessageDTO convertToDTO(Message message) {
         MessageDTO dto = new MessageDTO();
@@ -218,14 +215,14 @@ public class MessageService {
         return dto;
     }
 
-//    Format time for display
+    // Format time for display
 
     private String formatTime(LocalDateTime time) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
         return time.format(formatter);
     }
 
-//    Check if user can access message
+    // Check if user can access message
 
     public boolean canAccessMessage(int messageId, int userId, String userType) {
         try {
