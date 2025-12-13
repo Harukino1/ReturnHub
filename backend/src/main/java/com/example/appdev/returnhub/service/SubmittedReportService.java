@@ -199,12 +199,26 @@ public class SubmittedReportService {
         return convertToResponseDTO(updatedReport);
     }
 
-    // Delete report
+    // Delete report - FIXED: Handles constraint violations by deleting children first
     @Transactional
     public void deleteReport(int reportId) {
         if (!submittedReportRepository.existsById(reportId)) {
             throw new RuntimeException("Report not found with id: " + reportId);
         }
+
+        // 1. Delete associated LostItem if it exists
+        LostItem lostItem = lostItemRepository.findBySubmittedReport_ReportId(reportId);
+        if (lostItem != null) {
+            lostItemRepository.delete(lostItem);
+        }
+
+        // 2. Delete associated FoundItem if it exists
+        FoundItem foundItem = foundItemRepository.findBySubmittedReport_ReportId(reportId);
+        if (foundItem != null) {
+            foundItemRepository.delete(foundItem);
+        }
+
+        // 3. Finally delete the report
         submittedReportRepository.deleteById(reportId);
     }
 
