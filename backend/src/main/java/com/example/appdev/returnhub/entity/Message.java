@@ -28,11 +28,11 @@ public class Message{
     private Conversation conversation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_user_id")
+    @JoinColumn(name = "sender_user_id", nullable = true)
     private User senderUser;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender_staff_id")
+    @JoinColumn(name = "sender_staff_id", nullable = true)
     private Staff senderStaff;
 
     // Constructors

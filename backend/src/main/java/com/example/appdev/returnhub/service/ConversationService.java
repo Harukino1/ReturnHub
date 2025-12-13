@@ -36,7 +36,7 @@ public class ConversationService {
 
     // ==================== CONVERSATION MANAGEMENT ====================
 
-//    Create or get existing conversation between user and staff
+    // Create or get existing conversation between user and staff
 
     @Transactional
     public ConversationDTO getOrCreateConversation(int userId, int staffId) {
@@ -62,7 +62,21 @@ public class ConversationService {
         return convertToDTO(savedConversation);
     }
 
-//    Get all conversations for a user
+    // Auto-pick a staff and create/get conversation
+    @Transactional
+    public ConversationDTO getOrCreateConversationAuto(int userId) {
+        List<Staff> staffList = staffRepository.findAll();
+        if (staffList.isEmpty()) {
+            throw new RuntimeException("No staff available to assign for conversation");
+        }
+        Staff selected = staffList.stream()
+                .filter(s -> "STAFF".equalsIgnoreCase(s.getRole()))
+                .findFirst()
+                .orElse(staffList.get(0));
+        return getOrCreateConversation(userId, selected.getStaffId());
+    }
+
+    // Get all conversations for a user
 
     public List<ConversationDTO> getUserConversations(int userId) {
         List<Conversation> conversations = conversationRepository.findByUser_UserIdOrderByConversationIdDesc(userId);
@@ -71,7 +85,7 @@ public class ConversationService {
                 .collect(Collectors.toList());
     }
 
-//    Get all conversations for a staff member
+    // Get all conversations for a staff member
 
     public List<ConversationDTO> getStaffConversations(int staffId) {
         List<Conversation> conversations = conversationRepository.findByStaff_StaffIdOrderByConversationIdDesc(staffId);
@@ -80,7 +94,7 @@ public class ConversationService {
                 .collect(Collectors.toList());
     }
 
-//    Get specific conversation by ID
+    // Get specific conversation by ID
 
     public ConversationDTO getConversation(int conversationId) {
         Conversation conversation = conversationRepository.findById(conversationId)
@@ -90,8 +104,7 @@ public class ConversationService {
 
     // ==================== MESSAGE MANAGEMENT ====================
 
-
-//    Send message in a conversation
+    // Send message in a conversation
 
     @Transactional
     public MessageDTO sendMessage(int conversationId, int senderId, String senderType, String content) {
@@ -108,27 +121,23 @@ public class ConversationService {
             User user = userRepository.findById(senderId)
                     .orElseThrow(() -> new RuntimeException("User not found with id: " + senderId));
             message.setSenderUser(user);
-            message.setSenderStaff(null);
 
             // Send notification to staff
             notificationService.createNewMessageNotification(
                     conversation.getStaff().getStaffId(),
                     conversationId,
-                    user.getName()
-            );
+                    user.getName());
 
         } else if ("STAFF".equalsIgnoreCase(senderType)) {
             Staff staff = staffRepository.findById(senderId)
                     .orElseThrow(() -> new RuntimeException("Staff not found with id: " + senderId));
             message.setSenderStaff(staff);
-            message.setSenderUser(null);
 
             // Send notification to user
             notificationService.createNewMessageNotification(
                     conversation.getUser().getUserId(),
                     conversationId,
-                    staff.getName()
-            );
+                    staff.getName());
         } else {
             throw new RuntimeException("Invalid sender type. Must be USER or STAFF");
         }
@@ -137,7 +146,7 @@ public class ConversationService {
         return convertToMessageDTO(savedMessage);
     }
 
-//    Get all messages in a conversation
+    // Get all messages in a conversation
 
     public List<MessageDTO> getConversationMessages(int conversationId) {
         List<Message> messages = messageRepository.findByConversation_ConversationIdOrderByCreatedAtAsc(conversationId);
@@ -146,24 +155,27 @@ public class ConversationService {
                 .collect(Collectors.toList());
     }
 
-//    Get recent messages with pagination
+    // Get recent messages with pagination
 
     public List<MessageDTO> getRecentMessages(int conversationId, int limit) {
-        List<Message> messages = messageRepository.findTopNByConversation_ConversationIdOrderByCreatedAtDesc(conversationId, limit);
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(0,
+                Math.max(1, limit));
+        List<Message> messages = messageRepository.findByConversation_ConversationIdOrderByCreatedAtDesc(conversationId,
+                pageable);
         return messages.stream()
                 .map(this::convertToMessageDTO)
                 .sorted((m1, m2) -> m1.getCreatedAt().compareTo(m2.getCreatedAt()))
                 .collect(Collectors.toList());
     }
 
-//    Mark messages as read in a conversation
+    // Mark messages as read in a conversation
 
     @Transactional
     public void markMessagesAsRead(int conversationId, boolean isUser) {
         messageRepository.markMessagesAsRead(conversationId, isUser);
     }
 
-//    Get unread message count for a user in conversation
+    // Get unread message count for a user in conversation
 
     public long getUnreadCount(int conversationId, boolean isUser) {
         return messageRepository.countUnreadMessages(conversationId, isUser);
@@ -171,7 +183,7 @@ public class ConversationService {
 
     // ==================== HELPER METHODS ====================
 
-//    Convert Conversation entity to DTO
+    // Convert Conversation entity to DTO
 
     private ConversationDTO convertToDTO(Conversation conversation) {
         ConversationDTO dto = new ConversationDTO();
@@ -185,8 +197,7 @@ public class ConversationService {
 
         // Get last message
         List<Message> lastMessages = messageRepository.findTop1ByConversation_ConversationIdOrderByCreatedAtDesc(
-                conversation.getConversationId()
-        );
+                conversation.getConversationId());
 
         if (!lastMessages.isEmpty()) {
             Message lastMessage = lastMessages.get(0);
@@ -201,7 +212,7 @@ public class ConversationService {
         return dto;
     }
 
-//    Convert Message entity to DTO
+    // Convert Message entity to DTO
 
     private MessageDTO convertToMessageDTO(Message message) {
         MessageDTO dto = new MessageDTO();
@@ -227,14 +238,14 @@ public class ConversationService {
         return dto;
     }
 
-//    Format time for display
+    // Format time for display
 
     private String formatTime(LocalDateTime time) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm a");
         return time.format(formatter);
     }
 
-//    Check if user can access conversation
+    // Check if user can access conversation
 
     public boolean canAccessConversation(int conversationId, int userId, String userType) {
         try {

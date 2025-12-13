@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import com.example.appdev.returnhub.entity.Message;
 
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @Repository
@@ -16,11 +17,8 @@ public interface MessageRepository extends JpaRepository<Message, Integer> {
     // Find messages by conversation ID, ordered by creation time
     List<Message> findByConversation_ConversationIdOrderByCreatedAtAsc(int conversationId);
 
-    // Find recent messages with limit
-    @Query("SELECT m FROM Message m WHERE m.conversation.conversationId = :conversationId ORDER BY m.createdAt DESC")
-    List<Message> findTopNByConversation_ConversationIdOrderByCreatedAtDesc(
-            @Param("conversationId") int conversationId,
-            @Param("limit") int limit);
+    // Find recent messages with limit (Pageable)
+    List<Message> findByConversation_ConversationIdOrderByCreatedAtDesc(int conversationId, Pageable pageable);
 
     // Find last message in conversation
     @Query("SELECT m FROM Message m WHERE m.conversation.conversationId = :conversationId ORDER BY m.createdAt DESC")
